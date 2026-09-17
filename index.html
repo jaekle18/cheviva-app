@@ -154,6 +154,11 @@
   .pendiente { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--ph); }
   .pendiente .num { font-family: 'Archivo Black', sans-serif; font-size: 18px; min-width: 32px; color: var(--seal); }
   nav.barra { position: fixed; left: 0; right: 0; bottom: 0; background: var(--white); border-top: 1px solid var(--kraft); display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 6; }
+  /* 16 Sep, his screenshot: on the home screen the bar sat under the iPhone's home line. The page does not run under it, so
+     env(safe-area-inset-bottom) stays 0 there; a fixed lift keeps the labels clear. */
+  html.standalone nav.barra { padding-bottom: max(env(safe-area-inset-bottom), 26px); }
+  html.standalone body { padding-bottom: calc(98px + env(safe-area-inset-bottom)); }
+  html.standalone .toast { bottom: calc(110px + env(safe-area-inset-bottom)); }
   nav.barra button { flex: 1; background: none; border: 0; padding: 9px 2px 8px; font: 600 11px 'Archivo', sans-serif; color: var(--muted); letter-spacing: .02em; }
   nav.barra button .ic { display: block; font-size: 20px; line-height: 1.1; margin-bottom: 2px; }
   nav.barra button.on { color: var(--seal); }
@@ -182,6 +187,7 @@
 </style>
 </head>
 <body>
+<script>if (window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)) document.documentElement.classList.add('standalone');</script>
 <header class="top">
   <div class="sello">채</div>
   <div class="marca">CHEVIVA</div>
