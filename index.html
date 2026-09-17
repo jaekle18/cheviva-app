@@ -328,7 +328,8 @@
   <section id="p-registro" class="pantalla" hidden>
     <h2>Venta</h2>
     <p class="sub">Qué vendiste o regalaste, cuándo, dónde y a quién. Nuestro WhatsApp: <a id="lnkWa2" href="#" style="color:var(--seal);font-weight:600"></a></p>
-    <div class="seg tipo" id="v-tipo"><button type="button" data-t="Compró" class="on">Vendí</button><button type="button" data-t="Regaló">Regalé</button><button type="button" data-t="Contacto">Contacto</button></div>
+    <div class="seg tipo" id="v-tipo"><button type="button" data-t="Compró" class="on">Vendí</button><button type="button" data-t="Regaló">Regalé</button><button type="button" data-t="En consignación">Dejé</button><button type="button" data-t="Contacto">Contacto</button></div>
+    <p class="sub" id="v-explica" hidden>Frascos que dejás con alguien para que los venda. Siguen siendo del negocio hasta que los venda: no es una venta y no entra plata.</p>
     <div class="tarjeta" id="v-card">
       <label>Quién</label><div class="seg" id="v-quien"></div>
       <label>Fecha</label><input type="date" id="v-fecha">
@@ -337,14 +338,18 @@
       <label>Dónde</label><input id="v-donde" list="lugares" placeholder="Feria de Karu"><datalist id="lugares"></datalist>
       <label>Canal</label><select id="v-canal"></select>
       <div class="fila2">
-        <div><label>A quién (opcional)</label><input id="v-nombre"></div>
+        <div><label id="v-nombre-label">A quién (opcional)</label><input id="v-nombre"></div>
         <div><label>Teléfono (opcional)</label><input id="v-telefono" inputmode="tel" placeholder="0981 123 456"></div>
       </div>
       <label>Nota</label><textarea id="v-nota"></textarea>
       <button class="btn primario" id="v-guardar">Guardar la venta</button>
     </div>
+    <div class="tarjeta" id="consigna-card" hidden>
+      <h3>Frascos en manos de revendedores</h3>
+      <div id="consigna"></div>
+    </div>
     <div class="tarjeta" id="v-lista-card">
-      <h3>Últimas ventas y regalos</h3>
+      <h3>Últimos movimientos</h3>
       <div id="ventas"></div>
     </div>
     <div class="tarjeta" id="r-card" hidden>
@@ -563,6 +568,7 @@
     d.productos.forEach(function (p, i) { if (cantidadesAntes[p]) $('v-q' + i).value = cantidadesAntes[p]; $('v-q' + i).addEventListener('input', prellenarCobrado); });
     var canalAntes = $('v-canal').value || ultimo('cheviva-canal');
     llenarSelect($('v-canal'), d.canales, 'Sin especificar');
+    pintarTipo();
     if (canalAntes && d.canales.indexOf(canalAntes) >= 0) $('v-canal').value = canalAntes;
     $('lugares').innerHTML = (d.lugares || []).map(function (x) { return '<option value="' + esc(x) + '">'; }).join('');
     if (!$('v-donde').value && d.lugares && d.lugares.length) $('v-donde').value = d.lugares[0];
@@ -570,14 +576,31 @@
     $('v-quien').innerHTML = d.vendedores.map(function (v) { return '<button type="button" data-t="' + esc(v) + '"' + (v === quienAntes ? ' class="on"' : '') + '>' + esc(v) + '</button>'; }).join('');
     QUIEN = d.vendedores.indexOf(quienAntes) >= 0 ? quienAntes : '';
     $('v-quien').querySelectorAll('button').forEach(function (bt) { bt.addEventListener('click', function () { QUIEN = bt.dataset.t; recordar('cheviva-quien', QUIEN); $('v-quien').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === bt); }); }); });
+    var gente = (d.consigna && d.consigna.gente) || [];
+    $('consigna').innerHTML = gente.length ? gente.map(function (g, i) {
+      return '<div class="contacto"><div class="quien"><b>' + esc(g.quien) + ' · ' + esc(g.detalle) + '</b><small>desde el ' +
+             esc(g.desde) + ' · ' + g.dias + ' día' + (g.dias === 1 ? '' : 's') + '</small></div>' +
+             '<button type="button" class="wa" data-c="' + i + '">Volvieron</button></div>';
+    }).join('') : '';
+    $('consigna').querySelectorAll('button[data-c]').forEach(function (bt) {
+      bt.addEventListener('click', function () {
+        var g = gente[Number(bt.dataset.c)];
+        TIPO = 'Volvió'; pintarTipo();                                   // the same form, filled in: he only corrects the numbers
+        $('v-nombre').value = g.quien;
+        (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = g.productos[p] ? String(g.productos[p]) : ''; });
+        $('v-fecha').value = d.hoy;
+        $('v-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        toast('Cambiá los números si no volvieron todos.');
+      });
+    });
     $('ventas').innerHTML = (d.ventasRecientes || []).length ? d.ventasRecientes.map(function (v, i) {
-      return '<div class="contacto"><div class="quien"><b>' + (v.quien ? esc(v.quien) + ' ' : '') + (v.tipo === 'Compró' ? 'vendió' : 'regaló') + ' ' + v.cantidad + ' × ' + esc(v.producto) + (v.cobrado ? ' · ' + gs(v.cobrado) : '') + '</b><small>' +
+      return '<div class="contacto"><div class="quien"><b>' + (v.quien ? esc(v.quien) + ' ' : '') + (VERBOS[v.tipo] || 'vendió') + ' ' + v.cantidad + ' × ' + esc(v.producto) + (v.cobrado ? ' · ' + gs(v.cobrado) : '') + '</b><small>' +
              esc([v.fecha, v.donde, v.nombre, v.canal].filter(Boolean).join(' · ')) + '</small></div><button type="button" class="wa" data-v="' + i + '">Borrar</button></div>';
     }).join('') : '<p class="sub" style="margin:0">Todavía no hay ventas ni regalos.</p>';
     $('ventas').querySelectorAll('button[data-v]').forEach(function (bt) {
       bt.addEventListener('click', function () {
         var v = d.ventasRecientes[Number(bt.dataset.v)];
-        if (!confirm('¿Borrar ' + (v.tipo === 'Compró' ? 'la venta' : 'el regalo') + ' de ' + v.cantidad + ' × ' + v.producto + (v.fecha ? ' del ' + v.fecha : '') + '? Queda anulado en la planilla, no se pierde.')) return;
+        if (!confirm('¿Borrar lo que ' + (VERBOS[v.tipo] || 'vendió') + ': ' + v.cantidad + ' × ' + v.producto + (v.fecha ? ' del ' + v.fecha : '') + '? Queda anulado en la planilla, no se pierde.')) return;
         bt.disabled = true; bt.textContent = 'Anulando…';
         google.script.run.withSuccessHandler(function (r) { toast(r && r.mensaje ? r.mensaje : 'Anulado.', !(r && r.ok)); cargar(); })
           .withFailureHandler(function (e) { bt.disabled = false; bt.textContent = 'Borrar'; toast(e && e.message ? e.message : String(e), true); })
@@ -629,12 +652,19 @@
     $('v-cobrado').value = total ? String(total) : '';
   }
   $('v-cobrado').addEventListener('input', function () { cobradoTocado = $('v-cobrado').value !== ''; });
+  var VERBOS = { 'Compró': 'vendió', 'Regaló': 'regaló', 'En consignación': 'dejó', 'Volvió': 'recuperó' };
   function pintarTipo() {
-    var contacto = TIPO === 'Contacto';
+    var contacto = TIPO === 'Contacto', consigna = TIPO === 'En consignación' || TIPO === 'Volvió';
     $('v-card').hidden = contacto; $('v-lista-card').hidden = contacto; $('r-card').hidden = !contacto; $('contactos-card').hidden = !contacto;
+    $('consigna-card').hidden = contacto || !(D && D.consigna && D.consigna.gente && D.consigna.gente.length);
     $('v-cobrado-wrap').hidden = TIPO !== 'Compró';
-    $('v-guardar').textContent = TIPO === 'Compró' ? 'Guardar la venta' : 'Guardar el regalo';
-    $('v-tipo').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x.dataset.t === TIPO); });
+    $('v-explica').hidden = TIPO !== 'En consignación';
+    // for a hand-over the name is the whole point, so the label stops saying "optional"
+    $('v-nombre-label').textContent = consigna ? 'A quién' : 'A quién (opcional)';
+    $('v-guardar').textContent = TIPO === 'Compró' ? 'Guardar la venta'
+      : TIPO === 'Regaló' ? 'Guardar el regalo'
+      : TIPO === 'En consignación' ? 'Guardar lo que dejé' : 'Guardar lo que volvió';
+    $('v-tipo').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x.dataset.t === TIPO || (TIPO === 'Volvió' && x.dataset.t === 'En consignación')); });
     if (TIPO === 'Compró') prellenarCobrado();
   }
   $('v-tipo').querySelectorAll('button').forEach(function (bt) { bt.addEventListener('click', function () { TIPO = bt.dataset.t; pintarTipo(); }); });
@@ -642,7 +672,8 @@
   $('v-guardar').addEventListener('click', function () {
     var cantidades = {}; (D ? D.productos : []).forEach(function (p, i) { cantidades[p] = $('v-q' + i).value; });
     recordar('cheviva-canal', $('v-canal').value);
-    if (!QUIEN) { toast('¿Quién ' + (TIPO === 'Compró' ? 'vendió' : 'regaló') + '? Tocá David o Nara.', true); return; }
+    if (!QUIEN) { toast('¿Quién ' + (VERBOS[TIPO] || 'vendió') + '? Tocá David o Nara.', true); return; }
+    if ((TIPO === 'En consignación' || TIPO === 'Volvió') && !$('v-nombre').value.trim()) { toast('¿A quién se los dejaste? Poné el nombre.', true); return; }
     guardar($('v-guardar'), 'guardarVenta', { tipo: TIPO, quien: QUIEN, fecha: $('v-fecha').value, cantidades: cantidades, cobrado: TIPO === 'Compró' ? $('v-cobrado').value : '',
       donde: $('v-donde').value, canal: $('v-canal').value, nombre: $('v-nombre').value, telefono: $('v-telefono').value, nota: $('v-nota').value },
       function () { (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = ''; }); $('v-cobrado').value = ''; cobradoTocado = false; $('v-nombre').value = ''; $('v-telefono').value = ''; $('v-nota').value = ''; });
