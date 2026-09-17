@@ -473,7 +473,7 @@
       fila('Equipo, uso del mes', gs(-d.mes.depreciacion)) +
       fila('Resultado', gs(d.mes.resultado), 'total');
     // 16 Sep, his yes: next to the estimate, the cash that really came in and went out (every purchase counts the day it was paid)
-    $('mesCaja').innerHTML = caja('Caja del mes', d.mes.ventas, d.mes.compras || 0);
+    $('mesCaja').innerHTML = caja('Caja del mes', d.mes.cobrado, d.mes.compras || 0);
     $('faltaLector').hidden = d.hayClave !== false;
     var w = d.semanas[0], w1 = d.semanas[1];
     $('semanaTitulo').textContent = 'Esta semana: ' + w.texto;
@@ -483,7 +483,7 @@
       fila('Regalos, al costo', gs(-w.muestras)) +
       fila('Gastos (viajes, feria, Canva…)', gs(-w.gastos)) +
       fila('Resultado de la semana', gs(w.resultado), 'total');
-    $('semanaCaja').innerHTML = caja('Caja de la semana', w.ventas, w.compras || 0);
+    $('semanaCaja').innerHTML = caja('Caja de la semana', w.cobrado, w.compras || 0);
     $('semanaNota').textContent = w1 ? 'La semana pasada (' + w1.texto + '): ventas ' + gs(w1.ventas) + ' (' + w1.vendidos + ' frascos), resultado ' + gs(w1.resultado) + '.' : '';
     var cuentasFilas = (d.porCuenta || []).map(function (c) { return fila(esc(c.cuenta) + '<small>' + c.compras + ' compra' + (c.compras === 1 ? '' : 's') + '</small>', gs(c.total)); });
     if (d.sinCuenta && d.sinCuenta.compras) cuentasFilas.push(fila('Sin cuenta todavía<small>' + d.sinCuenta.compras + ' compra' + (d.sinCuenta.compras === 1 ? '' : 's') + ' · ponela en la planilla, columna Cuenta</small>', gs(d.sinCuenta.total), 'suave'));
