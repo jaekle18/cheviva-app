@@ -15,12 +15,12 @@
   #entrada { position: fixed; inset: 0; z-index: 50; background: #FBFAF8; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; gap: 14px; font: 16px/1.45 'Archivo', -apple-system, sans-serif; color: #17140F; }
   #entrada[hidden] { display: none; }
   #entrada .sello { width: 64px; height: 64px; font-size: 40px; }
-  #entrada input { max-width: 280px; text-align: center; letter-spacing: .12em; text-transform: uppercase; }
+  #entrada input { max-width: 280px; text-align: center; letter-spacing: .12em; }
   #entrada button { max-width: 280px; }
   #entrada p { margin: 0; text-align: center; max-width: 320px; }
 </style>
 <script>
-/* The phone's code, and google.script.run as calls to the sheet's door (16 Sep 2026). */
+/* The app's password (his own, 16 Sep 2026), and google.script.run as calls to the sheet's door. */
 (function () {
   var PUERTA = 'https://script.google.com/macros/s/AKfycbxdqvrq81ksoCi4OJt9RRFIIU8pdYxj6v1gmSz8BMrWontPdvvyzz-wS21iN9mYx0hcyA/exec', K = 'cheviva-codigo';
   var ACCIONES = {
@@ -42,10 +42,9 @@
       if (!caja) {
         caja = document.createElement('div'); caja.id = 'entrada';
         caja.innerHTML = '<div class="sello">채</div><div class="marca">CHEVIVA</div>' +
-          '<p id="entradaAviso">Escribí el código de Cheviva. Se pide una sola vez en este teléfono.</p>' +
-          '<input id="entradaCodigo" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXXX-XXXXX">' +
-          '<button class="btn primario" id="entradaBoton" type="button">Entrar</button>' +
-          '<p class="sub">El código está en la planilla: menú Cheviva → Direcciones.</p>';
+          '<p id="entradaAviso">Escribí la contraseña de Cheviva. Se pide una sola vez en este teléfono.</p>' +
+          '<input id="entradaCodigo" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Contraseña">' +   // digits today; drop inputmode if it ever gets letters
+          '<button class="btn primario" id="entradaBoton" type="button">Entrar</button>';
         document.body.appendChild(caja);
         document.getElementById('entradaBoton').onclick = function () {
           var v = document.getElementById('entradaCodigo').value.trim();
@@ -67,7 +66,8 @@
     fetch(PUERTA, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(cuerpo), redirect: 'follow' })
       .then(function (r) { return r.json(); })
       .then(function (j) {
-        if (j && j.ok === false && j.error === 'no autorizado') { try { localStorage.removeItem(K); } catch (e) {} pedirCodigo('Ese código no sirve. Revisalo en la planilla: menú Cheviva → Direcciones.'); return; }
+        if (j && j.ok === false && j.error === 'no autorizado') { try { localStorage.removeItem(K); } catch (e) {} pedirCodigo('Esa contraseña no es. Probá de nuevo.'); return; }
+        if (j && j.ok === false && j.error === 'demasiados intentos') { pedirCodigo('Demasiados intentos con una contraseña equivocada. Probá de nuevo en una hora.'); return; }
         if (j && j.ok === false && j.error) { if (mal) mal(new Error(j.error)); return; }
         if (ok) ok(j);
       })
