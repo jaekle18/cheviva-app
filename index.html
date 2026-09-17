@@ -334,7 +334,10 @@
       <label>Quién</label><div class="seg" id="v-quien"></div>
       <label>Fecha</label><input type="date" id="v-fecha">
       <label>Cuántos</label><div class="fila3" id="v-cantidades"></div>
-      <div id="v-cobrado-wrap"><label>Total cobrado, Gs</label><input id="v-cobrado" inputmode="numeric" placeholder="se completa con el precio de lista"></div>
+      <div id="v-cobrado-wrap"><label>Total cobrado, Gs</label><input id="v-cobrado" inputmode="numeric" placeholder="se completa con el precio de lista">
+        <p class="sub" id="v-cobrado-nota" hidden style="margin:6px 0 0"></p></div>
+      <div id="v-queda-wrap" hidden><label>Se queda por frasco, Gs (opcional)</label><input id="v-queda" inputmode="numeric" placeholder="lo dejás en blanco si todavía no arreglaron">
+        <p class="sub" style="margin:6px 0 0">Si lo ponés, la app te propone sola cuánto cobrar cuando esa persona te pague.</p></div>
       <label>Dónde</label><input id="v-donde" list="lugares" placeholder="Feria de Karu"><datalist id="lugares"></datalist>
       <label>Canal</label><select id="v-canal"></select>
       <div class="fila2">
@@ -579,7 +582,8 @@
     var gente = (d.consigna && d.consigna.gente) || [];
     $('consigna').innerHTML = gente.length ? gente.map(function (g, i) {
       return '<div class="contacto"><div class="quien"><b>' + esc(g.quien) + ' · ' + esc(g.detalle) + '</b><small>desde el ' +
-             esc(g.desde) + ' · ' + g.dias + ' día' + (g.dias === 1 ? '' : 's') + '</small></div>' +
+             esc(g.desde) + ' · ' + g.dias + ' día' + (g.dias === 1 ? '' : 's') +
+             (g.queda ? ' · se queda ' + gs(g.queda) + ' por frasco' : '') + '</small></div>' +
              '<button type="button" class="wa" data-c="' + i + '">Volvieron</button></div>';
     }).join('') : '';
     $('consigna').querySelectorAll('button[data-c]').forEach(function (bt) {
@@ -646,11 +650,31 @@
   function recordarCuenta(c) { recordar('cheviva-cuenta', c); }
   /* ---------- the sale switch: Vendí · Regalé · Contacto ---------- */
   var TIPO = 'Compró', cobradoTocado = false, QUIEN = '';
+  function quedaDe(nombre) {
+    if (!D) return 0;
+    var n = String(nombre || '').trim().toLowerCase();
+    var g = ((D.consigna || {}).gente || []).filter(function (x) { return String(x.quien).toLowerCase() === n; })[0];
+    return (g && g.queda) || Number(D.quedaRevendedor || 0) || 0;
+  }
   function prellenarCobrado() {
     if (cobradoTocado || TIPO !== 'Compró' || !D) return;
-    var total = 0; D.productos.forEach(function (p, i) { total += (Number($('v-q' + i).value) || 0) * ((D.precios || {})[p] || 0); });
+    // a reseller's sale is worth the list price minus what that person keeps — and only when a
+    // number was ever agreed; with nothing typed anywhere this is the plain list price, as before
+    var queda = $('v-canal').value === 'Revendedor' ? quedaDe($('v-nombre').value) : 0;
+    var total = 0, frascos = 0;
+    D.productos.forEach(function (p, i) {
+      var n = Number($('v-q' + i).value) || 0, precio = (D.precios || {})[p] || 0;
+      if (!n || !precio) return;
+      total += n * Math.max(0, precio - queda); frascos += n;
+    });
     $('v-cobrado').value = total ? String(total) : '';
+    var nota = $('v-cobrado-nota');
+    nota.hidden = !(queda > 0 && frascos > 0);
+    if (!nota.hidden) nota.textContent = frascos + ' × (' + gs((D.precios || {})['Kimchi Picante'] || 0) + ' − ' +
+      gs(queda) + ' que se queda ' + ($('v-nombre').value.trim() || 'el revendedor') + ')';
   }
+  $('v-canal').addEventListener('change', prellenarCobrado);
+  $('v-nombre').addEventListener('input', function () { prellenarCobrado(); });
   $('v-cobrado').addEventListener('input', function () { cobradoTocado = $('v-cobrado').value !== ''; });
   var VERBOS = { 'Compró': 'vendió', 'Regaló': 'regaló', 'En consignación': 'dejó', 'Volvió': 'recuperó' };
   function pintarTipo() {
@@ -659,6 +683,8 @@
     $('consigna-card').hidden = contacto || !(D && D.consigna && D.consigna.gente && D.consigna.gente.length);
     $('v-cobrado-wrap').hidden = TIPO !== 'Compró';
     $('v-explica').hidden = TIPO !== 'En consignación';
+    $('v-queda-wrap').hidden = TIPO !== 'En consignación';
+    if (TIPO === 'En consignación' && !$('v-queda').value) $('v-queda').value = quedaDe($('v-nombre').value) || '';
     // for a hand-over the name is the whole point, so the label stops saying "optional"
     $('v-nombre-label').textContent = consigna ? 'A quién' : 'A quién (opcional)';
     $('v-guardar').textContent = TIPO === 'Compró' ? 'Guardar la venta'
@@ -675,8 +701,9 @@
     if (!QUIEN) { toast('¿Quién ' + (VERBOS[TIPO] || 'vendió') + '? Tocá David o Nara.', true); return; }
     if ((TIPO === 'En consignación' || TIPO === 'Volvió') && !$('v-nombre').value.trim()) { toast('¿A quién se los dejaste? Poné el nombre.', true); return; }
     guardar($('v-guardar'), 'guardarVenta', { tipo: TIPO, quien: QUIEN, fecha: $('v-fecha').value, cantidades: cantidades, cobrado: TIPO === 'Compró' ? $('v-cobrado').value : '',
-      donde: $('v-donde').value, canal: $('v-canal').value, nombre: $('v-nombre').value, telefono: $('v-telefono').value, nota: $('v-nota').value },
-      function () { (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = ''; }); $('v-cobrado').value = ''; cobradoTocado = false; $('v-nombre').value = ''; $('v-telefono').value = ''; $('v-nota').value = ''; });
+      donde: $('v-donde').value, canal: $('v-canal').value, nombre: $('v-nombre').value, telefono: $('v-telefono').value, nota: $('v-nota').value,
+      queda: TIPO === 'En consignación' ? $('v-queda').value : '' },
+      function () { (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = ''; }); $('v-cobrado').value = ''; cobradoTocado = false; $('v-nombre').value = ''; $('v-telefono').value = ''; $('v-nota').value = ''; $('v-queda').value = ''; $('v-cobrado-nota').hidden = true; });
   });
   function chatTipeado() { var u = waUrl($('r-telefono').value); $('r-wa').href = u || '#'; $('r-wa').classList.toggle('off', !u); }
   $('r-telefono').addEventListener('input', chatTipeado);
