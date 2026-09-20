@@ -408,6 +408,9 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
+  var VERSION_PAGINA = '2026-09-20-personas';   // must match what the sheet hands over; see below
+  var recargado = false;
+  try { recargado = sessionStorage.getItem('cheviva-recarga') === VERSION_PAGINA; } catch (e) {}
 
   /* ---------- helpers ---------- */
   function gs(n) { var v = Number(n) || 0; n = Math.sign(v) * Math.round(Math.abs(v)); var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n < 0 ? '−' : '') + 'Gs\u00A0' + s; }   // half a guaraní rounds away from zero, like the sheet; the no-break space keeps Gs on its number
@@ -463,6 +466,11 @@
     return d.length < 8 ? '' : 'https://wa.me/' + d;
   }
   function pintar(d) {
+    // the page and the sheet must agree; an old page reading new data printed Gs 0 on real figures (20 Sep)
+    if (d.version && VERSION_PAGINA && d.version !== VERSION_PAGINA && !recargado) {
+      try { recargado = true; sessionStorage.setItem('cheviva-recarga', d.version); } catch (e) {}
+      location.reload(true); return;
+    }
     D = d; ultimaLectura = Date.now();
     var ahora = new Date();
     $('actualizado').textContent = 'Leído de la planilla a las ' + ('0' + ahora.getHours()).slice(-2) + ':' + ('0' + ahora.getMinutes()).slice(-2);
