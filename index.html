@@ -30,6 +30,7 @@
     guardarFrascos: function (d) { return { accion: 'frascos', datos: d }; },
     guardarRegistro: function (d) { return { accion: 'registro', datos: d }; },
     guardarVenta: function (d) { return { accion: 'venta', datos: d }; },
+    guardarPago: function (d) { return { accion: 'pago', datos: d }; },
     anularRegistro: function (d) { return { accion: 'anular', datos: d }; },
     subirRecibo: function (c) { return { accion: 'subir', carga: c }; },
     aceptarLectura: function (l, c) { return { accion: 'aceptar', lectura: l, cuenta: c }; },
@@ -220,6 +221,18 @@
         <table id="vendedoresTabla"></table>
       </div>
 
+      <div class="tarjeta" id="cuenta-card">
+        <h3>Quién le debe a quién</h3>
+        <p class="sub" id="cuentaFrase" style="margin:0 0 8px"></p>
+        <table id="cuentaTabla"></table>
+        <div class="fila2">
+          <div><label>Monto, Gs</label><input id="cta-monto" inputmode="numeric" placeholder="0"></div>
+          <div><label>Fecha</label><input type="date" id="cta-fecha"></div>
+        </div>
+        <label>Nota (opcional)</label><input id="cta-nota" placeholder="por ejemplo: efectivo de la feria">
+        <button class="btn primario" id="cta-guardar">Anotar el pago</button>
+      </div>
+
       <div class="tarjeta">
         <h3>Compras por cuenta</h3>
         <table id="cuentasTabla"></table>
@@ -336,6 +349,7 @@
       <label>Cuántos</label><div class="fila3" id="v-cantidades"></div>
       <div id="v-cobrado-wrap"><label>Total cobrado, Gs</label><input id="v-cobrado" inputmode="numeric" placeholder="se completa con el precio de lista">
         <p class="sub" id="v-cobrado-nota" hidden style="margin:6px 0 0"></p></div>
+      <div id="v-cuenta-wrap"><label>¿A qué bolsillo fue la plata?</label><select id="v-cuenta"></select></div>
       <div id="v-queda-wrap" hidden><label>Se queda por frasco, Gs (opcional)</label><input id="v-queda" inputmode="numeric" placeholder="lo dejás en blanco si todavía no arreglaron">
         <p class="sub" style="margin:6px 0 0">Si lo ponés, la app te propone sola cuánto cobrar cuando esa persona te pague.</p></div>
       <label>Dónde</label><input id="v-donde" list="lugares" placeholder="Feria de Karu"><datalist id="lugares"></datalist>
@@ -449,7 +463,7 @@
     var ahora = new Date();
     $('actualizado').textContent = 'Leído de la planilla a las ' + ('0' + ahora.getHours()).slice(-2) + ':' + ('0' + ahora.getMinutes()).slice(-2);
     $('hoy').textContent = d.hoy.split('-').reverse().join('/');
-    ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha'].forEach(function (id) { if (!$(id).value) $(id).value = d.hoy; });
+    ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha', 'cta-fecha'].forEach(function (id) { if (!$(id).value) $(id).value = d.hoy; });
     var n = d.numeros;
     var pp = d.porProducto || {}, pic = pp['Kimchi Picante'] ? pp['Kimchi Picante'].stock : 0, bla = pp['Kimchi Blanco'] ? pp['Kimchi Blanco'].stock : 0, vas = pp['Vasito 100 ml'] ? pp['Vasito 100 ml'].stock : 0;
     var ultimoLote = (d.lotes || []).filter(function (l) { return l.costoFrasco; })[0];   // newest batch with 350 ml jars: each batch costs a bit different
@@ -488,6 +502,7 @@
     var cuentasFilas = (d.porCuenta || []).map(function (c) { return fila(esc(c.cuenta) + '<small>' + c.compras + ' compra' + (c.compras === 1 ? '' : 's') + '</small>', gs(c.total)); });
     if (d.sinCuenta && d.sinCuenta.compras) cuentasFilas.push(fila('Sin cuenta todavía<small>' + d.sinCuenta.compras + ' compra' + (d.sinCuenta.compras === 1 ? '' : 's') + ' · ponela en la planilla, columna Cuenta</small>', gs(d.sinCuenta.total), 'suave'));
     $('cuentasTabla').innerHTML = cuentasFilas.length ? cuentasFilas.join('') : '<tr><td class="placeholder">Todavía no hay compras.</td></tr>';
+    pintarCuenta(d);
     var pvs = d.porVendedor || [], sumar = function (k) { return pvs.reduce(function (t, v) { return t + (v[k] || 0); }, 0); };
     $('vendedoresTabla').innerHTML = pvs.some(function (v) { return v.ventas || v.frascos || v.vasitos || v.regalados; })
       ? '<tr><th>Quién</th><th class="n">Frascos</th><th class="n">Vasitos</th><th class="n">Ventas</th></tr>' +
@@ -540,7 +555,10 @@
       fila('Suma', gs(dn.suma), 'total') +
       fila('Lo que el negocio tiene hoy (activo)', gs(b.activo), 'suave') +
       fila('Plata puesta por David hasta hoy', gs(b.aporteDavid), 'suave') +
-      (b.aporteNara ? fila('Plata puesta por Nara hasta hoy', gs(b.aporteNara), 'suave') : '');
+      // 20 Sep: the line STAYS at zero. Being square is exactly what success looks like here, and a line that
+      // disappears then reads as something broken. The words flip instead of printing a minus.
+      fila(b.aporteNara >= 0 ? 'Plata puesta por Nara hasta hoy' : 'Plata del negocio que tiene Nara',
+           gs(Math.abs(b.aporteNara || 0)), 'suave');
     $('lnkCompra').href = d.urls.compra; $('lnkLote').href = d.urls.lote; $('lnkFrascos').href = d.urls.frascos;
     $('lnkRegistro').href = d.urls.registro; $('lnkCarpeta').href = d.urls.carpeta; $('lnkPlanilla').href = d.urls.planilla;
     $('lnkWhatsApp').href = d.whatsapp.url; $('lnkWhatsApp').textContent = 'WhatsApp de Cheviva ' + d.whatsapp.numero;
@@ -578,7 +596,11 @@
     var quienAntes = QUIEN || ultimo('cheviva-quien');
     $('v-quien').innerHTML = d.vendedores.map(function (v) { return '<button type="button" data-t="' + esc(v) + '"' + (v === quienAntes ? ' class="on"' : '') + '>' + esc(v) + '</button>'; }).join('');
     QUIEN = d.vendedores.indexOf(quienAntes) >= 0 ? quienAntes : '';
-    $('v-quien').querySelectorAll('button').forEach(function (bt) { bt.addEventListener('click', function () { QUIEN = bt.dataset.t; recordar('cheviva-quien', QUIEN); $('v-quien').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === bt); }); }); });
+    $('v-quien').querySelectorAll('button').forEach(function (bt) { bt.addEventListener('click', function () { QUIEN = bt.dataset.t; recordar('cheviva-quien', QUIEN); $('v-quien').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === bt); }); bolsilloPorDefecto(); }); });
+    var bolsilloAntes = $('v-cuenta').value;
+    llenarSelect($('v-cuenta'), d.cuentas, 'Se queda con quien vendió');
+    if (bolsilloAntes && d.cuentas.indexOf(bolsilloAntes) >= 0) $('v-cuenta').value = bolsilloAntes;
+    bolsilloPorDefecto();                      // the list only exists now, so the default is set after it is filled
     var gente = (d.consigna && d.consigna.gente) || [];
     $('consigna').innerHTML = gente.length ? gente.map(function (g, i) {
       return '<div class="contacto"><div class="quien"><b>' + esc(g.quien) + ' · ' + esc(g.detalle) + '</b><small>desde el ' +
@@ -650,6 +672,35 @@
   function recordarCuenta(c) { recordar('cheviva-cuenta', c); }
   /* ---------- the sale switch: Vendí · Regalé · Contacto ---------- */
   var TIPO = 'Compró', cobradoTocado = false, QUIEN = '';
+  var PAGA = 'David', montoTocado = false;
+  /* The running account between the two of them: the words say which way it goes and the figure is always
+     positive (his rule: never a minus to decode). The button writes the payment that settles it. */
+  function pintarCuenta(d) {
+    var c = d.cuenta || {}, debe = Math.round(Number(c.debeANara) || 0);
+    var devuelto = ((c.pagado || {}).david || 0) - ((c.pagado || {}).nara || 0);
+    $('cuentaFrase').textContent = debe > 0 ? 'El negocio le debe ' + gs(debe) + ' a Nara.'
+      : debe < 0 ? 'Nara tiene ' + gs(-debe) + ' del negocio en la mano: ella le debe esa plata al negocio.'
+      : 'Están a mano: nadie le debe nada a nadie.';
+    $('cuentaTabla').innerHTML =
+      fila('Lo que pagó Nara', gs(c.pagoNara)) +
+      fila('Plata del negocio que tiene en la mano', gs(c.tieneNara)) +
+      fila('Lo que David ya le devolvió', gs(devuelto)) +
+      fila(debe >= 0 ? 'El negocio le debe a Nara' : 'Nara le debe al negocio', gs(Math.abs(debe)), 'total');
+    PAGA = debe < 0 ? 'Nara' : 'David';
+    $('cta-guardar').textContent = debe > 0 ? 'Anotar: David le pagó a Nara'
+      : debe < 0 ? 'Anotar: Nara le pagó a David' : 'Anotar un pago entre nosotros';
+    if (!montoTocado) $('cta-monto').value = debe ? String(Math.abs(debe)) : '';
+  }
+  /* A sale's money stays with whoever sold it unless he says otherwise: the same thing the books assume.
+     Switching the seller moves the pocket with it, but only while the pocket is still one this rule set —
+     an account he chose himself (a transfer into a bank) is never overwritten. */
+  function bolsilloPorDefecto() {
+    var sel = $('v-cuenta');
+    if (!sel || !QUIEN || !D || !D.cuentas) return;
+    var propio = QUIEN + ' Efectivo';
+    var automaticos = (D.vendedores || []).map(function (v) { return v + ' Efectivo'; });
+    if ((!sel.value || automaticos.indexOf(sel.value) >= 0) && D.cuentas.indexOf(propio) >= 0) sel.value = propio;
+  }
   function quedaDe(nombre) {
     if (!D) return 0;
     var n = String(nombre || '').trim().toLowerCase();
@@ -676,12 +727,19 @@
   $('v-canal').addEventListener('change', prellenarCobrado);
   $('v-nombre').addEventListener('input', function () { prellenarCobrado(); });
   $('v-cobrado').addEventListener('input', function () { cobradoTocado = $('v-cobrado').value !== ''; });
+  $('cta-monto').addEventListener('input', function () { montoTocado = $('cta-monto').value !== ''; });
+  $('cta-guardar').addEventListener('click', function () {
+    guardar($('cta-guardar'), 'guardarPago', { quien: PAGA, monto: $('cta-monto').value, fecha: $('cta-fecha').value, nota: $('cta-nota').value },
+      function () { $('cta-nota').value = ''; montoTocado = false; });
+  });
   var VERBOS = { 'Compró': 'vendió', 'Regaló': 'regaló', 'En consignación': 'dejó', 'Volvió': 'recuperó' };
   function pintarTipo() {
     var contacto = TIPO === 'Contacto', consigna = TIPO === 'En consignación' || TIPO === 'Volvió';
     $('v-card').hidden = contacto; $('v-lista-card').hidden = contacto; $('r-card').hidden = !contacto; $('contactos-card').hidden = !contacto;
     $('consigna-card').hidden = contacto || !(D && D.consigna && D.consigna.gente && D.consigna.gente.length);
     $('v-cobrado-wrap').hidden = TIPO !== 'Compró';
+    $('v-cuenta-wrap').hidden = TIPO !== 'Compró';
+    if (TIPO === 'Compró') bolsilloPorDefecto();
     $('v-explica').hidden = TIPO !== 'En consignación';
     $('v-queda-wrap').hidden = TIPO !== 'En consignación';
     if (TIPO === 'En consignación' && !$('v-queda').value) $('v-queda').value = quedaDe($('v-nombre').value) || '';
@@ -701,6 +759,7 @@
     if (!QUIEN) { toast('¿Quién ' + (VERBOS[TIPO] || 'vendió') + '? Tocá David o Nara.', true); return; }
     if ((TIPO === 'En consignación' || TIPO === 'Volvió') && !$('v-nombre').value.trim()) { toast('¿A quién se los dejaste? Poné el nombre.', true); return; }
     guardar($('v-guardar'), 'guardarVenta', { tipo: TIPO, quien: QUIEN, fecha: $('v-fecha').value, cantidades: cantidades, cobrado: TIPO === 'Compró' ? $('v-cobrado').value : '',
+      cuenta: TIPO === 'Compró' ? $('v-cuenta').value : '',
       donde: $('v-donde').value, canal: $('v-canal').value, nombre: $('v-nombre').value, telefono: $('v-telefono').value, nota: $('v-nota').value,
       queda: TIPO === 'En consignación' ? $('v-queda').value : '' },
       function () { (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = ''; }); $('v-cobrado').value = ''; cobradoTocado = false; $('v-nombre').value = ''; $('v-telefono').value = ''; $('v-nota').value = ''; $('v-queda').value = ''; $('v-cobrado-nota').hidden = true; });
