@@ -226,6 +226,10 @@
         <p class="sub" id="cuentaFrase" style="margin:0 0 8px"></p>
         <table id="cuentaTabla"></table>
         <div class="fila2">
+          <div><label>Quién paga</label><select id="cta-quien"></select></div>
+          <div><label>A quién</label><select id="cta-a"></select></div>
+        </div>
+        <div class="fila2">
           <div><label>Monto, Gs</label><input id="cta-monto" inputmode="numeric" placeholder="0"></div>
           <div><label>Fecha</label><input type="date" id="cta-fecha"></div>
         </div>
@@ -554,11 +558,13 @@
       fila('Equipo, lo que le queda de vida', gs(dn.equipoNeto)) +
       fila('Suma', gs(dn.suma), 'total') +
       fila('Lo que el negocio tiene hoy (activo)', gs(b.activo), 'suave') +
-      fila('Plata puesta por David hasta hoy', gs(b.aporteDavid), 'suave') +
-      // 20 Sep: the line STAYS at zero. Being square is exactly what success looks like here, and a line that
+      fila('Plata puesta por ' + esc((d.cuenta || {}).dueno || '') + ' hasta hoy', gs(b.aporteDueno), 'suave') +
+      // 20 Sep: a line STAYS at zero. Being square is exactly what success looks like here, and a line that
       // disappears then reads as something broken. The words flip instead of printing a minus.
-      fila(b.aporteNara >= 0 ? 'Plata puesta por Nara hasta hoy' : 'Plata del negocio que tiene Nara',
-           gs(Math.abs(b.aporteNara || 0)), 'suave');
+      ((d.cuenta || {}).gente || []).map(function (x) {
+        return fila(x.saldo >= 0 ? 'Plata puesta por ' + esc(x.quien) + ' hasta hoy' : 'Plata del negocio que tiene ' + esc(x.quien),
+                    gs(Math.abs(x.saldo || 0)), 'suave');
+      }).join('');
     $('lnkCompra').href = d.urls.compra; $('lnkLote').href = d.urls.lote; $('lnkFrascos').href = d.urls.frascos;
     $('lnkRegistro').href = d.urls.registro; $('lnkCarpeta').href = d.urls.carpeta; $('lnkPlanilla').href = d.urls.planilla;
     $('lnkWhatsApp').href = d.whatsapp.url; $('lnkWhatsApp').textContent = 'WhatsApp de Cheviva ' + d.whatsapp.numero;
@@ -672,24 +678,45 @@
   function recordarCuenta(c) { recordar('cheviva-cuenta', c); }
   /* ---------- the sale switch: Vendí · Regalé · Contacto ---------- */
   var TIPO = 'Compró', cobradoTocado = false, QUIEN = '';
-  var PAGA = 'David', montoTocado = false;
+  var montoTocado = false;
   /* The running account between the two of them: the words say which way it goes and the figure is always
      positive (his rule: never a minus to decode). The button writes the payment that settles it. */
   function pintarCuenta(d) {
-    var c = d.cuenta || {}, debe = Math.round(Number(c.debeANara) || 0);
-    var devuelto = ((c.pagado || {}).david || 0) - ((c.pagado || {}).nara || 0);
-    $('cuentaFrase').textContent = debe > 0 ? 'El negocio le debe ' + gs(debe) + ' a Nara.'
-      : debe < 0 ? 'Nara tiene ' + gs(-debe) + ' del negocio en la mano: ella le debe esa plata al negocio.'
-      : 'Están a mano: nadie le debe nada a nadie.';
+    var c = d.cuenta || {}, gente = c.gente || [], dueno = c.dueno || '';
+    // one line per person, whoever they are: the names come from the sheet's account list, never from this code
+    var abierto = gente.filter(function (x) { return Math.round(x.saldo || 0) !== 0; });
+    $('cuentaFrase').textContent = !gente.length ? 'Todavía no hay nadie más en las cuentas.'
+      : !abierto.length ? 'Están a mano: nadie le debe nada a nadie.'
+      : abierto.map(function (x) {
+          return x.saldo > 0 ? 'El negocio le debe ' + gs(x.saldo) + ' a ' + x.quien + '.'
+                             : x.quien + ' tiene ' + gs(-x.saldo) + ' del negocio en la mano.';
+        }).join(' ');
     $('cuentaTabla').innerHTML =
-      fila('Lo que pagó Nara', gs(c.pagoNara)) +
-      fila('Plata del negocio que tiene en la mano', gs(c.tieneNara)) +
-      fila('Lo que David ya le devolvió', gs(devuelto)) +
-      fila(debe >= 0 ? 'El negocio le debe a Nara' : 'Nara le debe al negocio', gs(Math.abs(debe)), 'total');
-    PAGA = debe < 0 ? 'Nara' : 'David';
-    $('cta-guardar').textContent = debe > 0 ? 'Anotar: David le pagó a Nara'
-      : debe < 0 ? 'Anotar: Nara le pagó a David' : 'Anotar un pago entre nosotros';
-    if (!montoTocado) $('cta-monto').value = debe ? String(Math.abs(debe)) : '';
+      '<tr><th>Quién</th><th class="n">Puso</th><th class="n">Tiene</th><th class="n">Saldo</th></tr>' +
+      gente.map(function (x) {
+        return '<tr><td>' + esc(x.quien) + '<small>ya devuelto ' + gs(x.devuelto) + '</small></td>' +
+               '<td class="n">' + gs(x.compras) + '</td><td class="n">' + gs(x.tiene) + '</td>' +
+               '<td class="n">' + gs(x.saldo) + '</td></tr>';
+      }).join('') +
+      '<tr class="total"><td>' + esc(dueno) + '<small>todo lo demás</small></td><td class="n" colspan="3">' + gs(c.aporteDueno) + '</td></tr>' +
+      (c.sinDestino ? '<tr class="suave"><td colspan="4">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '');
+    // the form is filled in with the payment that settles the first open balance; anyone can be picked instead
+    var x = abierto[0];
+    var paga = x ? (x.saldo > 0 ? dueno : x.quien) : dueno;
+    var cobra = x ? (x.saldo > 0 ? x.quien : dueno) : '';
+    llenarSelect($('cta-quien'), d.personas || [], '');
+    if (paga) $('cta-quien').value = paga;
+    pintarDestino(d);
+    if (cobra) $('cta-a').value = cobra;
+    $('cta-guardar').textContent = x ? 'Anotar: ' + paga + ' le pagó a ' + cobra : 'Anotar un pago entre nosotros';
+    if (!montoTocado) $('cta-monto').value = x ? String(Math.abs(Math.round(x.saldo))) : '';
+  }
+  /* The "A quién" list is everyone except whoever is paying. */
+  function pintarDestino(d) {
+    var todos = (d && d.personas) || (D && D.personas) || [];
+    var paga = $('cta-quien').value, antes = $('cta-a').value;
+    llenarSelect($('cta-a'), todos.filter(function (n) { return n !== paga; }), '');
+    if (antes && antes !== paga) $('cta-a').value = antes;
   }
   /* A sale's money stays with whoever sold it unless he says otherwise: the same thing the books assume.
      Switching the seller moves the pocket with it, but only while the pocket is still one this rule set —
@@ -728,8 +755,10 @@
   $('v-nombre').addEventListener('input', function () { prellenarCobrado(); });
   $('v-cobrado').addEventListener('input', function () { cobradoTocado = $('v-cobrado').value !== ''; });
   $('cta-monto').addEventListener('input', function () { montoTocado = $('cta-monto').value !== ''; });
+  $('cta-quien').addEventListener('change', function () { pintarDestino(D); });
   $('cta-guardar').addEventListener('click', function () {
-    guardar($('cta-guardar'), 'guardarPago', { quien: PAGA, monto: $('cta-monto').value, fecha: $('cta-fecha').value, nota: $('cta-nota').value },
+    guardar($('cta-guardar'), 'guardarPago', { quien: $('cta-quien').value, a: $('cta-a').value,
+      monto: $('cta-monto').value, fecha: $('cta-fecha').value, nota: $('cta-nota').value },
       function () { $('cta-nota').value = ''; montoTocado = false; });
   });
   var VERBOS = { 'Compró': 'vendió', 'Regaló': 'regaló', 'En consignación': 'dejó', 'Volvió': 'recuperó' };
@@ -756,7 +785,7 @@
   $('v-guardar').addEventListener('click', function () {
     var cantidades = {}; (D ? D.productos : []).forEach(function (p, i) { cantidades[p] = $('v-q' + i).value; });
     recordar('cheviva-canal', $('v-canal').value);
-    if (!QUIEN) { toast('¿Quién ' + (VERBOS[TIPO] || 'vendió') + '? Tocá David o Nara.', true); return; }
+    if (!QUIEN) { toast('¿Quién ' + (VERBOS[TIPO] || 'vendió') + '? Tocá ' + ((D && D.vendedores) || []).join(' o ') + '.', true); return; }
     if ((TIPO === 'En consignación' || TIPO === 'Volvió') && !$('v-nombre').value.trim()) { toast('¿A quién se los dejaste? Poné el nombre.', true); return; }
     guardar($('v-guardar'), 'guardarVenta', { tipo: TIPO, quien: QUIEN, fecha: $('v-fecha').value, cantidades: cantidades, cobrado: TIPO === 'Compró' ? $('v-cobrado').value : '',
       cuenta: TIPO === 'Compró' ? $('v-cuenta').value : '',
