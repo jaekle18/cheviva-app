@@ -408,7 +408,7 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-20-personas';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-21-sin-notas';   // must match what the sheet hands over; see below
   var recargado = false;
   try { recargado = sessionStorage.getItem('cheviva-recarga') === VERSION_PAGINA; } catch (e) {}
 
@@ -558,7 +558,7 @@
     var b = d.balance, dn = d.dinero;
     $('balanceTabla').innerHTML =
       fila('Salió en compras desde el principio', gs(dn.salio), 'total') +
-      fila('Ya es gasto: está en el Resultado', gs(dn.usado)) +
+      fila('Ya es gasto', gs(dn.usado)) +
       fila('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)', gs(dn.vacios)) +
       fila('Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dn.kimchi - (dn.enEspecie || 0))) +
       (dn.sinLote ? fila('Ingredientes comprados sin lote', gs(dn.sinLote)) : '') +
@@ -706,7 +706,7 @@
                '<td class="n">' + gs(x.compras) + '</td><td class="n">' + gs(x.tiene) + '</td>' +
                '<td class="n">' + gs(x.saldo) + '</td></tr>';
       }).join('') +
-      '<tr class="total"><td>' + esc(dueno) + '<small>todo lo demás</small></td><td class="n" colspan="3">' + gs(c.aporteDueno) + '</td></tr>' +
+      '<tr class="total"><td>' + esc(dueno) + '</td><td class="n" colspan="3">' + gs(c.aporteDueno) + '</td></tr>' +
       (c.sinDestino ? '<tr class="suave"><td colspan="4">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '');
     // the form is filled in with the payment that settles the first open balance; anyone can be picked instead
     var x = abierto[0];
