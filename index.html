@@ -409,7 +409,7 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-21-sin-notas-b';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-21-saldo-a-favor';   // must match what the sheet hands over; see below
   var recargado = false;
   try { recargado = sessionStorage.getItem('cheviva-recarga') === VERSION_PAGINA; } catch (e) {}
 
@@ -567,11 +567,13 @@
       fila('Equipo, lo que le queda de vida', gs(dn.equipoNeto)) +
       fila('Suma', gs(dn.suma), 'total') +
       fila('Lo que el negocio tiene hoy (activo)', gs(b.activo), 'suave') +
-      fila('Plata puesta por ' + esc((d.cuenta || {}).dueno || '') + ' hasta hoy', gs(b.aporteDueno), 'suave') +
+      // the same words as the Balance (his "B1, yes", 21 Sep): each line is that person's saldo, and it follows the sign
+      fila((b.aporteDueno || 0) >= 0 ? 'Saldo a favor de ' + esc((d.cuenta || {}).dueno || '') : 'Plata del negocio que tiene ' + esc((d.cuenta || {}).dueno || ''),
+           gs(Math.abs(b.aporteDueno || 0)), 'suave') +
       // 20 Sep: a line STAYS at zero. Being square is exactly what success looks like here, and a line that
       // disappears then reads as something broken. The words flip instead of printing a minus.
       ((d.cuenta || {}).gente || []).map(function (x) {
-        return fila(x.saldo >= 0 ? 'Plata puesta por ' + esc(x.quien) + ' hasta hoy' : 'Plata del negocio que tiene ' + esc(x.quien),
+        return fila(x.saldo >= 0 ? 'Saldo a favor de ' + esc(x.quien) : 'Plata del negocio que tiene ' + esc(x.quien),
                     gs(Math.abs(x.saldo || 0)), 'suave');
       }).join('');
     $('lnkCompra').href = d.urls.compra; $('lnkLote').href = d.urls.lote; $('lnkFrascos').href = d.urls.frascos;
