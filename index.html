@@ -23,6 +23,10 @@
 /* The app's password (his own, 16 Sep 2026), and google.script.run as calls to the sheet's door. */
 (function () {
   var PUERTA = 'https://script.google.com/macros/s/AKfycbxdqvrq81ksoCi4OJt9RRFIIU8pdYxj6v1gmSz8BMrWontPdvvyzz-wS21iN9mYx0hcyA/exec', K = 'cheviva-codigo';
+  // 21 Sep: the numbers the app keeps on the phone (src/app.html, GUARDADOS) go with the password. A phone that is not
+  // signed in, or whose password the sheet refused, never shows the last numbers it read.
+  var GUARDADOS = 'cheviva-datos';
+  function olvidarNumeros() { try { localStorage.removeItem(GUARDADOS); } catch (e) {} }
   var ACCIONES = {
     datosApp: function () { return { accion: 'datos' }; },
     guardarCompra: function (d) { return { accion: 'compra', datos: d }; },
@@ -68,7 +72,7 @@
     fetch(PUERTA, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(cuerpo), redirect: 'follow' })
       .then(function (r) { return r.json(); })
       .then(function (j) {
-        if (j && j.ok === false && j.error === 'no autorizado') { try { localStorage.removeItem(K); } catch (e) {} pedirCodigo('Esa contraseña no es. Probá de nuevo.'); return; }
+        if (j && j.ok === false && j.error === 'no autorizado') { try { localStorage.removeItem(K); } catch (e) {} olvidarNumeros(); pedirCodigo('Esa contraseña no es. Probá de nuevo.'); return; }
         if (j && j.ok === false && j.error === 'demasiados intentos') { pedirCodigo('Demasiados intentos con una contraseña equivocada. Probá de nuevo en una hora.'); return; }
         if (j && j.ok === false && j.error) { if (mal) mal(new Error(j.error)); return; }
         if (ok) ok(j);
@@ -83,7 +87,7 @@
     } });
   }
   window.google = { script: { get run() { return corredor(null, null); } } };
-  if (!codigo()) pedirCodigo();
+  if (!codigo()) { olvidarNumeros(); pedirCodigo(); }
 })();
 </script>
 <title>Cheviva</title>
@@ -178,6 +182,11 @@
   .pendiente[data-i] span:last-child::after { content: ' ›'; color: var(--seal); }
   .leido { display: flex; align-items: center; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .04em; color: var(--muted); margin: -4px 0 10px; }
   .leido a { color: var(--seal); font-weight: 600; text-decoration: none; margin-left: auto; border-bottom: 1px solid var(--kraft); }
+  /* 21 Sep (his plan: "and it stops making you wait"): the numbers the phone kept are drawn the moment the app opens.
+     The line that says when they were read turns amber while they are not the sheet's latest — kept from before, or
+     the sheet could not be reached — and a small wheel turns in it while the sheet is being asked */
+  .cuando-viejo { color: var(--warn); }
+  .cuando-leyendo::before { content: ''; display: inline-block; width: 8px; height: 8px; border: 2px solid var(--kraft); border-top-color: var(--warn); border-radius: 50%; animation: giro 1s linear infinite; margin-right: 6px; vertical-align: -1px; }
   .contacto { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--ph); }
   .contacto .quien { flex: 1; min-width: 0; }
   .contacto .quien b { display: block; font-weight: 600; }
@@ -510,6 +519,14 @@
   function llenarSelect(sel, lista, vacio) {
     sel.innerHTML = (vacio ? '<option value="">' + esc(vacio) + '</option>' : '') + lista.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + '</option>'; }).join('');
   }
+  /* The same, keeping what was picked. Since 21 Sep the page draws twice when it opens (the kept numbers, then the sheet's),
+     and the second draw must never undo a choice made in between. */
+  function llenarSelectMantener(sel, lista, vacio) {
+    var antes = sel.value;
+    llenarSelect(sel, lista, vacio);
+    if (antes && lista.indexOf(antes) >= 0) sel.value = antes;
+  }
+  function mismaLista(a, b) { return !!a && !!b && a.length === b.length && a.every(function (x, i) { return x === b[i]; }); }
 
   /* ---------- navigation ---------- */
   var botones = document.querySelectorAll('nav.barra button');
@@ -537,18 +554,59 @@
 
   /* ---------- load, and keep it fresh ---------- */
   var ultimaLectura = 0, leyendo = false;
+  /* 21 Sep (stage 6 of ordenar-sistema; his plan: "and it stops making you wait"). The sheet takes 8-10 s to answer, and
+     that wait is Google opening its door, not the numbers. So the phone keeps the last numbers it read, with the time
+     they were read, and draws them the moment the app opens, marked as updating; the sheet's answer replaces them, and
+     if the sheet cannot be reached they stay, with their time. Kept numbers of another version are thrown away, never
+     drawn: a page reading fields it does not know prints Gs 0 on real figures (trap 30), and the version reload in
+     pintar() must keep working. The phone page's wrapper forgets them together with the password. After a save the app
+     still re-reads everything (his call, 20 Sep). */
+  var GUARDADOS = 'cheviva-datos';
+  var LEIDO = 0, DE_LA_MEMORIA = false, FALLO = '';
+  var puesto = {};   // what the page itself wrote into a field: it may change it again, never what he typed or picked
+  function dos(n) { return ('0' + n).slice(-2); }
+  function diaDe(t) { var f = new Date(t); return f.getFullYear() + '-' + dos(f.getMonth() + 1) + '-' + dos(f.getDate()); }
+  function aLas(t) {   // "a las 18:32", or "el 20/09 a las 18:32" when that was not today
+    var f = new Date(t);
+    return (diaDe(t) === diaDe(Date.now()) ? '' : 'el ' + dos(f.getDate()) + '/' + dos(f.getMonth() + 1) + ' ') + 'a las ' + dos(f.getHours()) + ':' + dos(f.getMinutes());
+  }
+  function decirLeido() {
+    if (!LEIDO) return;
+    var viejo = DE_LA_MEMORIA || !!FALLO;
+    var cola = leyendo ? ' · actualizando…' : FALLO ? ' · no se pudo actualizar' : '';
+    var marcar = function (el) { el.classList.toggle('cuando-viejo', viejo); el.classList.toggle('cuando-leyendo', leyendo); };
+    $('actualizado').textContent = (viejo || leyendo ? 'Leído ' : 'Leído de la planilla ') + aLas(LEIDO) + cola + (FALLO && !leyendo ? ': ' + FALLO : '');
+    marcar($('actualizado'));
+    document.querySelectorAll('[data-leido]').forEach(function (el) { el.textContent = 'Leído ' + aLas(LEIDO) + cola; marcar(el); });
+  }
+  function leerGuardados() {
+    var g = null;
+    try { g = JSON.parse(localStorage.getItem(GUARDADOS) || 'null'); } catch (e) { g = null; }
+    if (g && g.datos && g.datos.version === VERSION_PAGINA && Number(g.leido) > 0) return g;
+    try { localStorage.removeItem(GUARDADOS); } catch (e) {}
+    return null;
+  }
+  function guardarLeidos(d) {
+    try {
+      if (d && d.version === VERSION_PAGINA) localStorage.setItem(GUARDADOS, JSON.stringify({ leido: LEIDO, datos: d }));
+      else localStorage.removeItem(GUARDADOS);
+    } catch (e) {}   // a phone that keeps nothing (private browsing, a full memory) still works: it waits, as before
+  }
   function cargar() {
     if (leyendo) return;
-    leyendo = true;
-    if (D) $('actualizado').textContent = 'Leyendo la planilla…';
-    google.script.run.withSuccessHandler(function (d) { leyendo = false; pintar(d); }).withFailureHandler(function (e) {
+    leyendo = true; decirLeido();
+    google.script.run.withSuccessHandler(function (d) {
       leyendo = false;
+      if (pintar(d)) guardarLeidos(d);
+    }).withFailureHandler(function (e) {
+      leyendo = false;
+      var motivo = e && e.message ? e.message : String(e);
       if (!D) {
-        var aviso = '<span class="error">No pude leer la planilla: ' + esc(e && e.message ? e.message : e) + '</span>';
+        var aviso = '<span class="error">No pude leer la planilla: ' + esc(motivo) + '</span>';
         $('cargando').innerHTML = aviso;
         document.querySelectorAll('.sin-datos-aviso').forEach(function (el) { el.innerHTML = aviso; });
       }
-      else $('actualizado').textContent = 'No se pudo actualizar: ' + (e && e.message ? e.message : e);
+      else { FALLO = motivo; decirLeido(); }   // the numbers stay on screen, with the time they were read
     }).datosApp();
   }
   // the page re-reads the sheet on its own: when it comes back to the front, and once a minute while it is open
@@ -564,23 +622,34 @@
     if (d.charAt(0) === '0') d = '595' + d.slice(1); else if (d.length === 9 && d.charAt(0) === '9') d = '595' + d;
     return d.length < 8 ? '' : 'https://wa.me/' + d;
   }
-  function pintar(d) {
+  /* Draws what the sheet said. leidoAntes = the time of numbers kept on the phone, drawn before the sheet answers.
+     Returns false when it reloads the page instead of drawing. */
+  function pintar(d, leidoAntes) {
     // the page and the sheet must agree; an old page reading new data printed Gs 0 on real figures (20 Sep).
     // ONE reload per pair of versions (21 Sep): the guard used to compare what it stored with the page's own version,
     // so a page still served old after its reload reloaded again every time the sheet answered, and never drew.
-    var par = VERSION_PAGINA + '>' + d.version, yaRecargo = false;
-    try { yaRecargo = sessionStorage.getItem('cheviva-recarga') === par; } catch (e) { yaRecargo = true; }
-    if (d.version && d.version !== VERSION_PAGINA && !yaRecargo) {
-      try { sessionStorage.setItem('cheviva-recarga', par); } catch (e) {}
-      location.reload(true); return;
+    // Kept numbers never get here with another version (leerGuardados), so only the sheet's answer can reload.
+    if (!leidoAntes) {
+      var par = VERSION_PAGINA + '>' + d.version, yaRecargo = false;
+      try { yaRecargo = sessionStorage.getItem('cheviva-recarga') === par; } catch (e) { yaRecargo = true; }
+      if (d.version && d.version !== VERSION_PAGINA && !yaRecargo) {
+        try { sessionStorage.setItem('cheviva-recarga', par); } catch (e) {}
+        location.reload(true); return false;
+      }
     }
-    D = d; ultimaLectura = Date.now();
+    var antes = D;   // what is on screen now: nothing typed or picked since may be undone by drawing again
+    D = d;
+    if (leidoAntes) { LEIDO = leidoAntes; DE_LA_MEMORIA = true; }
+    else { LEIDO = ultimaLectura = Date.now(); DE_LA_MEMORIA = false; FALLO = ''; }
     document.body.classList.remove('sin-datos');
-    var ahora = new Date(), hhmm = ('0' + ahora.getHours()).slice(-2) + ':' + ('0' + ahora.getMinutes()).slice(-2);
-    $('actualizado').textContent = 'Leído de la planilla a las ' + hhmm;
-    document.querySelectorAll('[data-leido]').forEach(function (el) { el.textContent = 'Leído a las ' + hhmm; });
-    $('hoy').textContent = d.hoy.split('-').reverse().join('/');
-    ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha', 'cta-fecha', 'k-fecha'].forEach(function (id) { if (!$(id).value) $(id).value = d.hoy; });
+    decirLeido();
+    // numbers kept from yesterday must not put yesterday into a form: then today comes from the phone
+    var hoy = leidoAntes ? diaDe(Date.now()) : d.hoy;
+    $('hoy').textContent = hoy.split('-').reverse().join('/');
+    // a date the page filled in follows the day; a date he changed stays
+    ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha', 'cta-fecha', 'k-fecha'].forEach(function (id) {
+      if (!$(id).value || $(id).value === puesto[id]) { $(id).value = hoy; puesto[id] = hoy; }
+    });
     var n = d.numeros;
     var pp = d.porProducto || {}, pic = pp['Kimchi Picante'] ? pp['Kimchi Picante'].stock : 0, bla = pp['Kimchi Blanco'] ? pp['Kimchi Blanco'].stock : 0, vas = pp['Vasito 100 ml'] ? pp['Vasito 100 ml'].stock : 0;
     var ultimoLote = (d.lotes || []).filter(function (l) { return l.costoFrasco; })[0];   // newest batch with 350 ml jars: each batch costs a bit different
@@ -703,20 +772,26 @@
     });
     // the forms
     // the "Qué" list in groups: ingredients, jars and labels, expenses, equipment — alphabetical inside
+    // 21 Sep: when the lists are the same as the ones on screen they are left alone, so a field he is using keeps its
+    // value and its keyboard while the sheet's answer replaces the numbers kept on the phone
     var queAntes = $('c-que').value;
-    $('c-que').innerHTML = '<option value="">Elegí…</option>' + d.gruposItems.map(function (g) {
-      return '<optgroup label="' + esc(g) + '">' + d.items.filter(function (i) { return i.grupo === g; }).map(function (i) { return '<option value="' + esc(i.nombre) + '">' + esc(i.nombre) + '</option>'; }).join('') + '</optgroup>';
-    }).join('');
-    if (queAntes) $('c-que').value = queAntes;
-    unidadesDe();
+    if (!antes || JSON.stringify([antes.gruposItems, antes.items]) !== JSON.stringify([d.gruposItems, d.items])) {
+      $('c-que').innerHTML = '<option value="">Elegí…</option>' + d.gruposItems.map(function (g) {
+        return '<optgroup label="' + esc(g) + '">' + d.items.filter(function (i) { return i.grupo === g; }).map(function (i) { return '<option value="' + esc(i.nombre) + '">' + esc(i.nombre) + '</option>'; }).join('') + '</optgroup>';
+      }).join('');
+      if (queAntes) $('c-que').value = queAntes;
+    }
+    unidadesDe(true);
     var cuentaAntes = $('c-cuenta').value || ultimaCuenta();
     llenarSelect($('c-cuenta'), d.cuentas, 'Sin especificar');
     if (cuentaAntes && d.cuentas.indexOf(cuentaAntes) >= 0) $('c-cuenta').value = cuentaAntes;
-    llenarSelect($('r-estado'), d.estadosContacto || d.estados, 'Elegí…');
+    llenarSelectMantener($('r-estado'), d.estadosContacto || d.estados, 'Elegí…');
     // the sale: one quantity box per product, the amount charged prefilled at list price, the place remembered
-    var cantidadesAntes = {}; (D && D.productos ? D.productos : []).forEach(function (p, i) { if ($('v-q' + i)) cantidadesAntes[p] = $('v-q' + i).value; });
-    $('v-cantidades').innerHTML = d.productos.map(function (p, i) { return '<div><label>' + esc(p.replace('Kimchi ', '').replace(' 100 ml', '')) + '</label><input id="v-q' + i + '" inputmode="numeric" placeholder="0"></div>'; }).join('');
-    d.productos.forEach(function (p, i) { if (cantidadesAntes[p]) $('v-q' + i).value = cantidadesAntes[p]; $('v-q' + i).addEventListener('input', prellenarCobrado); });
+    if (!mismaLista(antes && antes.productos, d.productos)) {
+      var cantidadesAntes = {}; ((antes && antes.productos) || []).forEach(function (p, i) { if ($('v-q' + i)) cantidadesAntes[p] = $('v-q' + i).value; });
+      $('v-cantidades').innerHTML = d.productos.map(function (p, i) { return '<div><label>' + esc(p.replace('Kimchi ', '').replace(' 100 ml', '')) + '</label><input id="v-q' + i + '" inputmode="numeric" placeholder="0"></div>'; }).join('');
+      d.productos.forEach(function (p, i) { if (cantidadesAntes[p]) $('v-q' + i).value = cantidadesAntes[p]; $('v-q' + i).addEventListener('input', prellenarCobrado); });
+    }
     var canalAntes = $('v-canal').value || ultimo('cheviva-canal');
     llenarSelect($('v-canal'), d.canales, 'Sin especificar');
     pintarTipo();
@@ -744,7 +819,7 @@
         TIPO = 'Volvió'; pintarTipo();                                   // the same form, filled in: he only corrects the numbers
         $('v-nombre').value = g.quien;
         (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = g.productos[p] ? String(g.productos[p]) : ''; });
-        $('v-fecha').value = d.hoy;
+        $('v-fecha').value = hoy;
         $('v-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
         toast('Cambiá los números si no volvieron todos.');
       });
@@ -763,17 +838,23 @@
           .anularRegistro({ fila: v.fila, marca: v.marca, producto: v.producto });
       });
     });
-    llenarSelect($('r-producto'), d.productos.concat(['—']), 'Elegí…');
-    llenarSelect($('r-canal'), d.canales, 'Sin especificar');
-    llenarSelect($('f-lote'), d.lotes.map(function (l) { return l.lote; }), d.lotes.length ? 'Elegí…' : 'No hay lotes');
+    llenarSelectMantener($('r-producto'), d.productos.concat(['—']), 'Elegí…');
+    llenarSelectMantener($('r-canal'), d.canales, 'Sin especificar');
+    llenarSelectMantener($('f-lote'), d.lotes.map(function (l) { return l.lote; }), d.lotes.length ? 'Elegí…' : 'No hay lotes');
     // the labels are no longer typed (21 Sep): the card says how many each jar takes, from Ajustes
     var ep = d.etiquetasPorFrasco;
     $('f-tamanos').textContent = 'Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.' +
       (ep ? ' Las etiquetas se descuentan solas: ' + (ep['350 ml'] || 0) + ' por frasco y ' + (ep['100 ml'] || 0) + ' por vasito.' : '');
     pintarConteo(d);
-    if (!$('l-lote').value) { var max = d.lotes.reduce(function (m, l) { return Math.max(m, Number(l.lote) || 0); }, 0); $('l-lote').value = String(max + 1); }
-    $('l-gramos').innerHTML = d.preguntasLote.map(function (q, i) { return '<label>' + esc(q) + '</label><input id="l-g' + i + '" inputmode="numeric" placeholder="0">'; }).join('');
+    var siguienteLote = String(d.lotes.reduce(function (m, l) { return Math.max(m, Number(l.lote) || 0); }, 0) + 1);
+    if (!$('l-lote').value || $('l-lote').value === puesto['l-lote']) { $('l-lote').value = siguienteLote; puesto['l-lote'] = siguienteLote; }
+    if (!mismaLista(antes && antes.preguntasLote, d.preguntasLote)) {
+      var gramosAntes = {}; ((antes && antes.preguntasLote) || []).forEach(function (q, i) { if ($('l-g' + i)) gramosAntes[q] = $('l-g' + i).value; });
+      $('l-gramos').innerHTML = d.preguntasLote.map(function (q, i) { return '<label>' + esc(q) + '</label><input id="l-g' + i + '" inputmode="numeric" placeholder="0">'; }).join('');
+      d.preguntasLote.forEach(function (q, i) { if (gramosAntes[q]) $('l-g' + i).value = gramosAntes[q]; });
+    }
     $('cargando').hidden = true; $('inicio').hidden = false;
+    return true;
   }
   // 16 Sep: "sigue en el negocio Gs 1.435.868" ran out of its tile. Every amount is one unbreakable piece now, so a
   // tile's big number shrinks until it fits (never below 13 px), and the small line under it wraps.
@@ -858,7 +939,7 @@
   function recordarCuenta(c) { recordar('cheviva-cuenta', c); }
   /* ---------- the sale switch: Vendí · Regalé · Contacto ---------- */
   var TIPO = 'Compró', cobradoTocado = false, QUIEN = '';
-  var montoTocado = false;
+  var montoTocado = false, quienTocado = false;
   /* The running account between the two of them: the words say which way it goes and the figure is always
      positive (his rule: never a minus to decode). The button writes the payment that settles it. */
   function pintarCuenta(d) {
@@ -894,10 +975,13 @@
     var x = abierto[0];
     var paga = x ? (x.saldo > 0 ? dueno : x.quien) : dueno;
     var cobra = x ? (x.saldo > 0 ? x.quien : dueno) : '';
+    // who pays and who gets it are suggested only until he picks one himself (21 Sep: the page draws twice when it opens)
+    var quienAntes = $('cta-quien').value;
     llenarSelect($('cta-quien'), d.personas || [], '');
-    if (paga) $('cta-quien').value = paga;
-    pintarDestino(d);
-    if (cobra) $('cta-a').value = cobra;
+    if (quienTocado && (d.personas || []).indexOf(quienAntes) >= 0) $('cta-quien').value = quienAntes;
+    else if (paga) $('cta-quien').value = paga;
+    pintarDestino(d);                                    // keeps the "A quién" on screen when it can
+    if (!quienTocado && cobra) $('cta-a').value = cobra;
     pintarQueEs(d);
     if (!montoTocado) $('cta-monto').value = x ? String(Math.abs(Math.round(x.saldo))) : '';
   }
@@ -966,14 +1050,14 @@
   $('v-nombre').addEventListener('input', function () { prellenarCobrado(); });
   $('v-cobrado').addEventListener('input', function () { cobradoTocado = $('v-cobrado').value !== ''; });
   $('cta-monto').addEventListener('input', function () { montoTocado = $('cta-monto').value !== ''; });
-  $('cta-quien').addEventListener('change', function () { pintarDestino(D); pintarQueEs(D); });
-  $('cta-a').addEventListener('change', function () { pintarQueEs(D); });
+  $('cta-quien').addEventListener('change', function () { quienTocado = true; pintarDestino(D); pintarQueEs(D); });
+  $('cta-a').addEventListener('change', function () { quienTocado = true; pintarQueEs(D); });
   $('cta-que').addEventListener('change', function () { queTocado = true; pintarQueEs(D); });
   $('cta-guardar').addEventListener('click', function () {
     guardar($('cta-guardar'), 'guardarPago', { quien: $('cta-quien').value, a: $('cta-a').value,
       que: $('cta-que-wrap').hidden ? '' : $('cta-que').value,
       monto: $('cta-monto').value, fecha: $('cta-fecha').value, nota: $('cta-nota').value },
-      function () { $('cta-nota').value = ''; montoTocado = false; queTocado = false; });
+      function () { $('cta-nota').value = ''; montoTocado = false; queTocado = false; quienTocado = false; });
   });
   var VERBOS = { 'Compró': 'vendió', 'Regaló': 'regaló', 'En consignación': 'dejó', 'Volvió': 'recuperó' };
   function pintarTipo() {
@@ -1009,11 +1093,22 @@
   });
   function chatTipeado() { var u = waUrl($('r-telefono').value); $('r-wa').href = u || '#'; $('r-wa').classList.toggle('off', !u); }
   $('r-telefono').addEventListener('input', chatTipeado);
-  function unidadesDe() {
+  // mantener: drawing again keeps the unit he picked; picking another item starts from that item's own first unit
+  function unidadesDe(mantener) {
     var it = (D ? D.items : []).filter(function (i) { return i.nombre === $('c-que').value; })[0];
-    llenarSelect($('c-unidad'), it ? it.unidades : (D ? D.unidades : []));
+    (mantener ? llenarSelectMantener : llenarSelect)($('c-unidad'), it ? it.unidades : (D ? D.unidades : []));
   }
-  $('c-que').addEventListener('change', unidadesDe);
+  $('c-que').addEventListener('change', function () { unidadesDe(); });
+  // the numbers kept on the phone, at once (21 Sep); then the sheet's
+  var guardados = leerGuardados();
+  if (guardados) {
+    try { pintar(guardados.datos, guardados.leido); }
+    catch (e) {   // kept numbers this page cannot draw are dropped, and it waits for the sheet as before
+      try { localStorage.removeItem(GUARDADOS); } catch (x) {}
+      D = null; LEIDO = 0; DE_LA_MEMORIA = false;
+      document.body.classList.add('sin-datos'); $('cargando').hidden = false; $('inicio').hidden = true;
+    }
+  }
   cargar();
 
   /* ---------- the four entries ---------- */
