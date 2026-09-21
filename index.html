@@ -171,7 +171,6 @@
   .placeholder { color: var(--muted); font-style: italic; }
   .recibo-total { font-family: 'Archivo Black', sans-serif; font-size: 22px; margin: 8px 0 2px; }
   td small { display: block; color: var(--muted); font-size: 12px; }
-  #lotesTabla, #vendedoresTabla { font-size: 14px; }
   table.caja { margin-top: 14px; }
   table.caja tr.suave td { font-size: 12px; line-height: 1.35; }
   #lotesTabla td, #lotesTabla th { padding: 6px 3px; }
@@ -187,9 +186,33 @@
   .wa.off { opacity: .4; pointer-events: none; }
   button.wa { font-family: 'Archivo', sans-serif; cursor: pointer; }
   .seg.tipo { margin-bottom: 12px; }
+  /* 21 Sep, his point 9: the front page ends in three buttons, each a screen of its own */
+  .botones { padding: 0; overflow: hidden; }
+  .botones button.ir { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; background: var(--white); border: 0; border-bottom: 1px solid var(--ph); padding: 14px; font: inherit; color: var(--ink); cursor: pointer; }
+  .botones button.ir:last-child { border-bottom: 0; }
+  .botones .ir .t { flex: 1; min-width: 0; }
+  .botones .ir b { display: block; font-family: 'Archivo Black', 'Archivo', sans-serif; font-size: 17px; letter-spacing: .02em; font-weight: 400; }
+  .botones .ir small { display: block; margin-top: 2px; line-height: 1.35; }
+  .botones .ir .flecha { color: var(--seal); font-size: 24px; line-height: 1; flex: none; }
+  .arriba { display: flex; align-items: center; gap: 8px; margin: -4px 0 4px; }
+  .arriba a.volver { color: var(--seal); font-weight: 600; text-decoration: none; padding: 6px 0; }
+  .arriba .cuando { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .04em; color: var(--muted); text-align: right; }
+  body.sin-datos .con-datos, body:not(.sin-datos) .sin-datos-aviso { display: none; }
+  /* five columns at 320 px: the headers go tighter here than elsewhere, never the figures */
+  /* 21 Sep: a table of three to five columns of figures on a 320 px phone. The words and the figures shrink with the
+     screen (never below 11.5 px), the headings lose their spacing, and a heading of two words may take two lines */
+  table.densa { font-size: clamp(11.5px, 3.6vw, 14px); }
+  table.densa th { font-size: clamp(8.5px, 2.8vw, 11px); letter-spacing: 0; }
+  table.densa td, table.densa th { padding: 6px 2px; }
+  table.densa td:first-child, table.densa th:first-child { padding-left: 0; }
+  table.densa td.n, table.densa th.n { padding-left: clamp(2px, calc((100vw - 300px) / 12), 8px); }   /* headings of figures apart, as far as the screen allows */
+  table.densa td small { font-size: clamp(10.5px, 3.1vw, 12px); }
+  th.envuelve { white-space: normal; }
+  td a.enlace { color: var(--ink); text-decoration: none; font-weight: 600; }
+  #cta-que-dice { margin: 6px 0 0; }
 </style>
 </head>
-<body>
+<body class="sin-datos">
 <script>if (window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)) document.documentElement.classList.add('standalone');</script>
 <header class="top">
   <div class="sello">채</div>
@@ -203,6 +226,13 @@
     <div id="cargando" class="tarjeta"><span class="spinner"></span>Leyendo la planilla…</div>
     <div id="inicio" hidden>
       <div class="leido"><span id="actualizado"></span><a href="#" id="btnActualizar">Actualizar</a></div>
+      <!-- 21 Sep, his point 9: four things — what needs attention, the tiles, this month, this week — and three buttons -->
+      <div class="tarjeta" id="pendientesTarjeta">
+        <h3>Para revisar</h3>
+        <div id="pendientes"></div>
+        <button class="btn chico" id="btnLeer">Leer los recibos que quedaron en la carpeta</button>
+      </div>
+
       <div class="kpis" id="kpis"></div>
 
       <div class="tarjeta">
@@ -218,19 +248,30 @@
         <small id="semanaNota"></small>
       </div>
 
-      <div class="tarjeta">
-        <h3>Ventas por persona</h3>
-        <table id="vendedoresTabla"></table>
+      <div class="tarjeta botones" id="botones">
+        <button type="button" class="ir" data-ir="cuentas"><span class="t"><b>Cuentas</b><small>Quién le debe a quién, anotar un pago, compras por cuenta</small></span><span class="flecha">›</span></button>
+        <button type="button" class="ir" data-ir="mensajes"><span class="t"><b>Mensajes</b><small>WhatsApp e Instagram</small></span><span class="flecha">›</span></button>
+        <button type="button" class="ir" data-ir="numeros"><span class="t"><b>Números</b><small>Ventas por persona, lotes, en qué se convirtió la plata, costos por frasco, enlaces</small></span><span class="flecha">›</span></button>
       </div>
+    </div>
+  </section>
 
+  <!-- ============ CUENTAS (behind the front page's first button) ============ -->
+  <section id="p-cuentas" class="pantalla" hidden>
+    <div class="arriba"><a href="#inicio" class="volver" data-ir="inicio">‹ Inicio</a><span class="cuando" data-leido></span></div>
+    <h2>Cuentas</h2>
+    <div class="tarjeta sin-datos-aviso"><span class="spinner"></span>Leyendo la planilla…</div>
+    <div class="con-datos">
       <div class="tarjeta" id="cuenta-card">
         <h3>Quién le debe a quién</h3>
         <p class="sub" id="cuentaFrase" style="margin:0 0 8px"></p>
-        <table id="cuentaTabla"></table>
+        <table id="cuentaTabla" class="densa"></table>
         <div class="fila2">
           <div><label>Quién paga</label><select id="cta-quien"></select></div>
           <div><label>A quién</label><select id="cta-a"></select></div>
         </div>
+        <div id="cta-que-wrap"><label>Qué es</label><select id="cta-que"></select>
+          <p class="sub" id="cta-que-dice"></p></div>
         <div class="fila2">
           <div><label>Monto, Gs</label><input id="cta-monto" inputmode="numeric" placeholder="0"></div>
           <div><label>Fecha</label><input type="date" id="cta-fecha"></div>
@@ -243,28 +284,55 @@
         <h3>Compras por cuenta</h3>
         <table id="cuentasTabla"></table>
       </div>
+    </div>
+  </section>
 
+  <!-- ============ MENSAJES ============ -->
+  <section id="p-mensajes" class="pantalla" hidden>
+    <div class="arriba"><a href="#inicio" class="volver" data-ir="inicio">‹ Inicio</a><span class="cuando" data-leido></span></div>
+    <h2>Mensajes</h2>
+    <div class="tarjeta sin-datos-aviso"><span class="spinner"></span>Leyendo la planilla…</div>
+    <div class="con-datos">
       <div class="tarjeta">
         <h3>WhatsApp</h3>
         <div id="waMensajes"></div>
         <small id="waEstado"></small>
       </div>
 
-      <div class="tarjeta" id="pendientesTarjeta">
-        <h3>Para revisar</h3>
-        <div id="pendientes"></div>
-        <button class="btn chico" id="btnLeer">Leer los recibos que quedaron en la carpeta</button>
+      <div class="tarjeta" id="ig-card">
+        <h3>Instagram</h3>
+        <p class="sub" id="igCuenta" style="margin:0 0 8px"></p>
+        <table id="igTabla" class="densa"></table>
+        <small id="igEstado"></small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NÚMEROS ============ -->
+  <section id="p-numeros" class="pantalla" hidden>
+    <div class="arriba"><a href="#inicio" class="volver" data-ir="inicio">‹ Inicio</a><span class="cuando" data-leido></span></div>
+    <h2>Números</h2>
+    <div class="tarjeta sin-datos-aviso"><span class="spinner"></span>Leyendo la planilla…</div>
+    <div class="con-datos">
+      <div class="tarjeta">
+        <h3>Ventas por persona</h3>
+        <table id="vendedoresTabla" class="densa"></table>
       </div>
 
       <div class="tarjeta">
         <h3>Lotes</h3>
-        <table id="lotesTabla"></table>
+        <table id="lotesTabla" class="densa"></table>
       </div>
 
       <div class="tarjeta">
-        <h3>¿Dónde está la plata que salió?</h3>
+        <h3>En qué se convirtió la plata que salió</h3>
         <p class="sub" style="margin:0 0 8px">Un gasto pasa al Resultado cuando se usa: al vender o regalar un frasco, al pagar un viaje o la feria, y una parte del equipo cada mes. El resto está en cosas que el negocio todavía tiene.</p>
         <table id="balanceTabla"></table>
+      </div>
+
+      <div class="tarjeta">
+        <h3>Costos y margen por frasco</h3>
+        <table id="frascoTabla"></table>
       </div>
 
       <div class="tarjeta enlaces">
@@ -423,13 +491,14 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-21-etiquetas-y-conteo';   // must match what the sheet hands over; see below
-  var recargado = false;
-  try { recargado = sessionStorage.getItem('cheviva-recarga') === VERSION_PAGINA; } catch (e) {}
+  var VERSION_PAGINA = '2026-09-21-la-nueva-forma';   // must match what the sheet hands over; see below
 
   /* ---------- helpers ---------- */
   function gs(n) { var v = Number(n) || 0; n = Math.sign(v) * Math.round(Math.abs(v)); var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n < 0 ? '−' : '') + 'Gs\u00A0' + s; }   // half a guaraní rounds away from zero, like the sheet; the no-break space keeps Gs on its number
+  function gs2(n) { var v = Math.round((Number(n) || 0) * 100) / 100, e = Math.trunc(Math.abs(v)), c = Math.round((Math.abs(v) - e) * 100);   // the price of a gram: Gs 22,03, as on Resultado
+    return (v < 0 ? '−' : '') + 'Gs ' + String(e).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + ('0' + c).slice(-2); }
   function pct(x) { return Math.round((Number(x) || 0) * 100) + '%'; }
+  function num(n) { return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }   // a count with its thousands dot
   function cant(n) { return String(Math.round((Number(n) || 0) * 1000) / 1000).replace('.', ','); }
   function esc(s) { return String(s === undefined || s === null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   function fila(a, b, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + a + '</td><td class="n">' + b + '</td></tr>'; }
@@ -444,13 +513,24 @@
 
   /* ---------- navigation ---------- */
   var botones = document.querySelectorAll('nav.barra button');
+  // the three screens behind the front page's buttons (21 Sep): the bottom bar keeps Inicio lit while one is open
+  var DEBAJO_DE_INICIO = { cuentas: true, mensajes: true, numeros: true };
   function ir(p) {
     document.querySelectorAll('.pantalla').forEach(function (s) { s.hidden = s.id !== 'p-' + p; });
-    botones.forEach(function (b) { b.classList.toggle('on', b.dataset.p === p); });
+    var enLaBarra = DEBAJO_DE_INICIO[p] ? 'inicio' : p;
+    botones.forEach(function (b) { b.classList.toggle('on', b.dataset.p === enLaBarra); });
     window.scrollTo(0, 0);
-    try { history.replaceState(null, '', '#' + p); } catch (e) {}
+    // the front page gets no "#inicio" in the address (21 Sep): that is also the id of its own block, and a browser
+    // scrolls to it when the page finishes loading after the numbers are drawn — measured: 71 px down, "Para revisar"
+    // under the header. Every other screen keeps its name there, so a reload reopens it.
+    try { history.replaceState(null, '', p === 'inicio' ? location.pathname + location.search : '#' + p); } catch (e) {}
   }
   botones.forEach(function (b) { b.addEventListener('click', function () { ir(b.dataset.p); }); });
+  document.addEventListener('click', function (ev) {
+    var el = ev.target && ev.target.closest ? ev.target.closest('[data-ir]') : null;
+    if (!el) return;
+    ev.preventDefault(); ir(el.dataset.ir);
+  });
   var inicial = (location.hash || '#inicio').slice(1);
   if (!document.getElementById('p-' + inicial)) inicial = 'inicio';
   ir(inicial);
@@ -463,7 +543,11 @@
     if (D) $('actualizado').textContent = 'Leyendo la planilla…';
     google.script.run.withSuccessHandler(function (d) { leyendo = false; pintar(d); }).withFailureHandler(function (e) {
       leyendo = false;
-      if (!D) $('cargando').innerHTML = '<span class="error">No pude leer la planilla: ' + esc(e && e.message ? e.message : e) + '</span>';
+      if (!D) {
+        var aviso = '<span class="error">No pude leer la planilla: ' + esc(e && e.message ? e.message : e) + '</span>';
+        $('cargando').innerHTML = aviso;
+        document.querySelectorAll('.sin-datos-aviso').forEach(function (el) { el.innerHTML = aviso; });
+      }
       else $('actualizado').textContent = 'No se pudo actualizar: ' + (e && e.message ? e.message : e);
     }).datosApp();
   }
@@ -481,14 +565,20 @@
     return d.length < 8 ? '' : 'https://wa.me/' + d;
   }
   function pintar(d) {
-    // the page and the sheet must agree; an old page reading new data printed Gs 0 on real figures (20 Sep)
-    if (d.version && VERSION_PAGINA && d.version !== VERSION_PAGINA && !recargado) {
-      try { recargado = true; sessionStorage.setItem('cheviva-recarga', d.version); } catch (e) {}
+    // the page and the sheet must agree; an old page reading new data printed Gs 0 on real figures (20 Sep).
+    // ONE reload per pair of versions (21 Sep): the guard used to compare what it stored with the page's own version,
+    // so a page still served old after its reload reloaded again every time the sheet answered, and never drew.
+    var par = VERSION_PAGINA + '>' + d.version, yaRecargo = false;
+    try { yaRecargo = sessionStorage.getItem('cheviva-recarga') === par; } catch (e) { yaRecargo = true; }
+    if (d.version && d.version !== VERSION_PAGINA && !yaRecargo) {
+      try { sessionStorage.setItem('cheviva-recarga', par); } catch (e) {}
       location.reload(true); return;
     }
     D = d; ultimaLectura = Date.now();
-    var ahora = new Date();
-    $('actualizado').textContent = 'Leído de la planilla a las ' + ('0' + ahora.getHours()).slice(-2) + ':' + ('0' + ahora.getMinutes()).slice(-2);
+    document.body.classList.remove('sin-datos');
+    var ahora = new Date(), hhmm = ('0' + ahora.getHours()).slice(-2) + ':' + ('0' + ahora.getMinutes()).slice(-2);
+    $('actualizado').textContent = 'Leído de la planilla a las ' + hhmm;
+    document.querySelectorAll('[data-leido]').forEach(function (el) { el.textContent = 'Leído a las ' + hhmm; });
     $('hoy').textContent = d.hoy.split('-').reverse().join('/');
     ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha', 'cta-fecha', 'k-fecha'].forEach(function (id) { if (!$(id).value) $(id).value = d.hoy; });
     var n = d.numeros;
@@ -531,16 +621,19 @@
     $('cuentasTabla').innerHTML = cuentasFilas.length ? cuentasFilas.join('') : '<tr><td class="placeholder">Todavía no hay compras.</td></tr>';
     pintarCuenta(d);
     var pvs = d.porVendedor || [], sumar = function (k) { return pvs.reduce(function (t, v) { return t + (v[k] || 0); }, 0); };
+    // 21 Sep, his point 9: what each one gave away is a column of its own, not a note under the name
     $('vendedoresTabla').innerHTML = pvs.some(function (v) { return v.ventas || v.frascos || v.vasitos || v.regalados; })
-      ? '<tr><th>Quién</th><th class="n">Frascos</th><th class="n">Vasitos</th><th class="n">Ventas</th></tr>' +
-        pvs.map(function (v) { return '<tr><td>' + esc(v.quien) + (v.regalados ? '<small>regaló ' + v.regalados + '</small>' : '') + '</td><td class="n">' + (v.frascos || 0) + '</td><td class="n">' + (v.vasitos || 0) + '</td><td class="n">' + gs(v.ventas) + '</td></tr>'; }).join('') +
-        (pvs.length > 1 ? '<tr class="total"><td>Total</td><td class="n">' + sumar('frascos') + '</td><td class="n">' + sumar('vasitos') + '</td><td class="n">' + gs(sumar('ventas')) + '</td></tr>' : '')
+      // the soft hyphen lets "Regalados" break as Rega-lados on a 320 px phone and nowhere else
+      ? '<tr><th>Quién</th><th class="n">Frascos</th><th class="n">Vasitos</th><th class="n envuelve">Rega&shy;lados</th><th class="n">Ventas</th></tr>' +
+        pvs.map(function (v) { return '<tr><td>' + esc(v.quien) + '</td><td class="n">' + (v.frascos || 0) + '</td><td class="n">' + (v.vasitos || 0) + '</td><td class="n">' + (v.regalados || 0) + '</td><td class="n">' + gs(v.ventas) + '</td></tr>'; }).join('') +
+        (pvs.length > 1 ? '<tr class="total"><td>Total</td><td class="n">' + sumar('frascos') + '</td><td class="n">' + sumar('vasitos') + '</td><td class="n">' + sumar('regalados') + '</td><td class="n">' + gs(sumar('ventas')) + '</td></tr>' : '')
       : '<tr><td class="placeholder">Todavía no hay ventas.</td></tr>';
     $('waMensajes').innerHTML = (d.whatsapp.mensajes || []).length ? d.whatsapp.mensajes.map(function (m) {
       return '<div class="contacto"><div class="quien"><b>' + esc(m.nombre || m.telefono) + ' <small style="display:inline">' + esc(m.direccion === 'enviado' ? '← nosotros' : '→ nos escribió') + ' · ' + esc(m.cuando) + '</small></b><small>' + esc(m.texto) + '</small></div>' +
              '<a class="wa' + (m.whatsapp ? '' : ' off') + '" href="' + esc(m.whatsapp || '#') + '" target="_blank" rel="noopener">Abrir</a></div>';
     }).join('') : '<p class="sub" style="margin:0">Todavía no llegan mensajes: falta vincular el WhatsApp de la empresa.</p>';
     $('waEstado').textContent = d.whatsapp.ultimo ? 'Última lectura del WhatsApp: ' + d.whatsapp.ultimo + '. Quien escribe por primera vez entra solo en Ventas como consulta.' : '';
+    pintarInstagram(d.instagram);
     var p = d.pendientes, items = [];
     if (p.recibos) items.push([p.recibos, 'recibo(s) esperando en "Por revisar" (no cuadran o parecen repetidos)', { url: d.urls.planilla }]);
     if (p.problemas) items.push([p.problemas, 'recibo(s) con problema en la carpeta', { ir: 'recibo' }]);
@@ -573,7 +666,7 @@
       }).join('') : '<tr><td colspan="4" class="placeholder">Todavía no hay lotes.</td></tr>');
     var b = d.balance, dn = d.dinero;
     $('balanceTabla').innerHTML =
-      fila('Salió en compras desde el principio', gs(dn.salio), 'total') +
+      fila('Salió en compras', gs(dn.salio), 'total') +   // his point 2: no "desde el principio" in a heading
       fila('Ya es gasto', gs(dn.usado)) +
       fila('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)', gs(dn.vacios)) +
       fila('Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dn.kimchi - (dn.enEspecie || 0))) +
@@ -591,6 +684,11 @@
         return fila(x.saldo >= 0 ? 'Saldo a favor de ' + esc(x.quien) : 'Plata del negocio que tiene ' + esc(x.quien),
                     gs(Math.abs(x.saldo || 0)), 'suave');
       }).join('');
+    // the per-jar block: the sheet hands over the very rows Resultado prints (21 Sep), so the phone cannot disagree
+    var enCifra = function (x) { return x.forma === 'pct' ? pct(x.valor) : x.forma === 'gs2' ? gs2(x.valor) : gs(x.valor); };
+    $('frascoTabla').innerHTML = (d.porFrasco || []).length
+      ? d.porFrasco.map(function (x) { return fila(esc(x.texto), enCifra(x)); }).join('')
+      : fila('Costo por frasco de 350 ml', d.costoFrasco && d.costoFrasco['350 ml'] ? gs(d.costoFrasco['350 ml']) : '—');   // a sheet from before 21 Sep
     $('lnkCompra').href = d.urls.compra; $('lnkLote').href = d.urls.lote; $('lnkFrascos').href = d.urls.frascos;
     $('lnkRegistro').href = d.urls.registro; $('lnkCarpeta').href = d.urls.carpeta; $('lnkPlanilla').href = d.urls.planilla;
     $('lnkWhatsApp').href = d.whatsapp.url; $('lnkWhatsApp').textContent = 'WhatsApp de Cheviva ' + d.whatsapp.numero;
@@ -720,6 +818,39 @@
       (x.ultimo ? ' Último conteo: ' + x.ultimo.fecha + ', ' + cant(x.ultimo.contado) + u + '.' : ' Nunca se contó.');
   }
   $('k-que').addEventListener('change', function () { $('k-hecho').hidden = true; decirConteo(); });
+  /* Instagram next to WhatsApp (21 Sep, his point 9). The numbers come from the sheet, which reads Instagram at most once
+     an hour; they always carry the time they were read, and a connection that was cut says so instead of showing old
+     numbers as today's. A sheet with no Instagram key hands over nothing, and the card stays out of sight. */
+  function pintarInstagram(ig) {
+    $('ig-card').hidden = !ig;
+    if (!ig) return;
+    var c = ig.cuenta || {}, posts = ig.posts || [];
+    if (ig.cortada) {
+      $('igCuenta').innerHTML = '<span class="error">La conexión con Instagram se cortó: Instagram ya no acepta la llave.</span>';
+      $('igTabla').innerHTML = '';
+      $('igEstado').textContent = 'Hay que volver a conectarla en la página de Meta de la app' + (ig.fallo ? '. Se vio el ' + ig.fallo + '.' : '.');
+      return;
+    }
+    if (ig.pendiente) {
+      $('igCuenta').textContent = 'Todavía no se leyó Instagram. La planilla lo lee sola, una vez por hora.';
+      $('igTabla').innerHTML = ''; $('igEstado').textContent = ig.error ? 'La última vez no se pudo: ' + ig.error : '';
+      return;
+    }
+    $('igCuenta').innerHTML = (c.usuario ? '<b>@' + esc(c.usuario) + '</b> · ' : '') + '<span class="nb">' + cuantos(c.seguidores, 'seguidor', 'seguidores') + '</span> · <span class="nb">' + cuantos(c.publicaciones, 'publicación', 'publicaciones') + '</span>';
+    var algunaSumando = posts.some(function (p) { return p.sumando; });
+    $('igTabla').innerHTML = posts.length
+      ? '<tr><th>Publicación</th><th class="n">Alcance</th><th class="n">Vistas</th><th class="n envuelve">Me gusta</th></tr>' +
+        posts.map(function (p) {
+          var nota = [p.tipo, p.texto].filter(Boolean).join(' · ') + (p.comentarios ? ' · ' + cuantos(p.comentarios, 'comentario', 'comentarios') : '') + (p.sumando ? ' · todavía sumando' : '');
+          var fecha = p.enlace ? '<a class="enlace" href="' + esc(p.enlace) + '" target="_blank" rel="noopener">' + esc(p.fecha) + '</a>' : esc(p.fecha);
+          var n = function (x) { return x === null || x === undefined ? '—' : num(x); };
+          return '<tr><td>' + fecha + '<small>' + esc(nota) + '</small></td><td class="n">' + n(p.alcance) + '</td><td class="n">' + n(p.vistas) + '</td><td class="n">' + n(p.meGusta) + '</td></tr>';
+        }).join('')
+      : '<tr><td class="placeholder">Todavía no hay publicaciones.</td></tr>';
+    $('igEstado').textContent = 'Leído de Instagram el ' + ig.leido + '.' +
+      (algunaSumando ? ' Instagram sigue sumando los números de una publicación durante 48 horas.' : '') +
+      (ig.error ? ' La última lectura no se pudo: ' + ig.error : '');
+  }
   function kpi(e, n, neg) { return '<div class="kpi' + (neg ? ' neg' : '') + '"><div class="e">' + esc(e) + '</div><div class="n">' + n + '</div></div>'; }
   function ultimo(clave) { try { return localStorage.getItem(clave) || ''; } catch (e) { return ''; } }
   function recordar(clave, v) { try { if (v) localStorage.setItem(clave, v); } catch (e) {} }
@@ -740,15 +871,25 @@
           return x.saldo > 0 ? 'El negocio le debe ' + gs(x.saldo) + ' a ' + x.quien + '.'
                              : x.quien + ' tiene ' + gs(-x.saldo) + ' del negocio en la mano.';
         }).join(' ');
-    $('cuentaTabla').innerHTML =
-      '<tr><th>Quién</th><th class="n">Puso</th><th class="n">Tiene</th><th class="n">Saldo</th></tr>' +
-      gente.map(function (x) {
-        return '<tr><td>' + esc(x.quien) + '<small>ya devuelto <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
-               '<td class="n">' + gs(x.compras) + '</td><td class="n">' + gs(x.tiene) + '</td>' +
-               '<td class="n">' + gs(x.saldo) + '</td></tr>';
-      }).join('') +
-      '<tr class="total"><td>' + esc(dueno) + '</td><td class="n" colspan="3">' + gs(c.aporteDueno) + '</td></tr>' +
-      (c.sinDestino ? '<tr class="suave"><td colspan="4">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '');
+    /* 21 Sep (the Cuentas screen): everyone with the same four figures, the owner included, as on the sheet's tab since
+       step two. Puso and the saldo are columns; what they hold and what was paid back sit under the name, so three
+       columns of guaraníes still fit a 320 px phone. A sheet from before step two has no "todos": the old table stays. */
+    var todos = c.todos || [];
+    $('cuentaTabla').innerHTML = todos.length
+      ? '<tr><th>Quién</th><th class="n">Puso</th><th class="n envuelve">Saldo a su favor</th></tr>' +
+        todos.map(function (x) {
+          return '<tr><td>' + esc(x.quien) + '<small>tiene <span class="nb">' + gs(x.tiene) + '</span> del negocio · ya se le devolvió <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
+                 '<td class="n">' + gs(x.puso) + '</td><td class="n">' + gs(x.saldo) + '</td></tr>';
+        }).join('') +
+        (c.sinDestino ? '<tr class="suave"><td colspan="3">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '')
+      : '<tr><th>Quién</th><th class="n">Puso</th><th class="n">Tiene</th><th class="n">Saldo</th></tr>' +
+        gente.map(function (x) {
+          return '<tr><td>' + esc(x.quien) + '<small>ya devuelto <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
+                 '<td class="n">' + gs(x.compras) + '</td><td class="n">' + gs(x.tiene) + '</td>' +
+                 '<td class="n">' + gs(x.saldo) + '</td></tr>';
+        }).join('') +
+        '<tr class="total"><td>' + esc(dueno) + '</td><td class="n" colspan="3">' + gs(c.aporteDueno) + '</td></tr>' +
+        (c.sinDestino ? '<tr class="suave"><td colspan="4">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '');
     // the form is filled in with the payment that settles the first open balance; anyone can be picked instead
     var x = abierto[0];
     var paga = x ? (x.saldo > 0 ? dueno : x.quien) : dueno;
@@ -757,7 +898,7 @@
     if (paga) $('cta-quien').value = paga;
     pintarDestino(d);
     if (cobra) $('cta-a').value = cobra;
-    $('cta-guardar').textContent = x ? 'Anotar: ' + paga + ' le pagó a ' + cobra : 'Anotar un pago entre nosotros';
+    pintarQueEs(d);
     if (!montoTocado) $('cta-monto').value = x ? String(Math.abs(Math.round(x.saldo))) : '';
   }
   /* The "A quién" list is everyone except whoever is paying. */
@@ -766,6 +907,27 @@
     var paga = $('cta-quien').value, antes = $('cta-a').value;
     llenarSelect($('cta-a'), todos.filter(function (n) { return n !== paga; }), '');
     if (antes && antes !== paga) $('cta-a').value = antes;
+  }
+  /* What the payment IS (21 Sep; until then only the sheet's tab could say it, so cash handed over from the phone went in
+     as paying someone back). The kinds and their lines come from the sheet. Until he picks one himself, the choice
+     follows the direction by the sheet's own rule, and the button says in words what will be written. */
+  var queTocado = false;
+  function pintarQueEs(d) {
+    var tipos = (d && d.tiposPago) || (D && D.tiposPago) || [];
+    $('cta-que-wrap').hidden = !tipos.length;            // a sheet from before 21 Sep: the sheet decides, as before
+    var dueno = (((d || D) || {}).cuenta || {}).dueno || '', paga = $('cta-quien').value, cobra = $('cta-a').value;
+    if (tipos.length) {
+      var antes = $('cta-que').value;
+      llenarSelect($('cta-que'), tipos.map(function (t) { return t.nombre; }));
+      var vaAlDueno = cobra === dueno && paga !== dueno;
+      var sugerido = tipos.filter(function (t) { return !!t.alDueno === vaAlDueno; })[0] || tipos[0];
+      $('cta-que').value = queTocado && antes && tipos.some(function (t) { return t.nombre === antes; }) ? antes : sugerido.nombre;
+      var elegido = tipos.filter(function (t) { return t.nombre === $('cta-que').value; })[0] || {};
+      $('cta-que-dice').textContent = elegido.dice || '';
+      $('cta-guardar').textContent = paga && cobra ? 'Anotar: ' + paga + ' ' + (elegido.verbo || 'le pagó a') + ' ' + cobra : 'Anotar un pago entre nosotros';
+    } else {
+      $('cta-guardar').textContent = paga && cobra ? 'Anotar: ' + paga + ' le pagó a ' + cobra : 'Anotar un pago entre nosotros';
+    }
   }
   /* A sale's money stays with whoever sold it unless he says otherwise: the same thing the books assume.
      Switching the seller moves the pocket with it, but only while the pocket is still one this rule set —
@@ -804,11 +966,14 @@
   $('v-nombre').addEventListener('input', function () { prellenarCobrado(); });
   $('v-cobrado').addEventListener('input', function () { cobradoTocado = $('v-cobrado').value !== ''; });
   $('cta-monto').addEventListener('input', function () { montoTocado = $('cta-monto').value !== ''; });
-  $('cta-quien').addEventListener('change', function () { pintarDestino(D); });
+  $('cta-quien').addEventListener('change', function () { pintarDestino(D); pintarQueEs(D); });
+  $('cta-a').addEventListener('change', function () { pintarQueEs(D); });
+  $('cta-que').addEventListener('change', function () { queTocado = true; pintarQueEs(D); });
   $('cta-guardar').addEventListener('click', function () {
     guardar($('cta-guardar'), 'guardarPago', { quien: $('cta-quien').value, a: $('cta-a').value,
+      que: $('cta-que-wrap').hidden ? '' : $('cta-que').value,
       monto: $('cta-monto').value, fecha: $('cta-fecha').value, nota: $('cta-nota').value },
-      function () { $('cta-nota').value = ''; montoTocado = false; });
+      function () { $('cta-nota').value = ''; montoTocado = false; queTocado = false; });
   });
   var VERBOS = { 'Compró': 'vendió', 'Regaló': 'regaló', 'En consignación': 'dejó', 'Volvió': 'recuperó' };
   function pintarTipo() {
