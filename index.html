@@ -117,6 +117,7 @@
   .kpi .n.partido .par { display: block; }
   .kpi .n small.linea { display: block; line-height: 1.35; margin-top: 4px; white-space: normal; }
   .contacto .quien small, .pendiente span, td small { overflow-wrap: anywhere; }   /* a long link or a run-on word wraps instead of running out */
+  .nb { white-space: nowrap; overflow-wrap: normal; }   /* a money figure wraps BEFORE it, never inside it */
   .kpi .e { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .kpi.neg .n { color: var(--seal); }
   table { width: 100%; border-collapse: collapse; font-size: 15px; }
@@ -408,7 +409,7 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-21-sin-notas';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-21-sin-notas-b';   // must match what the sheet hands over; see below
   var recargado = false;
   try { recargado = sessionStorage.getItem('cheviva-recarga') === VERSION_PAGINA; } catch (e) {}
 
@@ -702,7 +703,7 @@
     $('cuentaTabla').innerHTML =
       '<tr><th>Quién</th><th class="n">Puso</th><th class="n">Tiene</th><th class="n">Saldo</th></tr>' +
       gente.map(function (x) {
-        return '<tr><td>' + esc(x.quien) + '<small>ya devuelto ' + gs(x.devuelto) + '</small></td>' +
+        return '<tr><td>' + esc(x.quien) + '<small>ya devuelto <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
                '<td class="n">' + gs(x.compras) + '</td><td class="n">' + gs(x.tiene) + '</td>' +
                '<td class="n">' + gs(x.saldo) + '</td></tr>';
       }).join('') +
