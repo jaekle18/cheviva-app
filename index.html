@@ -31,6 +31,7 @@
     guardarRegistro: function (d) { return { accion: 'registro', datos: d }; },
     guardarVenta: function (d) { return { accion: 'venta', datos: d }; },
     guardarPago: function (d) { return { accion: 'pago', datos: d }; },
+    guardarConteo: function (d) { return { accion: 'conteo', datos: d }; },
     anularRegistro: function (d) { return { accion: 'anular', datos: d }; },
     subirRecibo: function (c) { return { accion: 'subir', carga: c }; },
     aceptarLectura: function (l, c) { return { accion: 'aceptar', lectura: l, cuenta: c }; },
@@ -335,10 +336,23 @@
         <div><label>Blanco</label><input id="f-blanco" inputmode="numeric" placeholder="0"></div>
         <div><label>Vasitos</label><input id="f-vasitos" inputmode="numeric" placeholder="0"></div>
       </div>
-      <p class="sub" style="margin:6px 0 0">Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.</p>
-      <label>Etiquetas usadas</label><input id="f-etiquetas" inputmode="numeric" placeholder="opcional">
+      <p class="sub" id="f-tamanos" style="margin:6px 0 0">Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.</p>
       <label>Nota</label><textarea id="f-nota"></textarea>
       <button class="btn primario" id="f-guardar">Guardar los frascos</button>
+    </div>
+    <!-- 21 Sep, his point 7: count the box, type the number once, and the sheet holds exactly that -->
+    <div class="tarjeta" id="conteo-card" hidden>
+      <h3>Contar lo que hay</h3>
+      <p class="sub">Contá lo que hay de verdad y la planilla queda en ese número. La diferencia entra como gasto del mes.</p>
+      <div class="fila2">
+        <div><label>Qué</label><select id="k-que"></select></div>
+        <div><label>Fecha</label><input type="date" id="k-fecha"></div>
+      </div>
+      <label id="k-cuanto">Cuántos hay</label><input id="k-cantidad" inputmode="decimal" placeholder="0">
+      <p class="sub" id="k-dice" style="margin:6px 0 0"></p>
+      <label>Nota</label><input id="k-nota" placeholder="opcional">
+      <button class="btn primario" id="k-guardar">Guardar el conteo</button>
+      <p class="sub" id="k-hecho" hidden style="margin:8px 0 0"></p>
     </div>
   </section>
 
@@ -409,7 +423,7 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-21-saldo-a-favor';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-21-etiquetas-y-conteo';   // must match what the sheet hands over; see below
   var recargado = false;
   try { recargado = sessionStorage.getItem('cheviva-recarga') === VERSION_PAGINA; } catch (e) {}
 
@@ -476,7 +490,7 @@
     var ahora = new Date();
     $('actualizado').textContent = 'Leído de la planilla a las ' + ('0' + ahora.getHours()).slice(-2) + ':' + ('0' + ahora.getMinutes()).slice(-2);
     $('hoy').textContent = d.hoy.split('-').reverse().join('/');
-    ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha', 'cta-fecha'].forEach(function (id) { if (!$(id).value) $(id).value = d.hoy; });
+    ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha', 'cta-fecha', 'k-fecha'].forEach(function (id) { if (!$(id).value) $(id).value = d.hoy; });
     var n = d.numeros;
     var pp = d.porProducto || {}, pic = pp['Kimchi Picante'] ? pp['Kimchi Picante'].stock : 0, bla = pp['Kimchi Blanco'] ? pp['Kimchi Blanco'].stock : 0, vas = pp['Vasito 100 ml'] ? pp['Vasito 100 ml'].stock : 0;
     var ultimoLote = (d.lotes || []).filter(function (l) { return l.costoFrasco; })[0];   // newest batch with 350 ml jars: each batch costs a bit different
@@ -536,6 +550,7 @@
     if (p.unidad) items.push([p.unidad, 'compra(s) con una unidad que no corresponde', { url: d.urls.planilla }]);
     if (p.desconocidos && p.desconocidos.length) items.push([p.desconocidos.length, 'compra(s) con un nombre que no está en la lista y no cuentan: ' + p.desconocidos.join(', '), { url: d.urls.planilla }]);
     if (p.sinCuenta) items.push([p.sinCuenta, 'compra(s) sin cuenta: en la planilla, pestaña Compras, columna Cuenta', { url: d.urls.planilla }]);
+    if (p.conteosSinLeer) items.push([p.conteosSinLeer, 'conteo(s) que la planilla no pudo leer y no cuentan', { url: d.urls.planilla }]);
     $('pendientes').innerHTML = items.length ? items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + esc(x[1]) + '</span></div>'; }).join('')
                                             : '<p class="sub" style="margin:0">Nada pendiente.</p>';
     $('pendientes').querySelectorAll('.pendiente[data-i]').forEach(function (el) {
@@ -563,7 +578,7 @@
       fila('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)', gs(dn.vacios)) +
       fila('Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dn.kimchi - (dn.enEspecie || 0))) +
       (dn.sinLote ? fila('Ingredientes comprados sin lote', gs(dn.sinLote)) : '') +
-      fila('Gochugaru (' + Math.round(b.gochuStockG || 0) + ' g) y etiquetas en stock', gs(dn.gochuEtiquetas)) +
+      fila('Gochugaru (' + Math.round(b.gochuStockG || 0) + ' g) y etiquetas' + (b.etiquetasStock !== undefined ? ' (' + Math.round(b.etiquetasStock) + ')' : '') + ' en stock', gs(dn.gochuEtiquetas)) +
       fila('Equipo, lo que le queda de vida', gs(dn.equipoNeto)) +
       fila('Suma', gs(dn.suma), 'total') +
       fila('Lo que el negocio tiene hoy (activo)', gs(b.activo), 'suave') +
@@ -653,6 +668,11 @@
     llenarSelect($('r-producto'), d.productos.concat(['—']), 'Elegí…');
     llenarSelect($('r-canal'), d.canales, 'Sin especificar');
     llenarSelect($('f-lote'), d.lotes.map(function (l) { return l.lote; }), d.lotes.length ? 'Elegí…' : 'No hay lotes');
+    // the labels are no longer typed (21 Sep): the card says how many each jar takes, from Ajustes
+    var ep = d.etiquetasPorFrasco;
+    $('f-tamanos').textContent = 'Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.' +
+      (ep ? ' Las etiquetas se descuentan solas: ' + (ep['350 ml'] || 0) + ' por frasco y ' + (ep['100 ml'] || 0) + ' por vasito.' : '');
+    pintarConteo(d);
     if (!$('l-lote').value) { var max = d.lotes.reduce(function (m, l) { return Math.max(m, Number(l.lote) || 0); }, 0); $('l-lote').value = String(max + 1); }
     $('l-gramos').innerHTML = d.preguntasLote.map(function (q, i) { return '<label>' + esc(q) + '</label><input id="l-g' + i + '" inputmode="numeric" placeholder="0">'; }).join('');
     $('cargando').hidden = true; $('inicio').hidden = false;
@@ -682,6 +702,24 @@
       '<tr class="suave"><td colspan="2">Cada compra cuenta el día que se pagó, aunque los frascos y los ingredientes sigan en el negocio. Por eso la caja no es el resultado.</td></tr>';
   }
   function cuantos(n, uno, varios) { n = Number(n) || 0; return n + ' ' + (n === 1 ? uno : varios); }
+  /* The count card (21 Sep, his point 7): the list of what can be counted comes from the sheet, and so does what the
+     sheet has of each right now, so the difference is in front of him before he saves. */
+  function pintarConteo(d) {
+    var lista = d.contables || [];
+    $('conteo-card').hidden = !lista.length;
+    var antes = $('k-que').value;
+    llenarSelect($('k-que'), lista.map(function (x) { return x.item; }));
+    if (antes && lista.some(function (x) { return x.item === antes; })) $('k-que').value = antes;
+    decirConteo();
+  }
+  function decirConteo() {
+    var x = ((D && D.contables) || []).filter(function (c) { return c.item === $('k-que').value; })[0];
+    var u = x && x.unidad && x.unidad !== 'unidad' ? ' ' + x.unidad : '';
+    $('k-cuanto').textContent = 'Cuántos hay' + (u ? ' (' + u.trim() + ')' : '');
+    $('k-dice').textContent = !x ? '' : 'Según la planilla hay ' + cant(x.stock) + u + '.' +
+      (x.ultimo ? ' Último conteo: ' + x.ultimo.fecha + ', ' + cant(x.ultimo.contado) + u + '.' : ' Nunca se contó.');
+  }
+  $('k-que').addEventListener('change', function () { $('k-hecho').hidden = true; decirConteo(); });
   function kpi(e, n, neg) { return '<div class="kpi' + (neg ? ' neg' : '') + '"><div class="e">' + esc(e) + '</div><div class="n">' + n + '</div></div>'; }
   function ultimo(clave) { try { return localStorage.getItem(clave) || ''; } catch (e) { return ''; } }
   function recordar(clave, v) { try { if (v) localStorage.setItem(clave, v); } catch (e) {} }
@@ -833,9 +871,14 @@
       function () { $('l-lote').value = ''; $('l-parte').value = ''; $('l-nota').value = ''; (D ? D.preguntasLote : []).forEach(function (q, i) { $('l-g' + i).value = ''; }); });
   });
   $('f-guardar').addEventListener('click', function () {
-    guardar($('f-guardar'), 'guardarFrascos', { lote: $('f-lote').value, fecha: $('f-fecha').value, etiquetas: $('f-etiquetas').value, nota: $('f-nota').value,
+    guardar($('f-guardar'), 'guardarFrascos', { lote: $('f-lote').value, fecha: $('f-fecha').value, nota: $('f-nota').value,
       cantidades: { 'Kimchi Picante': $('f-picante').value, 'Kimchi Blanco': $('f-blanco').value, 'Vasito 100 ml': $('f-vasitos').value } },
-      function () { $('f-picante').value = ''; $('f-blanco').value = ''; $('f-vasitos').value = ''; $('f-etiquetas').value = ''; $('f-nota').value = ''; });
+      function () { $('f-picante').value = ''; $('f-blanco').value = ''; $('f-vasitos').value = ''; $('f-nota').value = ''; });
+  });
+  // what the count did stays on the card, in words, until he picks something else: a toast is gone in a few seconds
+  $('k-guardar').addEventListener('click', function () {
+    guardar($('k-guardar'), 'guardarConteo', { que: $('k-que').value, contado: $('k-cantidad').value, fecha: $('k-fecha').value, nota: $('k-nota').value },
+      function (r) { $('k-cantidad').value = ''; $('k-nota').value = ''; $('k-hecho').textContent = r.mensaje || ''; $('k-hecho').hidden = !r.mensaje; });
   });
   $('r-guardar').addEventListener('click', function () {
     guardar($('r-guardar'), 'guardarRegistro', { nombre: $('r-nombre').value, telefono: $('r-telefono').value, estado: $('r-estado').value, producto: $('r-producto').value, cantidad: $('r-cantidad').value, cobrado: $('r-cobrado').value, canal: $('r-canal').value, nota: $('r-nota').value },
