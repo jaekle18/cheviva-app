@@ -77,7 +77,7 @@
         if (j && j.ok === false && j.error) { if (mal) mal(new Error(j.error)); return; }
         if (ok) ok(j);
       })
-      .catch(function (e) { if (mal) mal(new Error('No hay conexión con la planilla: ' + (e && e.message ? e.message : e))); });
+      .catch(function () { if (mal) mal(new Error('No hay conexión con la planilla.')); });   // never the browser's own English words (22 Sep, his "C2: yes")
   }
   function corredor(ok, mal) {
     return new Proxy({}, { get: function (t, n) {
@@ -592,6 +592,13 @@
       else localStorage.removeItem(GUARDADOS);
     } catch (e) {}   // a phone that keeps nothing (private browsing, a full memory) still works: it waits, as before
   }
+  /* Why the sheet could not be read, always in Spanish (22 Sep, his "C2: yes": "so the line is all in Spanish"). The
+     wrapper already says a lost connection in Spanish; anything else is Google answering in English (a daily limit, a
+     time-out), and becomes one plain phrase. The details stay in the sheet's Log. */
+  function motivoDe(e) {
+    var m = e && e.message ? String(e.message) : String(e || '');
+    return /^No hay conexión con la planilla/.test(m) ? 'no hay conexión con la planilla' : 'la planilla contestó con un error';
+  }
   function cargar() {
     if (leyendo) return;
     leyendo = true; decirLeido();
@@ -600,7 +607,7 @@
       if (pintar(d)) guardarLeidos(d);
     }).withFailureHandler(function (e) {
       leyendo = false;
-      var motivo = e && e.message ? e.message : String(e);
+      var motivo = motivoDe(e);
       if (!D) {
         var aviso = '<span class="error">No pude leer la planilla: ' + esc(motivo) + '</span>';
         $('cargando').innerHTML = aviso;
@@ -744,13 +751,13 @@
       fila('Equipo, lo que le queda de vida', gs(dn.equipoNeto)) +
       fila('Suma', gs(dn.suma), 'total') +
       fila('Lo que el negocio tiene hoy (activo)', gs(b.activo), 'suave') +
-      // the same words as the Balance (his "B1, yes", 21 Sep): each line is that person's saldo, and it follows the sign
-      fila((b.aporteDueno || 0) >= 0 ? 'Saldo a favor de ' + esc((d.cuenta || {}).dueno || '') : 'Plata del negocio que tiene ' + esc((d.cuenta || {}).dueno || ''),
-           gs(Math.abs(b.aporteDueno || 0)), 'suave') +
+      // the same words as the Balance (22 Sep, the accounting view): the owner's saldo is his investment, anyone else's
+      // is what the business owes them or the business's money in their hands, and the words follow the sign
+      fila('Inversión neta de ' + esc((d.cuenta || {}).dueno || ''), gs(b.aporteDueno || 0), 'suave') +
       // 20 Sep: a line STAYS at zero. Being square is exactly what success looks like here, and a line that
       // disappears then reads as something broken. The words flip instead of printing a minus.
       ((d.cuenta || {}).gente || []).map(function (x) {
-        return fila(x.saldo >= 0 ? 'Saldo a favor de ' + esc(x.quien) : 'Plata del negocio que tiene ' + esc(x.quien),
+        return fila(x.saldo >= 0 ? 'El negocio le debe a ' + esc(x.quien) : esc(x.quien) + ' tiene plata del negocio',
                     gs(Math.abs(x.saldo || 0)), 'suave');
       }).join('');
     // the per-jar block: the sheet hands over the very rows Resultado prints (21 Sep), so the phone cannot disagree
@@ -946,11 +953,17 @@
     var c = d.cuenta || {}, gente = c.gente || [], dueno = c.dueno || '';
     // one line per person, whoever they are: the names come from the sheet's account list, never from this code
     var abierto = gente.filter(function (x) { return Math.round(x.saldo || 0) !== 0; });
-    $('cuentaFrase').textContent = !gente.length ? 'Todavía no hay nadie más en las cuentas.'
-      : !abierto.length ? 'Están a mano: nadie le debe nada a nadie.'
-      : abierto.map(function (x) {
-          return x.saldo > 0 ? 'El negocio le debe ' + gs(x.saldo) + ' a ' + x.quien + '.'
-                             : x.quien + ' tiene ' + gs(-x.saldo) + ' del negocio en la mano.';
+    /* Everyone, the owner first, in an accountant's words (22 Sep; his last look, 21 Sep: the owner was missing): his
+       saldo is his investment, anyone else's is a debt of the business or the business's money in their hands. */
+    var lista = (c.todos && c.todos.length) ? c.todos.filter(function (x) { return x.quien === dueno; })
+      .concat(c.todos.filter(function (x) { return x.quien !== dueno; })) : gente;
+    $('cuentaFrase').textContent = !lista.length ? 'Todavía no hay nadie en las cuentas.'
+      : lista.map(function (x) {
+          var s = Math.round(x.saldo || 0);
+          return x.quien === dueno ? 'Inversión neta de ' + x.quien + ': ' + gs(s) + '.'
+               : s > 0 ? 'El negocio le debe ' + gs(s) + ' a ' + x.quien + '.'
+               : s < 0 ? x.quien + ' tiene ' + gs(-s) + ' de plata del negocio.'
+               : x.quien + ' está a mano con el negocio.';
         }).join(' ');
     /* 21 Sep (the Cuentas screen): everyone with the same four figures, the owner included, as on the sheet's tab since
        step two. Puso and the saldo are columns; what they hold and what was paid back sit under the name, so three
