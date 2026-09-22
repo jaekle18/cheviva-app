@@ -970,9 +970,11 @@
        columns of guaraníes still fit a 320 px phone. A sheet from before step two has no "todos": the old table stays. */
     var todos = c.todos || [];
     $('cuentaTabla').innerHTML = todos.length
-      ? '<tr><th>Quién</th><th class="n">Puso</th><th class="n envuelve">Saldo a su favor</th></tr>' +
-        todos.map(function (x) {
-          return '<tr><td>' + esc(x.quien) + '<small>tiene <span class="nb">' + gs(x.tiene) + '</span> del negocio · ya se le devolvió <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
+      /* the sheet's own words and order since 22 Sep (the accounting view): the owner first, "Puso de su plata", what of
+         the business's money reached each one, and the saldo — his is his investment, theirs a debt or money they hold */
+      ? '<tr><th>Quién</th><th class="n envuelve">Puso de su plata</th><th class="n">Saldo</th></tr>' +
+        todos.filter(function (x) { return x.quien === dueno; }).concat(todos.filter(function (x) { return x.quien !== dueno; })).map(function (x) {
+          return '<tr><td>' + esc(x.quien) + '<small>plata del negocio que le llegó <span class="nb">' + gs(x.tiene) + '</span> · ya se le devolvió <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
                  '<td class="n">' + gs(x.puso) + '</td><td class="n">' + gs(x.saldo) + '</td></tr>';
         }).join('') +
         (c.sinDestino ? '<tr class="suave"><td colspan="3">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '')
