@@ -769,7 +769,7 @@
     var av = d.avisos || {};
     (av.insumos || []).forEach(function (x) { items.push([1, x.texto, { ir: 'compra', que: x.item }]); });
     (av.esperando || []).forEach(function (x) { items.push([1, x.texto, { ir: 'mensajes' }, x.ejemplo]); });
-    (av.consignas || []).forEach(function (x) { items.push([1, x.texto, { ir: 'venta', consigna: true }, x.ejemplo]); });
+    (av.consignas || []).forEach(function (x) { items.push([1, x.texto, { ir: 'registro', consigna: true }, x.ejemplo]); });   // the Venta screen
     $('pendientes').innerHTML = items.length ? items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>'; }).join('')
                                             : '<p class="sub" style="margin:0">Nada pendiente.</p>';
     $('pendientes').querySelectorAll('.pendiente[data-i]').forEach(function (el) {
