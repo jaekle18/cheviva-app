@@ -518,8 +518,6 @@
   function gs(n) { var v = Number(n) || 0; n = Math.sign(v) * Math.round(Math.abs(v)); var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n < 0 ? '−' : '') + 'Gs\u00A0' + s; }   // half a guaraní rounds away from zero, like the sheet; the no-break space keeps Gs on its number
   function gs2(n) { var v = Math.round((Number(n) || 0) * 100) / 100, e = Math.trunc(Math.abs(v)), c = Math.round((Math.abs(v) - e) * 100);   // the price of a gram: Gs 22,03, as on Resultado
     return (v < 0 ? '−' : '') + 'Gs ' + String(e).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + ('0' + c).slice(-2); }
-  function redondoComoGs(n) { var v = Number(n) || 0; return Math.sign(v) * Math.round(Math.abs(v)); }   // the rounding gs() prints
-  function sumaComoSeVe(lineas) { return lineas.reduce(function (t, x) { return t + redondoComoGs(x); }, 0); }
   function pct(x) { return Math.round((Number(x) || 0) * 100) + '%'; }
   function num(n) { return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }   // a count with its thousands dot
   function cant(n) { return String(Math.round((Number(n) || 0) * 1000) / 1000).replace('.', ','); }
@@ -701,20 +699,17 @@
     var n = d.numeros;
     var pp = d.porProducto || {}, pic = pp['Kimchi Picante'] ? pp['Kimchi Picante'].stock : 0, bla = pp['Kimchi Blanco'] ? pp['Kimchi Blanco'].stock : 0, vas = pp['Vasito 100 ml'] ? pp['Vasito 100 ml'].stock : 0;
     var ultimoLote = (d.lotes || []).filter(function (l) { return l.costoFrasco; })[0];   // newest batch with 350 ml jars: each batch costs a bit different
-    /* 24 Sep (stage 1's checker of cheviva-demo): the month's lines are shown to the guaraní and the result is their sum, so
-       the table adds up on screen (the lines of September added to Gs 95.964 under a result of Gs 95.965). */
-    var gastosMes = (d.mes.gastosItems || []).filter(function (g) { return g[1]; });   // every expense by its own name
-    var resultadoMes = sumaComoSeVe([d.mes.ventas, -d.mes.cmv, -d.mes.muestras, -d.mes.depreciacion].concat(gastosMes.map(function (g) { return -g[1]; })));
     $('kpis').innerHTML =
       kpi('Plata que salió', gs(n['Dinero gastado'])) +
       kpi('Ventas', gs(d.total.ventas) + (d.vendidos ? '<small class="linea">' + cuantos(d.vendidos['350 ml'], 'frasco', 'frascos') + ' · ' + cuantos(d.vendidos['100 ml'], 'vasito', 'vasitos') + '</small>' : '')) +
-      kpi('Resultado de ' + d.mes.nombre, gs(resultadoMes), resultadoMes < 0) +
+      kpi('Resultado de ' + d.mes.nombre, gs(d.mes.resultado), d.mes.resultado < 0) +
       kpi('Frascos en stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>' + (vas ? '<small class="linea">' + vas + ' vasitos</small>' : '')) +
       kpi('Costo por frasco', d.costoFrasco['350 ml'] ? gs(d.costoFrasco['350 ml']) + '<small class="linea">promedio de los lotes' + (ultimoLote ? ' · último ' + gs(ultimoLote.costoFrasco) : '') + '</small>' : '—') +
       kpi('Margen por frasco', d.costoFrasco['350 ml'] ? gs(d.margenFrasco.margen) + '<small class="linea">' + pct(d.margenFrasco.pct) + ' a ' + gs(d.margenFrasco.precio) + '</small>' : '—', d.margenFrasco.margen < 0);
     ajustarKpis();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarKpis);   // the web fonts are wider than the fallback
     $('mesTitulo').textContent = 'Este mes: ' + d.mes.nombre;
+    var gastosMes = (d.mes.gastosItems || []).filter(function (g) { return g[1]; });   // every expense by its own name
     $('mesTabla').innerHTML =
       fila('Ventas (' + d.mes.vendidos + ' frascos)', gs(d.mes.ventas)) +
       fila('Costo de lo vendido', gs(-d.mes.cmv)) +
@@ -722,7 +717,7 @@
       gastosMes.map(function (g) { return fila(esc(g[0]), gs(-g[1])); }).join('') +
       (gastosMes.length ? '' : fila('Gastos', gs(0))) +
       fila('Equipo, uso del mes', gs(-d.mes.depreciacion)) +
-      fila('Resultado', gs(resultadoMes), 'total');
+      fila('Resultado', gs(d.mes.resultado), 'total');
     // 16 Sep, his yes: next to the estimate, the cash that really came in and went out (every purchase counts the day it was paid)
     $('mesCaja').innerHTML = caja('Caja del mes', d.mes.cobrado, d.mes.compras || 0);
     $('faltaLector').hidden = d.hayClave !== false;
@@ -739,7 +734,7 @@
       fila('Costo de lo vendido', gs(-w.cmv)) +
       fila('Regalos, al costo', gs(-w.muestras)) +
       fila('Gastos (viajes, feria, Canva…)', gs(-w.gastos)) +
-      fila('Resultado de la semana', gs(sumaComoSeVe([w.ventas, -w.cmv, -w.muestras, -w.gastos])), 'total');
+      fila('Resultado de la semana', gs(w.resultado), 'total');
     $('semanaCaja').innerHTML = caja('Caja de la semana', w.cobrado, w.compras || 0);
     $('semanaNota').textContent = w1 ? 'La semana pasada (' + w1.texto + '): ventas ' + gs(w1.ventas) + ' (' + w1.vendidos + ' frascos), resultado ' + gs(w1.resultado) + '.' : '';
     var cuentasFilas = (d.porCuenta || []).map(function (c) { return fila(esc(c.cuenta) + '<small>' + c.compras + ' compra' + (c.compras === 1 ? '' : 's') + '</small>', gs(c.total)); });
