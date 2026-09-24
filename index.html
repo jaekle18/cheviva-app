@@ -226,6 +226,7 @@
   /* 24 Sep (cheviva-demo stage 3): a labeled example of the demo, never a row of the books */
   .ejemplo { font: 600 10px/1 'IBM Plex Mono', monospace; letter-spacing: .08em; background: var(--ink); color: var(--paper); padding: 2px 5px; border-radius: 3px; vertical-align: 2px; white-space: nowrap; }
   label.btn.apagado { opacity: .45; pointer-events: none; }
+  a.wa[hidden] { display: none !important; }   /* a chat link with nothing to open is not drawn (24 Sep); its inline style would win otherwise */
   .demo-tira b { font-family: 'Archivo Black', 'Archivo', sans-serif; letter-spacing: .12em; color: var(--white); background: var(--seal); padding: 1px 6px; }
   .demo-tira span { flex: 1 1 180px; min-width: 0; }
   .demo-tira button { flex: 0 0 auto; font: 12px/1 'Archivo', sans-serif; font-weight: 600; background: var(--paper); color: var(--ink); border: 0; border-radius: 6px; padding: 7px 10px; }
@@ -482,7 +483,7 @@
         <div><label>Nombre</label><input id="r-nombre"></div>
         <div><label>Teléfono</label><input id="r-telefono" inputmode="tel" placeholder="0981 123 456"></div>
       </div>
-      <a id="r-wa" class="wa off" href="#" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px">Abrir el chat en WhatsApp</a>
+      <a id="r-wa" class="wa" href="#" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px" hidden>Abrir el chat en WhatsApp</a>
       <label>Qué pasó</label><select id="r-estado"></select>
       <div class="fila2">
         <div><label>Producto</label><select id="r-producto"></select></div>
@@ -1165,7 +1166,7 @@
       queda: TIPO === 'En consignación' ? $('v-queda').value : '' },
       function () { (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = ''; }); $('v-cobrado').value = ''; cobradoTocado = false; $('v-nombre').value = ''; $('v-telefono').value = ''; $('v-nota').value = ''; $('v-queda').value = ''; $('v-cobrado-nota').hidden = true; });
   });
-  function chatTipeado() { var u = waUrl($('r-telefono').value); $('r-wa').href = u || '#'; $('r-wa').classList.toggle('off', !u); }
+  function chatTipeado() { var u = waUrl($('r-telefono').value); $('r-wa').href = u || '#'; $('r-wa').hidden = !u; }   // shown only with a number to open (24 Sep)
   $('r-telefono').addEventListener('input', chatTipeado);
   // mantener: drawing again keeps the unit he picked; picking another item starts from that item's own first unit
   function unidadesDe(mantener) {
