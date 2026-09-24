@@ -223,6 +223,9 @@
   /* the demo's strip (23 Sep, cheviva-demo): shown only when the sheet says it is the demo */
   .demo-tira { position: sticky; top: calc(61px + env(safe-area-inset-top)); z-index: 4; background: var(--ink); color: var(--paper); padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font: 12px/1.35 'IBM Plex Mono', monospace; }
   .demo-tira[hidden] { display: none; }
+  /* 24 Sep (cheviva-demo stage 3): a labeled example of the demo, never a row of the books */
+  .ejemplo { font: 600 10px/1 'IBM Plex Mono', monospace; letter-spacing: .08em; background: var(--ink); color: var(--paper); padding: 2px 5px; border-radius: 3px; vertical-align: 2px; white-space: nowrap; }
+  label.btn.apagado { opacity: .45; pointer-events: none; }
   .demo-tira b { font-family: 'Archivo Black', 'Archivo', sans-serif; letter-spacing: .12em; color: var(--white); background: var(--seal); padding: 1px 6px; }
   .demo-tira span { flex: 1 1 180px; min-width: 0; }
   .demo-tira button { flex: 0 0 auto; font: 12px/1 'Archivo', sans-serif; font-weight: 600; background: var(--paper); color: var(--ink); border: 0; border-radius: 6px; padding: 7px 10px; }
@@ -371,6 +374,7 @@
     <p>Sacale una foto al recibo, o elegí una foto o un PDF. Se lee en el momento y te muestro lo que leyó.</p>
     <label class="btn primario">Sacar foto<input type="file" id="camara" accept="image/*" capture="environment"></label>
     <label class="btn">Elegir foto o PDF<input type="file" id="archivo" accept="image/*,application/pdf" multiple></label>
+    <p class="sub" id="socioRecibos" hidden></p>
     <p class="error" id="faltaLector" hidden>Falta conectar el lector: en la planilla, menú Cheviva → Conectar el lector de recibos.</p>
     <div id="progreso" hidden><div class="tarjeta"><span class="spinner"></span><span id="progresoTexto">Subiendo…</span></div></div>
     <div id="resultados"></div>
@@ -508,12 +512,14 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-21-la-nueva-forma';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-24-avisos';   // must match what the sheet hands over; see below
 
   /* ---------- helpers ---------- */
   function gs(n) { var v = Number(n) || 0; n = Math.sign(v) * Math.round(Math.abs(v)); var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n < 0 ? '−' : '') + 'Gs\u00A0' + s; }   // half a guaraní rounds away from zero, like the sheet; the no-break space keeps Gs on its number
   function gs2(n) { var v = Math.round((Number(n) || 0) * 100) / 100, e = Math.trunc(Math.abs(v)), c = Math.round((Math.abs(v) - e) * 100);   // the price of a gram: Gs 22,03, as on Resultado
     return (v < 0 ? '−' : '') + 'Gs ' + String(e).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + ('0' + c).slice(-2); }
+  function redondoComoGs(n) { var v = Number(n) || 0; return Math.sign(v) * Math.round(Math.abs(v)); }   // the rounding gs() prints
+  function sumaComoSeVe(lineas) { return lineas.reduce(function (t, x) { return t + redondoComoGs(x); }, 0); }
   function pct(x) { return Math.round((Number(x) || 0) * 100) + '%'; }
   function num(n) { return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }   // a count with its thousands dot
   function cant(n) { return String(Math.round((Number(n) || 0) * 1000) / 1000).replace('.', ','); }
@@ -695,17 +701,20 @@
     var n = d.numeros;
     var pp = d.porProducto || {}, pic = pp['Kimchi Picante'] ? pp['Kimchi Picante'].stock : 0, bla = pp['Kimchi Blanco'] ? pp['Kimchi Blanco'].stock : 0, vas = pp['Vasito 100 ml'] ? pp['Vasito 100 ml'].stock : 0;
     var ultimoLote = (d.lotes || []).filter(function (l) { return l.costoFrasco; })[0];   // newest batch with 350 ml jars: each batch costs a bit different
+    /* 24 Sep (stage 1's checker of cheviva-demo): the month's lines are shown to the guaraní and the result is their sum, so
+       the table adds up on screen (the lines of September added to Gs 95.964 under a result of Gs 95.965). */
+    var gastosMes = (d.mes.gastosItems || []).filter(function (g) { return g[1]; });   // every expense by its own name
+    var resultadoMes = sumaComoSeVe([d.mes.ventas, -d.mes.cmv, -d.mes.muestras, -d.mes.depreciacion].concat(gastosMes.map(function (g) { return -g[1]; })));
     $('kpis').innerHTML =
       kpi('Plata que salió', gs(n['Dinero gastado'])) +
       kpi('Ventas', gs(d.total.ventas) + (d.vendidos ? '<small class="linea">' + cuantos(d.vendidos['350 ml'], 'frasco', 'frascos') + ' · ' + cuantos(d.vendidos['100 ml'], 'vasito', 'vasitos') + '</small>' : '')) +
-      kpi('Resultado de ' + d.mes.nombre, gs(d.mes.resultado), d.mes.resultado < 0) +
+      kpi('Resultado de ' + d.mes.nombre, gs(resultadoMes), resultadoMes < 0) +
       kpi('Frascos en stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>' + (vas ? '<small class="linea">' + vas + ' vasitos</small>' : '')) +
       kpi('Costo por frasco', d.costoFrasco['350 ml'] ? gs(d.costoFrasco['350 ml']) + '<small class="linea">promedio de los lotes' + (ultimoLote ? ' · último ' + gs(ultimoLote.costoFrasco) : '') + '</small>' : '—') +
       kpi('Margen por frasco', d.costoFrasco['350 ml'] ? gs(d.margenFrasco.margen) + '<small class="linea">' + pct(d.margenFrasco.pct) + ' a ' + gs(d.margenFrasco.precio) + '</small>' : '—', d.margenFrasco.margen < 0);
     ajustarKpis();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarKpis);   // the web fonts are wider than the fallback
     $('mesTitulo').textContent = 'Este mes: ' + d.mes.nombre;
-    var gastosMes = (d.mes.gastosItems || []).filter(function (g) { return g[1]; });   // every expense by its own name
     $('mesTabla').innerHTML =
       fila('Ventas (' + d.mes.vendidos + ' frascos)', gs(d.mes.ventas)) +
       fila('Costo de lo vendido', gs(-d.mes.cmv)) +
@@ -713,10 +722,16 @@
       gastosMes.map(function (g) { return fila(esc(g[0]), gs(-g[1])); }).join('') +
       (gastosMes.length ? '' : fila('Gastos', gs(0))) +
       fila('Equipo, uso del mes', gs(-d.mes.depreciacion)) +
-      fila('Resultado', gs(d.mes.resultado), 'total');
+      fila('Resultado', gs(resultadoMes), 'total');
     // 16 Sep, his yes: next to the estimate, the cash that really came in and went out (every purchase counts the day it was paid)
     $('mesCaja').innerHTML = caja('Caja del mes', d.mes.cobrado, d.mes.compras || 0);
     $('faltaLector').hidden = d.hayClave !== false;
+    // 24 Sep (S14): a partner of the demo sees how many of the 3 test receipts are left; at 0 the upload is off
+    var so = d.socio, sinRecibos = !!(so && so.quedan <= 0);
+    $('socioRecibos').hidden = !so;
+    if (so) $('socioRecibos').textContent = sinRecibos ? 'Ya usaste tus ' + so.limite + ' recibos de prueba. Todo lo demás de la demo sigue abierto.'
+                                                       : 'Recibos de prueba: te quedan ' + so.quedan + ' de ' + so.limite;
+    ['camara', 'archivo'].forEach(function (id) { $(id).disabled = sinRecibos; $(id).parentNode.classList.toggle('apagado', sinRecibos); });
     var w = d.semanas[0], w1 = d.semanas[1];
     $('semanaTitulo').textContent = 'Esta semana: ' + w.texto;
     $('semanaTabla').innerHTML =
@@ -724,7 +739,7 @@
       fila('Costo de lo vendido', gs(-w.cmv)) +
       fila('Regalos, al costo', gs(-w.muestras)) +
       fila('Gastos (viajes, feria, Canva…)', gs(-w.gastos)) +
-      fila('Resultado de la semana', gs(w.resultado), 'total');
+      fila('Resultado de la semana', gs(sumaComoSeVe([w.ventas, -w.cmv, -w.muestras, -w.gastos])), 'total');
     $('semanaCaja').innerHTML = caja('Caja de la semana', w.cobrado, w.compras || 0);
     $('semanaNota').textContent = w1 ? 'La semana pasada (' + w1.texto + '): ventas ' + gs(w1.ventas) + ' (' + w1.vendidos + ' frascos), resultado ' + gs(w1.resultado) + '.' : '';
     var cuentasFilas = (d.porCuenta || []).map(function (c) { return fila(esc(c.cuenta) + '<small>' + c.compras + ' compra' + (c.compras === 1 ? '' : 's') + '</small>', gs(c.total)); });
@@ -755,12 +770,22 @@
     if (p.desconocidos && p.desconocidos.length) items.push([p.desconocidos.length, 'compra(s) con un nombre que no está en la lista y no cuentan: ' + p.desconocidos.join(', '), { url: d.urls.planilla }]);
     if (p.sinCuenta) items.push([p.sinCuenta, 'compra(s) sin cuenta: en la planilla, pestaña Compras, columna Cuenta', { url: d.urls.planilla }]);
     if (p.conteosSinLeer) items.push([p.conteosSinLeer, 'conteo(s) que la planilla no pudo leer y no cuentan', { url: d.urls.planilla }]);
-    $('pendientes').innerHTML = items.length ? items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + esc(x[1]) + '</span></div>'; }).join('')
+    // 24 Sep (cheviva-demo stage 3, his C1, C2, C4): each one a line of its own, worked out when the app asks
+    var av = d.avisos || {};
+    (av.insumos || []).forEach(function (x) { items.push([1, x.texto, { ir: 'compra', que: x.item }]); });
+    (av.esperando || []).forEach(function (x) { items.push([1, x.texto, { ir: 'mensajes' }, x.ejemplo]); });
+    (av.consignas || []).forEach(function (x) { items.push([1, x.texto, { ir: 'venta', consigna: true }, x.ejemplo]); });
+    $('pendientes').innerHTML = items.length ? items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>'; }).join('')
                                             : '<p class="sub" style="margin:0">Nada pendiente.</p>';
     $('pendientes').querySelectorAll('.pendiente[data-i]').forEach(function (el) {
       el.addEventListener('click', function () {
         var a = items[Number(el.dataset.i)][2] || {};
-        if (a.ir) { ir(a.ir); if (a.lote && $('f-lote')) $('f-lote').value = a.lote; }
+        if (a.ir) {
+          ir(a.ir);
+          if (a.lote && $('f-lote')) $('f-lote').value = a.lote;
+          if (a.que && $('c-que')) { $('c-que').value = a.que; unidadesDe(true); }
+          if (a.consigna && $('consigna-card') && !$('consigna-card').hidden) $('consigna-card').scrollIntoView({ block: 'start' });
+        }
         else if (a.url) window.open(a.url, '_blank');
       });
     });
@@ -850,10 +875,10 @@
     bolsilloPorDefecto();                      // the list only exists now, so the default is set after it is filled
     var gente = (d.consigna && d.consigna.gente) || [];
     $('consigna').innerHTML = gente.length ? gente.map(function (g, i) {
-      return '<div class="contacto"><div class="quien"><b>' + esc(g.quien) + ' · ' + esc(g.detalle) + '</b><small>desde el ' +
+      return '<div class="contacto"><div class="quien"><b>' + (g.ejemplo ? '<span class="ejemplo">EJEMPLO</span> ' : '') + esc(g.quien) + ' · ' + esc(g.detalle) + '</b><small>desde el ' +
              esc(g.desde) + ' · ' + g.dias + ' día' + (g.dias === 1 ? '' : 's') +
              (g.queda ? ' · se queda ' + gs(g.queda) + ' por frasco' : '') + '</small></div>' +
-             '<button type="button" class="wa" data-c="' + i + '">Volvieron</button></div>';
+             (g.ejemplo ? '' : '<button type="button" class="wa" data-c="' + i + '">Volvieron</button>') + '</div>';
     }).join('') : '';
     $('consigna').querySelectorAll('button[data-c]').forEach(function (bt) {
       bt.addEventListener('click', function () {
