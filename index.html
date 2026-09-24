@@ -710,14 +710,16 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarKpis);   // the web fonts are wider than the fallback
     $('mesTitulo').textContent = 'Este mes: ' + d.mes.nombre;
     var gastosMes = (d.mes.gastosItems || []).filter(function (g) { return g[1]; });   // every expense by its own name
+    // 24 Sep: the lines as printed come from the sheet, rounded so that they add up to the result under them
+    var mo = d.mes.mostrado || { ventas: d.mes.ventas, cmv: d.mes.cmv, muestras: d.mes.muestras, depreciacion: d.mes.depreciacion, resultado: d.mes.resultado, gastos: {} };
     $('mesTabla').innerHTML =
-      fila('Ventas (' + d.mes.vendidos + ' frascos)', gs(d.mes.ventas)) +
-      fila('Costo de lo vendido', gs(-d.mes.cmv)) +
-      fila('Muestras regaladas', gs(-d.mes.muestras)) +
-      gastosMes.map(function (g) { return fila(esc(g[0]), gs(-g[1])); }).join('') +
+      fila('Ventas (' + d.mes.vendidos + ' frascos)', gs(mo.ventas)) +
+      fila('Costo de lo vendido', gs(-mo.cmv)) +
+      fila('Muestras regaladas', gs(-mo.muestras)) +
+      gastosMes.map(function (g) { return fila(esc(g[0]), gs(-(mo.gastos[g[0]] !== undefined ? mo.gastos[g[0]] : g[1]))); }).join('') +
       (gastosMes.length ? '' : fila('Gastos', gs(0))) +
-      fila('Equipo, uso del mes', gs(-d.mes.depreciacion)) +
-      fila('Resultado', gs(d.mes.resultado), 'total');
+      fila('Equipo, uso del mes', gs(-mo.depreciacion)) +
+      fila('Resultado', gs(mo.resultado), 'total');
     // 16 Sep, his yes: next to the estimate, the cash that really came in and went out (every purchase counts the day it was paid)
     $('mesCaja').innerHTML = caja('Caja del mes', d.mes.cobrado, d.mes.compras || 0);
     $('faltaLector').hidden = d.hayClave !== false;
@@ -727,14 +729,14 @@
     if (so) $('socioRecibos').textContent = sinRecibos ? 'Ya usaste tus ' + so.limite + ' recibos de prueba. Todo lo demás de la demo sigue abierto.'
                                                        : 'Recibos de prueba: te quedan ' + so.quedan + ' de ' + so.limite;
     ['camara', 'archivo'].forEach(function (id) { $(id).disabled = sinRecibos; $(id).parentNode.classList.toggle('apagado', sinRecibos); });
-    var w = d.semanas[0], w1 = d.semanas[1];
+    var w = d.semanas[0], w1 = d.semanas[1], wm = w.mostrado || w;
     $('semanaTitulo').textContent = 'Esta semana: ' + w.texto;
     $('semanaTabla').innerHTML =
-      fila('Ventas (' + w.vendidos + ' frasco' + (w.vendidos === 1 ? '' : 's') + ')', gs(w.ventas)) +
-      fila('Costo de lo vendido', gs(-w.cmv)) +
-      fila('Regalos, al costo', gs(-w.muestras)) +
-      fila('Gastos (viajes, feria, Canva…)', gs(-w.gastos)) +
-      fila('Resultado de la semana', gs(w.resultado), 'total');
+      fila('Ventas (' + w.vendidos + ' frasco' + (w.vendidos === 1 ? '' : 's') + ')', gs(wm.ventas)) +
+      fila('Costo de lo vendido', gs(-wm.cmv)) +
+      fila('Regalos, al costo', gs(-wm.muestras)) +
+      fila('Gastos (viajes, feria, Canva…)', gs(-wm.gastos)) +
+      fila('Resultado de la semana', gs(wm.resultado), 'total');
     $('semanaCaja').innerHTML = caja('Caja de la semana', w.cobrado, w.compras || 0);
     $('semanaNota').textContent = w1 ? 'La semana pasada (' + w1.texto + '): ventas ' + gs(w1.ventas) + ' (' + w1.vendidos + ' frascos), resultado ' + gs(w1.resultado) + '.' : '';
     var cuentasFilas = (d.porCuenta || []).map(function (c) { return fila(esc(c.cuenta) + '<small>' + c.compras + ' compra' + (c.compras === 1 ? '' : 's') + '</small>', gs(c.total)); });
@@ -750,8 +752,9 @@
         (pvs.length > 1 ? '<tr class="total"><td>Total</td><td class="n">' + sumar('frascos') + '</td><td class="n">' + sumar('vasitos') + '</td><td class="n">' + sumar('regalados') + '</td><td class="n">' + gs(sumar('ventas')) + '</td></tr>' : '')
       : '<tr><td class="placeholder">Todavía no hay ventas.</td></tr>';
     $('waMensajes').innerHTML = (d.whatsapp.mensajes || []).length ? d.whatsapp.mensajes.map(function (m) {
-      return '<div class="contacto"><div class="quien"><b>' + esc(m.nombre || m.telefono) + ' <small style="display:inline">' + esc(m.direccion === 'enviado' ? '← nosotros' : '→ nos escribió') + ' · ' + esc(m.cuando) + '</small></b><small>' + esc(m.texto) + '</small></div>' +
-             '<a class="wa' + (m.whatsapp ? '' : ' off') + '" href="' + esc(m.whatsapp || '#') + '" target="_blank" rel="noopener">Abrir</a></div>';
+      // 24 Sep: "Abrir" only where there is a chat to open (the demo has no customer numbers, and an example no chat)
+      return '<div class="contacto"><div class="quien"><b>' + (m.ejemplo ? '<span class="ejemplo">EJEMPLO</span> ' : '') + esc(m.nombre || m.telefono) + ' <small style="display:inline">' + esc(m.direccion === 'enviado' ? '← nosotros' : '→ nos escribió') + ' · ' + esc(m.cuando) + '</small></b><small>' + esc(m.texto) + '</small></div>' +
+             (m.whatsapp ? '<a class="wa" href="' + esc(m.whatsapp) + '" target="_blank" rel="noopener">Abrir</a>' : '') + '</div>';
     }).join('') : '<p class="sub" style="margin:0">Todavía no llegan mensajes: falta vincular el WhatsApp de la empresa.</p>';
     $('waEstado').textContent = d.whatsapp.ultimo ? 'Última lectura del WhatsApp: ' + d.whatsapp.ultimo + '. Quien escribe por primera vez entra solo en Ventas como consulta.' : '';
     pintarInstagram(d.instagram);
@@ -795,16 +798,17 @@
                '<td>' + (l.envasadoEl ? esc(String(l.envasadoEl).slice(0, 5)) : '—') + '</td>' +
                '<td class="n">' + gs(l.ingredientes) + '</td><td class="n">' + (lleno.length ? lleno.join('') : 'nada') + '</td></tr>';
       }).join('') : '<tr><td colspan="4" class="placeholder">Todavía no hay lotes.</td></tr>');
-    var b = d.balance, dn = d.dinero;
+    var b = d.balance, dn = d.dinero, dm = d.dineroMostrado || { salio: dn.salio, usado: dn.usado, vacios: dn.vacios, kimchi: dn.kimchi - (dn.enEspecie || 0),
+      sinLote: dn.sinLote, gochuEtiquetas: dn.gochuEtiquetas, equipoNeto: dn.equipoNeto, suma: dn.suma };   // 24 Sep: lines that add up as printed
     $('balanceTabla').innerHTML =
-      fila('Salió en compras', gs(dn.salio), 'total') +   // his point 2: no "desde el principio" in a heading
-      fila('Ya es gasto', gs(dn.usado)) +
-      fila('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)', gs(dn.vacios)) +
-      fila('Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dn.kimchi - (dn.enEspecie || 0))) +
-      (dn.sinLote ? fila('Ingredientes comprados sin lote', gs(dn.sinLote)) : '') +
-      fila('Gochugaru (' + Math.round(b.gochuStockG || 0) + ' g) y etiquetas' + (b.etiquetasStock !== undefined ? ' (' + Math.round(b.etiquetasStock) + ')' : '') + ' en stock', gs(dn.gochuEtiquetas)) +
-      fila('Equipo, lo que le queda de vida', gs(dn.equipoNeto)) +
-      fila('Suma', gs(dn.suma), 'total') +
+      fila('Salió en compras', gs(dm.salio), 'total') +   // his point 2: no "desde el principio" in a heading
+      fila('Ya es gasto', gs(dm.usado)) +
+      fila('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)', gs(dm.vacios)) +
+      fila('Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dm.kimchi)) +
+      (dn.sinLote ? fila('Ingredientes comprados sin lote', gs(dm.sinLote)) : '') +
+      fila('Gochugaru (' + Math.round(b.gochuStockG || 0) + ' g) y etiquetas' + (b.etiquetasStock !== undefined ? ' (' + Math.round(b.etiquetasStock) + ')' : '') + ' en stock', gs(dm.gochuEtiquetas)) +
+      fila('Equipo, lo que le queda de vida', gs(dm.equipoNeto)) +
+      fila('Suma', gs(dm.suma), 'total') +
       fila('Lo que el negocio tiene hoy (activo)', gs(b.activo), 'suave') +
       // the same words as the Balance (22 Sep, the accounting view): the owner's saldo is his investment, anyone else's
       // is what the business owes them or the business's money in their hands, and the words follow the sign
@@ -827,7 +831,7 @@
     // the last contacts, each one a tap away on WhatsApp; tapping the name fills the form for a new entry
     $('contactos').innerHTML = (d.registroReciente || []).length ? d.registroReciente.map(function (r, i) {
       return '<div class="contacto"><div class="quien" data-i="' + i + '"><b>' + esc(r.nombre) + '</b><small>' + esc([r.estado, r.producto && r.producto !== '—' ? (r.cantidad || '') + ' × ' + r.producto : '', r.canal, r.fecha].filter(Boolean).join(' · ')) + '</small></div>' +
-             '<a class="wa' + (r.whatsapp ? '' : ' off') + '" href="' + esc(r.whatsapp || '#') + '" target="_blank" rel="noopener">WhatsApp</a></div>';
+             (r.whatsapp ? '<a class="wa" href="' + esc(r.whatsapp) + '" target="_blank" rel="noopener">WhatsApp</a>' : '') + '</div>';   // no number, no button (24 Sep)
     }).join('') : '<p class="sub" style="margin:0">Todavía no hay contactos.</p>';
     $('contactos').querySelectorAll('.quien').forEach(function (el) {
       el.addEventListener('click', function () { var r = d.registroReciente[Number(el.dataset.i)]; $('r-nombre').value = r.nombre; $('r-telefono').value = r.telefono || ''; chatTipeado(); window.scrollTo(0, 0); });
