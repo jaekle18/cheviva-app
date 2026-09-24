@@ -512,7 +512,7 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-24-avisos';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-24-suma';   // must match what the sheet hands over; see below
 
   /* ---------- helpers ---------- */
   function gs(n) { var v = Number(n) || 0; n = Math.sign(v) * Math.round(Math.abs(v)); var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n < 0 ? '−' : '') + 'Gs\u00A0' + s; }   // half a guaraní rounds away from zero, like the sheet; the no-break space keeps Gs on its number
