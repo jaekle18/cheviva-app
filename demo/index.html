@@ -162,16 +162,36 @@ var INGLES = {
 function inglesDe_(s) { return alIngles_(s); }
 var DIAS_INGLES = { dom: 'Sun', lun: 'Mon', mar: 'Tue', 'mié': 'Wed', mie: 'Wed', jue: 'Thu', vie: 'Fri', 'sáb': 'Sat', sab: 'Sat' };
 var MESES_INGLES = { ene: 'Jan', feb: 'Feb', mar: 'Mar', abr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', ago: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dic: 'Dec' };
-/** "sep 2026" -> "Sep 2026"; "lun 21 – dom 27 sep" -> "Mon Sep 21 – Sun Sep 27"; "lun 29 sep – dom 5 oct" too. */
+/** "sep 2026" -> "Sep 2026"; "lun 21 – dom 27 sep" -> "Mon 21 – Sun 27 Sep"; "lun 29 sep – dom 5 oct" -> "Mon 29 Sep – Sun 5 Oct".
+    Day before month, as his map document writes dates in English ("25 Sep 2026"; the chat's word, 25 Sep). */
 function fechaInglesa_(s) {
   var t = String(s || '').trim(), m;
   if ((m = t.match(/^([a-z]{3})\.? (\d{4})$/i)) && MESES_INGLES[m[1].toLowerCase()]) return MESES_INGLES[m[1].toLowerCase()] + ' ' + m[2];
   if ((m = t.match(/^([a-zé]{3}) (\d{1,2})(?: ([a-z]{3}))? – ([a-zá]{3}) (\d{1,2}) ([a-z]{3})$/i)) && DIAS_INGLES[m[1].toLowerCase()] && MESES_INGLES[m[6].toLowerCase()]) {
-    var m1 = MESES_INGLES[(m[3] || m[6]).toLowerCase()], m2 = MESES_INGLES[m[6].toLowerCase()];
-    return DIAS_INGLES[m[1].toLowerCase()] + ' ' + m1 + ' ' + m[2] + ' – ' + DIAS_INGLES[m[4].toLowerCase()] + ' ' + m2 + ' ' + m[5];
+    var m2 = MESES_INGLES[m[6].toLowerCase()];
+    return DIAS_INGLES[m[1].toLowerCase()] + ' ' + m[2] + (m[3] ? ' ' + MESES_INGLES[m[3].toLowerCase()] : '') + ' – ' + DIAS_INGLES[m[4].toLowerCase()] + ' ' + m[5] + ' ' + m2;
   }
   return null;
 }
+var MESES_CORTOS_INGLES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+/**
+ * What the English SCREEN shows of numbers and dates (the chat's word of 25 Sep, the English of his map document): money with
+ * comma thousands ("Gs 210,000", "Gs 22.03"), counts too ("1,230"), and a date "25 Sep 2026" or "25 Sep". Only the page uses it,
+ * once per piece of text: the door keeps the books' own way of writing numbers in its English words, and the sheet and the
+ * Spanish screens never change. Every number reaching it is written the books' way (dot for thousands, comma for decimals).
+ */
+function formatoIngles_(s) {
+  if (s === null || s === undefined) return s;
+  return String(s)
+    .replace(/(^|[^\d\/])(\d{1,2})\/(\d{1,2})(?:\/(\d{4}))?(?![\d\/])/g, function (x, antes, d, m, a) {
+      var dd = Number(d), mm = Number(m);
+      if (dd < 1 || dd > 31 || mm < 1 || mm > 12) return x;
+      return antes + dd + ' ' + MESES_CORTOS_INGLES[mm - 1] + (a ? ' ' + a : '');
+    })
+    .replace(/\d+(?:[.,]\d+)+/g, function (x) { return x.replace(/[.,]/g, function (c) { return c === '.' ? ',' : '.'; }); });
+}
+/** A piece of text as the English screen shows it: its words, then its numbers and dates. */
+function alInglesPantalla_(s) { return formatoIngles_(alIngles_(s)); }
 function nPlural_(n, uno, varios) { return n + ' ' + (Number(String(n).replace(/\./g, '')) === 1 ? uno : varios); }
 function duracionInglesa_(s) {
   var m;
@@ -328,6 +348,8 @@ var INGLES_REGLAS = [
   [/^Descuento de (Gs.+), ya descontado de las líneas de productos\.$/, function (x, g) { return 'Discount of ' + g + ', already taken off the product lines.'; }],
   [/^✓ Listo: (\d+) compras? por (Gs.+?)( \(el envío de (Gs.+) se repartió entre los productos\))?\.$/, function (x, n, g, y, e) {
     return '✓ Done: ' + nPlural_(n, 'purchase', 'purchases') + ' for ' + g + (e ? ' (the ' + e + ' delivery was spread over the products)' : '') + '.'; }],
+  // a shop's WhatsApp group, as the reader names it ("Grupo <group> · <sender>"): "Group <group> · <sender>", the same words as Home
+  [/^Grupo (.+)$/, function (x, a) { return 'Group ' + a; }],
   // the strip of the demo
   [/^números reales de Cheviva del (.+) · nombres cambiados$/, function (x, a) { return 'real Cheviva numbers from ' + a + ' · names changed'; }]
 ];
@@ -352,7 +374,13 @@ function nombreInsumoIngles_(s) {
  */
 function alIngles_(s) {
   if (s === null || s === undefined) return s;
-  var t = String(s);
+  // 25 Sep: until nothing more changes, so a piece holding two of our sentences ("Inversión neta de David: … Nara tiene …")
+  // comes out whole; English is never one of the list's Spanish phrases, so this ends (and at most 4 rounds)
+  var t = String(s), antes;
+  for (var vuelta = 0; vuelta < 4 && t !== antes; vuelta++) { antes = t; t = inglesUnaVez_(t); }
+  return t;
+}
+function inglesUnaVez_(t) {
   if (!/[A-Za-zÁÉÍÓÚáéíóúñÑ¿]/.test(t)) return t;
   var m = t.match(/^(\s*)([\s\S]*?)(\s*)$/), a = m[1], x = m[2], z = m[3];
   if (INGLES.hasOwnProperty(x)) return a + INGLES[x] + z;
@@ -364,8 +392,9 @@ function alIngles_(s) {
     // a leading or trailing space that belongs to the line itself (" · actualizando…")
     if (r[0].test(a + x + z)) return (a + x + z).replace(r[0], r[1]);
   }
-  // a line of pieces ("Consulta · WhatsApp · 23/09/2026"): each piece on its own; the rest stays as written
-  if (x.indexOf(' · ') > 0) return a + x.split(' · ').map(function (p) { return alIngles_(p); }).join(' · ') + z;
+  // a line of pieces ("Consulta · WhatsApp · 23/09/2026", or a piece that starts or ends with its dot, "Carrusel ·"):
+  // each piece on its own; the rest stays as written
+  if (x.indexOf('·') >= 0) return a + x.split(/(\s*·\s*)/).map(function (p, i) { return i % 2 || !p ? p : alIngles_(p); }).join('') + z;
   return t;
 }
 
@@ -386,8 +415,32 @@ function respuestaEnIngles_(salida) {
   (salida.porFrasco || []).forEach(function (x) { if (x && typeof x.texto === 'string') x.texto = alIngles_(x.texto); });
   (salida.resultados || []).forEach(function (x) { if (x && typeof x === 'object') ['mensaje', 'aviso'].forEach(function (k) { if (typeof x[k] === 'string') x[k] = alIngles_(x[k]); }); });
   if (salida.instagram && typeof salida.instagram.error === 'string') salida.instagram.error = alIngles_(salida.instagram.error);
+  leyendasEnIngles_(salida.instagram);
   return salida;
 }
+
+/**
+ * Cheviva's own Instagram captions in English (the chat's word of 25 Sep: S7 lets only customers' words and place names stay
+ * as written): Apps Script's built-in translation, which asks no permission and costs nothing, each caption kept 6 hours so it
+ * is translated once. A caption the service cannot translate stays as written, and the answer says why; nothing else changes.
+ */
+function leyendasEnIngles_(ig) {
+  if (!ig || !ig.posts || typeof LanguageApp === 'undefined') return;
+  var cache = null;
+  try { cache = CacheService.getScriptCache(); } catch (e) {}
+  ig.posts.forEach(function (p) {
+    var t = String((p && p.texto) || '').trim();
+    if (!t) return;
+    var k = 'ig-en-' + huellaTexto_(t), en = null;
+    try { en = cache ? cache.get(k) : null; } catch (e) {}
+    if (!en) {
+      try { en = LanguageApp.translate(t, 'es', 'en'); } catch (e) { ig.errorTraduccion = String(e && e.message ? e.message : e).slice(0, 160); return; }
+      try { if (cache && en) cache.put(k, en, 21600); } catch (e) {}
+    }
+    if (en && en !== t) { p.textoIngles = en; p.traducido = true; }
+  });
+}
+function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) + '-' + s.length; }
 
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -630,6 +683,7 @@ function respuestaEnIngles_(salida) {
   .idiomas, .demo-tira .idiomas { display: inline-flex; flex: 0 0 auto; min-width: auto; border: 1px solid var(--kraft); border-radius: 6px; overflow: hidden; }
   .idiomas button, .demo-tira .idiomas button { font: 600 12px/1 'Archivo', sans-serif; border: 0; border-radius: 0; background: var(--paper); color: var(--ink); padding: 7px 9px; margin: 0; width: auto; max-width: none; }
   .idiomas button.on, .demo-tira .idiomas button.on { background: var(--seal); color: var(--white); }
+  td small.auto { font-style: italic; }
 </style>
 </head>
 <body class="sin-datos">
@@ -921,7 +975,7 @@ function respuestaEnIngles_(salida) {
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-24-ingles';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-25-ingles-2';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -936,11 +990,15 @@ function respuestaEnIngles_(salida) {
   window.CHEVIVA_IDIOMA = IDIOMA;                                          // the wrapper sends it with every call, so the door answers in it
   document.documentElement.lang = IDIOMA;
   function enIngles(s) { return IDIOMA === 'en' && TRADUCE ? alIngles_(s) : s; }
+  var HECHOS = typeof WeakMap === 'function' ? new WeakMap() : null;   // each piece of text is put into English once (25 Sep)
   function traducirTexto(n) {
     var p = n.parentNode, v = n.nodeValue;
     if (!p || p.nodeName === 'SCRIPT' || p.nodeName === 'STYLE' || !v || !v.trim()) return;
-    var e = alIngles_(v);
+    if (p.closest && p.closest('[translate="no"]')) return;               // a customer's words, a translated caption, a receipt's own words
+    if (HECHOS && HECHOS.get(n) === v) return;                           // already English: its numbers are never formatted twice
+    var e = alInglesPantalla_(v);
     if (e !== v) n.nodeValue = e;
+    if (HECHOS) HECHOS.set(n, n.nodeValue);
   }
   function traducirAtributos(el) {
     ['placeholder', 'label'].forEach(function (a) {
@@ -968,8 +1026,8 @@ function respuestaEnIngles_(salida) {
       });
     }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'label'] });
     var alertaPropia = window.alert.bind(window), preguntaPropia = window.confirm.bind(window);
-    window.alert = function (m) { return alertaPropia(alIngles_(String(m))); };
-    window.confirm = function (m) { return preguntaPropia(alIngles_(String(m))); };
+    window.alert = function (m) { return alertaPropia(alInglesPantalla_(String(m))); };
+    window.confirm = function (m) { return preguntaPropia(alInglesPantalla_(String(m))); };
   }
   function elegirIdioma(l) {
     try { localStorage.setItem(IDIOMA_ELEGIDO, l); } catch (e) {}
@@ -1095,7 +1153,7 @@ function respuestaEnIngles_(salida) {
   var DAYS_DEMO = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MONTHS_DEMO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function fechaDemo(ms) {
     var t = new Date(ms), dd = function (n) { return ('0' + n).slice(-2); }, hora = dd(t.getHours()) + ':' + dd(t.getMinutes());
-    if (IDIOMA === 'en') return DAYS_DEMO[t.getDay()] + ' ' + MONTHS_DEMO[t.getMonth()] + ' ' + t.getDate() + ', ' + hora;   // American order: Wed Sep 23
+    if (IDIOMA === 'en') return DAYS_DEMO[t.getDay()] + ' ' + t.getDate() + ' ' + MONTHS_DEMO[t.getMonth()] + ', ' + hora;   // "Wed 23 Sep", as his map document
     return DIAS_DEMO[t.getDay()] + ' ' + t.getDate() + ' ' + MESES_DEMO[t.getMonth()] + ', ' + hora;
   }
   function pintarDemo(demo) {
@@ -1234,7 +1292,7 @@ function respuestaEnIngles_(salida) {
       : '<tr><td class="placeholder">Todavía no hay ventas.</td></tr>';
     $('waMensajes').innerHTML = (d.whatsapp.mensajes || []).length ? d.whatsapp.mensajes.map(function (m) {
       // 24 Sep: "Abrir" only where there is a chat to open (the demo has no customer numbers, and an example no chat)
-      return '<div class="contacto"><div class="quien"><b>' + (m.ejemplo ? '<span class="ejemplo">EJEMPLO</span> ' : '') + esc(m.nombre || m.telefono) + ' <small style="display:inline">' + esc(m.direccion === 'enviado' ? '← nosotros' : '→ nos escribió') + ' · ' + esc(m.cuando) + '</small></b><small>' + esc(m.texto) + '</small></div>' +
+      return '<div class="contacto"><div class="quien"><b>' + (m.ejemplo ? '<span class="ejemplo">EJEMPLO</span> ' : '') + esc(m.nombre || m.telefono) + ' <small style="display:inline">' + esc(m.direccion === 'enviado' ? '← nosotros' : '→ nos escribió') + ' · ' + esc(m.cuando) + '</small></b><small translate="no">' + esc(m.texto) + '</small></div>' +
              (m.whatsapp ? '<a class="wa" href="' + esc(m.whatsapp) + '" target="_blank" rel="noopener">Abrir</a>' : '') + '</div>';
     }).join('') : '<p class="sub" style="margin:0">Todavía no llegan mensajes: falta vincular el WhatsApp de la empresa.</p>';
     $('waEstado').textContent = d.whatsapp.ultimo ? 'Última lectura del WhatsApp: ' + d.whatsapp.ultimo + '. Quien escribe por primera vez entra solo en Ventas como consulta.' : '';
@@ -1476,10 +1534,13 @@ function respuestaEnIngles_(salida) {
     $('igTabla').innerHTML = posts.length
       ? '<tr><th>Publicación</th><th class="n">Alcance</th><th class="n">Vistas</th><th class="n envuelve">Me gusta</th></tr>' +
         posts.map(function (p) {
-          var nota = [p.tipo, p.texto].filter(Boolean).join(' · ') + (p.comentarios ? ' · ' + cuantos(p.comentarios, 'comentario', 'comentarios') : '') + (p.sumando ? ' · todavía sumando' : '');
+          var leyenda = IDIOMA === 'en' && p.textoIngles ? p.textoIngles : p.texto;   // 25 Sep: Cheviva's own caption in English with EN on
+          var nota = [p.tipo ? esc(p.tipo) : '', leyenda ? '<span translate="no">' + esc(leyenda) + '</span>' : ''].filter(Boolean).join(' · ') +
+            esc((p.comentarios ? ' · ' + cuantos(p.comentarios, 'comentario', 'comentarios') : '') + (p.sumando ? ' · todavía sumando' : ''));
           var fecha = p.enlace ? '<a class="enlace" href="' + esc(p.enlace) + '" target="_blank" rel="noopener">' + esc(p.fecha) + '</a>' : esc(p.fecha);
           var n = function (x) { return x === null || x === undefined ? '—' : num(x); };
-          return '<tr><td>' + fecha + '<small>' + esc(nota) + '</small></td><td class="n">' + n(p.alcance) + '</td><td class="n">' + n(p.vistas) + '</td><td class="n">' + n(p.meGusta) + '</td></tr>';
+          return '<tr><td>' + fecha + '<small>' + nota + '</small>' + (IDIOMA === 'en' && p.textoIngles ? '<small class="auto">translated automatically</small>' : '') +
+                 '</td><td class="n">' + n(p.alcance) + '</td><td class="n">' + n(p.vistas) + '</td><td class="n">' + n(p.meGusta) + '</td></tr>';
         }).join('')
       : '<tr><td class="placeholder">Todavía no hay publicaciones.</td></tr>';
     $('igEstado').textContent = 'Leído de Instagram el ' + ig.leido + '.' +
@@ -1504,13 +1565,14 @@ function respuestaEnIngles_(salida) {
        saldo is his investment, anyone else's is a debt of the business or the business's money in their hands. */
     var lista = (c.todos && c.todos.length) ? c.todos.filter(function (x) { return x.quien === dueno; })
       .concat(c.todos.filter(function (x) { return x.quien !== dueno; })) : gente;
-    $('cuentaFrase').textContent = !lista.length ? 'Todavía no hay nadie en las cuentas.'
+    // one piece per sentence (25 Sep): the English screen puts each sentence into English on its own, never two at once
+    $('cuentaFrase').innerHTML = !lista.length ? esc('Todavía no hay nadie en las cuentas.')
       : lista.map(function (x) {
           var s = Math.round(x.saldo || 0);
-          return x.quien === dueno ? 'Inversión neta de ' + x.quien + ': ' + gs(s) + '.'
+          return '<span>' + esc(x.quien === dueno ? 'Inversión neta de ' + x.quien + ': ' + gs(s) + '.'
                : s > 0 ? 'El negocio le debe ' + gs(s) + ' a ' + x.quien + '.'
                : s < 0 ? x.quien + ' tiene ' + gs(-s) + ' de plata del negocio.'
-               : x.quien + ' está a mano con el negocio.';
+               : x.quien + ' está a mano con el negocio.') + '</span>';
         }).join(' ');
     /* 21 Sep (the Cuentas screen): everyone with the same four figures, the owner included, as on the sheet's tab since
        step two. Puso and the saldo are columns; what they hold and what was paid back sit under the name, so three
@@ -1798,7 +1860,7 @@ function respuestaEnIngles_(salida) {
     if (!r.ok) { div.innerHTML = '<h3>' + esc(r.archivo || nombreLocal) + '</h3><p class="error">' + esc(r.mensaje) + '</p>'; return; }
     var rec = r.recibo, filas = '';
     rec.lineas.forEach(function (l) {
-      filas += '<tr><td>' + esc(l.que) + '<small>' + esc(l.texto) + '</small></td><td class="n">' + cant(l.cantidad) + ' ' + esc(l.unidad) + '</td><td class="n">' + gs(l.total) + '</td></tr>';
+      filas += '<tr><td>' + esc(l.que) + '<small translate="no">' + esc(l.texto) + '</small></td><td class="n">' + cant(l.cantidad) + ' ' + esc(l.unidad) + '</td><td class="n">' + gs(l.total) + '</td></tr>';
     });
     div.innerHTML = '<h3>' + esc(rec.comercio || r.archivo) + '</h3>' +
       '<div class="sub">' + esc(rec.fecha) + (rec.fechaLeida ? '' : ' (no se leyó la fecha: se puso hoy)') + ' · ' + rec.lineas.length + ' línea' + (rec.lineas.length === 1 ? '' : 's') +
