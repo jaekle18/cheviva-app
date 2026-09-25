@@ -3,6 +3,393 @@
 <head>
 <base target="_blank">
 <meta charset="utf-8">
+<script>
+/**
+ * ENGLISH AT A TAP (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7). One list, used twice: the door answers in it when
+ * a call carries idioma 'en' (respuestaEnIngles_, 10_web.js), and the phone page carries this same file (tools/
+ * construir-app-web.py puts it in the page) to show every screen, button, list and message in English.
+ * American English (his standing rule); Alex, who is British, reads it after David.
+ * What stays as written: customers' own words, place names, people's and shops' names, Instagram captions, and the names
+ * of the sheet's own tabs, columns and menu items (the sheet stays in Spanish: his Q3), which are quoted where they appear.
+ * The books never change language: what the page sends back is always the Spanish value; only what is shown is English.
+ */
+
+var INGLES = {
+  // the frame
+  'Leyendo la planilla…': 'Reading the sheet…', 'Actualizar': 'Refresh', 'Para revisar': 'To review',
+  'Leer los recibos que quedaron en la carpeta': 'Read the receipts left in the folder',
+  'Este mes': 'This month', 'Esta semana': 'This week', 'Cuentas': 'Accounts', 'Mensajes': 'Messages', 'Números': 'Numbers',
+  'Quién le debe a quién, anotar un pago, compras por cuenta': 'Who owes whom, record a payment, purchases by account',
+  'WhatsApp e Instagram': 'WhatsApp and Instagram',
+  'Ventas por persona, lotes, en qué se convirtió la plata, costos por frasco, enlaces': 'Sales by person, batches, what the money turned into, costs per jar, links',
+  '‹ Inicio': '‹ Home', 'Inicio': 'Home', 'Recibo': 'Receipt', 'Compra': 'Purchase', 'Lote': 'Batch', 'Venta': 'Sale',
+  'Empezar de nuevo': 'Start over', 'Copiando…': 'Copying…', 'EJEMPLO': 'EXAMPLE',
+  // Cuentas
+  'Quién le debe a quién': 'Who owes whom', 'Quién paga': 'Who pays', 'A quién': 'To whom', 'Qué es': 'What it is',
+  'Monto, Gs': 'Amount, Gs', 'Fecha': 'Date', 'Nota (opcional)': 'Note (optional)', 'por ejemplo: efectivo de la feria': 'for example: cash from the market',
+  'Anotar el pago': 'Record the payment', 'Anotar un pago entre nosotros': 'Record a payment between us', 'Compras por cuenta': 'Purchases by account',
+  'Sin cuenta todavía': 'No account yet', 'Todavía no hay compras.': 'No purchases yet.', 'Todavía no hay nadie en las cuentas.': 'Nobody in the accounts yet.',
+  'Puso de su plata': 'Put in of own money', 'Saldo': 'Balance', 'Puso': 'Put in', 'Tiene': 'Holds', 'Quién': 'Who',
+  // Mensajes
+  'Todavía no llegan mensajes: falta vincular el WhatsApp de la empresa.': 'No messages yet: the business\'s WhatsApp is not linked yet.',
+  'Abrir': 'Open', '← nosotros': '← us', '→ nos escribió': '→ wrote to us', 'Publicación': 'Post', 'Alcance': 'Reach', 'Vistas': 'Views',
+  'Me gusta': 'Likes', 'Todavía no hay publicaciones.': 'No posts yet.', 'Carrusel': 'Carousel', 'Reel': 'Reel', 'Imagen': 'Image', 'Video': 'Video',
+  'todavía sumando': 'still adding up',
+  'La conexión con Instagram se cortó: Instagram ya no acepta la llave.': 'The connection to Instagram was cut: Instagram no longer accepts the key.',
+  'Todavía no se leyó Instagram. La planilla lo lee sola, una vez por hora.': 'Instagram has not been read yet. The sheet reads it by itself, once an hour.',
+  // Números
+  'Ventas por persona': 'Sales by person', 'Lotes': 'Batches', 'En qué se convirtió la plata que salió': 'What the money that went out turned into',
+  'Un gasto pasa al Resultado cuando se usa: al vender o regalar un frasco, al pagar un viaje o la feria, y una parte del equipo cada mes. El resto está en cosas que el negocio todavía tiene.':
+    'An expense moves into the Result when it is used: when a jar is sold or given away, when a trip or the market is paid for, and a share of the equipment every month. The rest is in things the business still has.',
+  'Costos y margen por frasco': 'Costs and margin per jar', 'La planilla': 'The sheet', 'Formulario de compra': 'Purchase form',
+  'Formulario de lote': 'Batch form', 'Formulario de frascos': 'Jars form', 'Formulario de registro': 'Sales form', 'Carpeta de recibos': 'Receipts folder',
+  'WhatsApp de Cheviva': 'Cheviva\'s WhatsApp', 'Frascos': 'Jars', 'Vasitos': 'Cups', 'Rega\u00ADlados': 'Gifts', 'Regalados': 'Gifts', 'Ventas': 'Sales',
+  'Total': 'Total', 'Todavía no hay ventas.': 'No sales yet.', 'Envasado': 'Filled', 'Ingred.': 'Ingred.', 'nada': 'none', 'Todavía no hay lotes.': 'No batches yet.',
+  'Salió en compras': 'Spent on purchases', 'Ya es gasto': 'Already an expense', 'Kimchi hecho sin vender, en frascos y en lotes': 'Kimchi made and not sold, in jars and in batches',
+  'Ingredientes comprados sin lote': 'Ingredients bought with no batch', 'Equipo, lo que le queda de vida': 'Equipment, its remaining life', 'Suma': 'Sum',
+  'Lo que el negocio tiene hoy (activo)': 'What the business has today (assets)',
+  'Kimchi: costo por gramo (promedio, lotes con frascos)': 'Kimchi: cost per gram (average, batches with jars)', 'Costo por frasco de 350 ml': 'Cost per 350 ml jar',
+  'Costo por vasito de 100 ml': 'Cost per 100 ml cup', 'Margen por frasco, % del precio': 'Margin per jar, % of the price',
+  // Inicio
+  'Plata que salió': 'Money out', 'Frascos en stock': 'Jars in stock', 'picante': 'spicy', 'blanco': 'white', 'Costo por frasco': 'Cost per jar',
+  'promedio de los lotes': 'average of the batches', 'Margen por frasco': 'Margin per jar', 'Costo de lo vendido': 'Cost of what was sold',
+  'Muestras regaladas': 'Free samples', 'Gastos': 'Expenses', 'Equipo, uso del mes': 'Equipment, this month\'s share', 'Resultado': 'Result',
+  'Caja del mes': 'Cash this month', 'Caja de la semana': 'Cash this week', 'Entró: ventas cobradas': 'In: sales collected', 'Salió: todas las compras': 'Out: all purchases',
+  'Diferencia de caja': 'Cash difference',
+  'Cada compra cuenta el día que se pagó, aunque los frascos y los ingredientes sigan en el negocio. Por eso la caja no es el resultado.':
+    'Each purchase counts on the day it was paid, even while the jars and ingredients are still in the business. That is why cash is not the result.',
+  'Regalos, al costo': 'Gifts, at cost', 'Gastos (viajes, feria, Canva…)': 'Expenses (trips, market, Canva…)', 'Resultado de la semana': 'Result for the week',
+  'Nada pendiente.': 'Nothing pending.',
+  // Recibo
+  'Subir un recibo': 'Upload a receipt',
+  'Sacale una foto al recibo, o elegí una foto o un PDF. Se lee en el momento y te muestro lo que leyó.': 'Take a photo of the receipt, or choose a photo or a PDF. It is read right away and you see what was read.',
+  'Sacar foto': 'Take a photo', 'Elegir foto o PDF': 'Choose a photo or PDF', 'Subiendo…': 'Uploading…',
+  'Falta conectar el lector: en la planilla, menú Cheviva → Conectar el lector de recibos.': 'The receipt reader is not connected yet: see the Cheviva menu in the sheet.',
+  'Preparando la foto…': 'Preparing the photo…', 'Leyendo el recibo… (unos segundos)': 'Reading the receipt… (a few seconds)', 'No llegó respuesta.': 'No answer came back.',
+  '✓ Las líneas suman lo mismo que el total.': '✓ The lines add up to the total.', 'Aceptar → Compras': 'Accept → Purchases', 'Lo reviso después': 'I\'ll check it later',
+  'Quedó en "Por revisar" en la planilla.': 'It stayed in the sheet\'s "Por revisar" tab.',
+  'Quedó en "Por revisar" sin tildar. Corregilo ahí, tildalo y usá Cheviva → Recibos → Aceptar los revisados.': 'It stayed in the sheet\'s "Por revisar" tab, unticked. Fix it there, tick it and use the Cheviva menu → "Recibos" → "Aceptar los revisados".',
+  'Pasando a Compras…': 'Moving to Purchases…', 'No se pudo aceptar.': 'Could not accept it.', '¿De qué cuenta salió la plata? (sin especificar)': 'Which account did the money come from? (not specified)',
+  'Tiene que ser una foto o un PDF.': 'It has to be a photo or a PDF.', 'El PDF pesa más de 20 MB.': 'The PDF is over 20 MB.',
+  'La foto pesa más de 20 MB y no se pudo achicar.': 'The photo is over 20 MB and could not be shrunk.', 'no se pudo abrir la foto': 'the photo could not be opened',
+  'no se pudo leer el archivo': 'the file could not be read', 'sin JPEG': 'no JPEG', 'Leyendo…': 'Reading…', 'No se pudo.': 'It did not work.',
+  // Compra
+  'Cada vez que sale plata. El total incluye el delivery.': 'Every time money goes out. The total includes delivery.', 'Fecha de compra': 'Purchase date',
+  'Qué': 'What', 'Nombre': 'Name', 'Tapas de colores': 'Colored lids', 'Cantidad': 'Quantity', 'Unidad': 'Unit',
+  '¿Avisar cuando se esté acabando?': 'Warn when it is running low?', 'Se usa': 'Used', 'por frasco': 'per jar', 'por lote': 'per batch', 'opcional': 'optional',
+  'Total pagado, Gs': 'Total paid, Gs', 'Cuenta (de dónde salió la plata)': 'Account (where the money came from)', 'Nota': 'Note', 'Dónde, o qué era': 'Where, or what it was',
+  'Guardar la compra': 'Save the purchase', 'Elegí…': 'Choose…', 'Sin especificar': 'Not specified', '+ Nuevo': '+ New', 'Cuenta': 'Account',
+  // Lote
+  'Nuevo lote': 'New batch', 'Todo lo comprado como ingrediente el día del lote entra en el lote. El gochugaru va por gramos porque se compra aparte.':
+    'Everything bought as an ingredient on the batch\'s day goes into the batch. Gochugaru goes by grams because it is bought separately.',
+  'Lote (número)': 'Batch (number)', 'Fecha (el día de la compra)': 'Date (the day of the purchase)', 'Parte de la compra del día (%)': 'Share of the day\'s purchase (%)',
+  'solo si ese día hay más de un lote; vacío = partes iguales': 'only if there is more than one batch that day; empty = equal shares', 'Guardar el lote': 'Save the batch',
+  'Frascos llenados': 'Jars filled', 'Cada vez que llenás frascos: cuántos salieron de cada uno. Un lote puede dar Picante y Blanco a la vez.':
+    'Every time you fill jars: how many came out of each. One batch can give Spicy and White at once.',
+  'Picante': 'Spicy', 'Blanco': 'White', 'Vasito': 'Cup', 'Guardar los frascos': 'Save the jars', 'No hay lotes': 'No batches',
+  'Contar lo que hay': 'Count what there is', 'Contá lo que hay de verdad y la planilla queda en ese número. La diferencia entra como gasto del mes.':
+    'Count what is really there and the sheet takes that number. The difference goes in as an expense of the month.',
+  'Cuántos hay': 'How many there are', 'Guardar el conteo': 'Save the count', 'Nunca se contó.': 'Never counted.',
+  // Venta
+  'Qué vendiste o regalaste, cuándo, dónde y a quién. Nuestro WhatsApp:': 'What you sold or gave away, when, where and to whom. Our WhatsApp:',
+  'Vendí': 'Sold', 'Regalé': 'Gave', 'Dejé': 'Left', 'Contacto': 'Contact',
+  'Frascos que dejás con alguien para que los venda. Siguen siendo del negocio hasta que los venda: no es una venta y no entra plata.':
+    'Jars you leave with someone for them to sell. They stay the business\'s until sold: it is not a sale and no money comes in.',
+  'Cuántos': 'How many', 'Total cobrado, Gs': 'Total charged, Gs', 'se completa con el precio de lista': 'filled in with the list price',
+  '¿A qué bolsillo fue la plata?': 'Which pocket did the money go to?', 'Se queda por frasco, Gs (opcional)': 'They keep per jar, Gs (optional)',
+  'lo dejás en blanco si todavía no arreglaron': 'leave it blank if nothing is agreed yet',
+  'Si lo ponés, la app te propone sola cuánto cobrar cuando esa persona te pague.': 'If you fill it in, the app suggests how much to charge when that person pays you.',
+  'Dónde': 'Where', 'Canal': 'Channel', 'A quién (opcional)': 'To whom (optional)', 'Teléfono (opcional)': 'Phone (optional)', 'Teléfono': 'Phone',
+  'Guardar la venta': 'Save the sale', 'Guardar el regalo': 'Save the gift', 'Guardar lo que dejé': 'Save what I left', 'Guardar lo que volvió': 'Save what came back',
+  'Frascos en manos de revendedores': 'Jars held by resellers', 'Últimos movimientos': 'Latest entries', 'Abrir el chat en WhatsApp': 'Open the chat in WhatsApp',
+  'Qué pasó': 'What happened', 'Producto': 'Product', 'vacío = precio de lista': 'empty = list price', 'Guardar el contacto': 'Save the contact',
+  'Últimos contactos': 'Latest contacts', 'Todavía no hay contactos.': 'No contacts yet.', 'Todavía no hay ventas ni regalos.': 'No sales or gifts yet.',
+  'Se queda con quien vendió': 'Stays with whoever sold', 'Volvieron': 'Came back', 'Borrar': 'Delete', 'Anulando…': 'Voiding…', 'Guardando…': 'Saving…',
+  'Cambiá los números si no volvieron todos.': 'Change the numbers if not all of them came back.', '¿A quién se los dejaste? Poné el nombre.': 'Who did you leave them with? Enter the name.',
+  'el revendedor': 'the reseller', 'Anulado.': 'Voided.', 'No se pudo guardar.': 'Could not save.',
+  // the lists the books use (shown in English; the value saved stays the Spanish one)
+  'Ingredientes': 'Ingredients', 'Frascos y etiquetas': 'Jars and labels', 'Equipo': 'Equipment',
+  'Acelga japonesa': 'Napa cabbage', 'Ajo': 'Garlic', 'Azúcar': 'Sugar', 'Cebolla': 'Onion', 'Cebollita': 'Scallion', 'Gochugaru': 'Gochugaru',
+  'Harina de arroz': 'Rice flour', 'Jengibre': 'Ginger', 'Manzana': 'Apple', 'Pera': 'Pear', 'Rábano': 'Radish', 'Sal': 'Salt', 'Salsa de pescado': 'Fish sauce',
+  'Vinagre': 'Vinegar', 'Zanahoria': 'Carrot', 'Otro ingrediente': 'Other ingredient', 'Etiquetas': 'Labels', 'Frasco 100 ml': '100 ml jar', 'Frasco 350 ml': '350 ml jar',
+  'Tapas': 'Lids', 'Otro envase': 'Other container', 'Envío': 'Delivery', 'Feria y venta': 'Market and selling', 'Publicidad': 'Advertising', 'Servicios': 'Services',
+  'Software y diseño': 'Software and design', 'Transporte': 'Transportation', 'Otro': 'Other', 'Diferencia de conteo': 'Stock count difference',
+  'kg': 'kg', 'g': 'g', 'litro': 'liter', 'ml': 'ml', 'unidad': 'unit',
+  'Kimchi Picante': 'Spicy Kimchi', 'Kimchi Blanco': 'White Kimchi', 'Vasito 100 ml': '100 ml cup', 'Gochugaru (g)': 'Gochugaru (g)',
+  'Consulta': 'Inquiry', 'Regaló': 'Gave away', 'Reservó': 'Reserved', 'Compró': 'Bought', 'No contestó': 'No answer', 'En consignación': 'On consignment', 'Volvió': 'Came back',
+  'Feria': 'Market', 'WhatsApp': 'WhatsApp', 'En persona': 'In person', 'Delivery': 'Delivery', 'Revendedor': 'Reseller', 'Tienda': 'Shop',
+  'Tienda Ejemplo': 'Example Shop',
+  // the phone's sign-in and the wrapper's own words (tools/construir-app-web.py)
+  'La contraseña de la demo, no la de Cheviva. Se pide una sola vez en este teléfono.': 'The demo\'s password, not Cheviva\'s. It is asked for only once on this phone.',
+  'Escribí la contraseña de Cheviva. Se pide una sola vez en este teléfono.': 'Type Cheviva\'s password. It is asked for only once on this phone.',
+  'Contraseña': 'Password', 'Entrar': 'Sign in', 'Esa contraseña no es. Probá de nuevo.': 'That is not the password. Try again.',
+  'Demasiados intentos con una contraseña equivocada. Probá de nuevo en una hora.': 'Too many tries with a wrong password. Try again in an hour.',
+  'No hay conexión con la planilla.': 'No connection to the sheet.', 'no hay conexión con la planilla': 'no connection to the sheet',
+  'la planilla contestó con un error': 'the sheet answered with an error',
+  '¿Empezar de nuevo? Se borra todo lo que se cargó en la demo y vuelven los números reales de este momento. Tarda hasta 2 minutos.':
+    'Start over? Everything entered in the demo is erased and Cheviva\'s real numbers of this moment come back. It takes up to 2 minutes.',
+  'todavía sin los números de Cheviva': 'Cheviva\'s numbers not copied yet',
+  // the door's own words
+  'Hay otra operación en marcha. Probá en un minuto.': 'Another operation is running. Try again in a minute.',
+  'Hay otra lectura en marcha. Probá en un minuto.': 'Another reading is running. Try again in a minute.',
+  'Falta el nombre de lo que compraste.': 'The name of what you bought is missing.', 'Elegí en qué grupo va.': 'Choose which group it goes in.',
+  'Elegí qué compraste.': 'Choose what you bought.', 'Elegí la unidad.': 'Choose the unit.', 'Elegí la cuenta de la lista.': 'Choose the account from the list.',
+  'La cantidad tiene que ser mayor que cero.': 'The quantity has to be more than zero.', 'El total tiene que ser mayor que cero.': 'The total has to be more than zero.',
+  'Elegí si se usa por frasco o por lote.': 'Choose whether it is used per jar or per batch.', 'Poné el número del lote.': 'Enter the batch number.',
+  'La parte del día va de 1 a 100.': 'The day\'s share goes from 1 to 100.', 'Elegí el lote.': 'Choose the batch.', 'Los frascos no pueden ser negativos.': 'Jars cannot be negative.',
+  '¿Cuántos frascos salieron?': 'How many jars came out?', 'Elegí el tamaño del frasco.': 'Choose the jar size.', '¿Cuántos frascos llenaste?': 'How many jars did you fill?',
+  'Elegí qué kimchi lleva.': 'Choose which kimchi it holds.', 'Poné el nombre.': 'Enter the name.', 'Elegí qué pasó.': 'Choose what happened.',
+  'Elegí el producto.': 'Choose the product.', '¿Cuántos frascos?': 'How many jars?', 'Elegí el canal de la lista.': 'Choose the channel from the list.',
+  'Nadie se paga a sí mismo.': 'Nobody pays themselves.', 'Poné cuánto se pagó.': 'Enter how much was paid.',
+  '¿Cuántos hay? Poné el número que contaste, 0 si no queda nada.': 'How many are there? Enter the number you counted, 0 if none is left.',
+  'Lo contado no puede ser negativo.': 'The count cannot be negative.', 'La fecha del conteo no puede ser después de hoy.': 'The count date cannot be after today.',
+  '¿Venta, regalo o consignación?': 'Sale, gift or consignment?', 'Poné cuántos frascos o vasitos.': 'Enter how many jars or cups.',
+  'No encontré esa línea (¿ya estaba anulada?).': 'That line was not found (was it already voided?).', 'acción desconocida': 'unknown action',
+  'Esto solo existe en la demo.': 'This exists only in the demo.', 'Listo: vuelven los números reales de Cheviva de este momento.': 'Done: Cheviva\'s real numbers of this moment are back.',
+  'Con la contraseña de socio se leen solo los recibos que subís.': 'With a partner password only the receipts you upload are read.',
+  'Falta conectar el lector en la planilla.': 'The receipt reader is not connected in the sheet yet.', 'No sé qué lectura aceptar.': 'It is not clear which reading to accept.',
+  'La foto llegó dañada. Probá de nuevo.': 'The photo arrived damaged. Try again.', 'No llegó ninguna foto.': 'No photo arrived.',
+  'El archivo es muy grande (más de 25 MB).': 'The file is too big (over 25 MB).',
+  'Esas líneas ya no están en "Por revisar" (¿ya se aceptaron?).': 'Those lines are no longer in "Por revisar" (were they already accepted?).',
+  'Falta conectar el lector: en la planilla, Cheviva → Conectar el lector de recibos.': 'The receipt reader is not connected yet: see the Cheviva menu in the sheet.',
+  'No se leyó ninguna línea del recibo. Si la foto está borrosa, sacá otra; si no, avisale a Claude.': 'No line of the receipt was read. If the photo is blurry, take another; if not, tell Claude.',
+  'Google Drive no encontró texto en el PDF. Si el escaneo salió muy claro o muy oscuro, escanealo de nuevo.': 'Google Drive found no text in the PDF. If the scan came out too light or too dark, scan it again.',
+  'El lector no devolvió los datos en el formato pedido.': 'The reader did not return the data in the format asked for.'
+};
+
+/* Built lines: one rule each, in order; the first whose pattern matches the whole line wins. A part in brackets that is
+   itself a phrase (a month, an item, a product) is put through the same list. */
+function inglesDe_(s) { return alIngles_(s); }
+var DIAS_INGLES = { dom: 'Sun', lun: 'Mon', mar: 'Tue', 'mié': 'Wed', mie: 'Wed', jue: 'Thu', vie: 'Fri', 'sáb': 'Sat', sab: 'Sat' };
+var MESES_INGLES = { ene: 'Jan', feb: 'Feb', mar: 'Mar', abr: 'Apr', may: 'May', jun: 'Jun', jul: 'Jul', ago: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dic: 'Dec' };
+/** "sep 2026" -> "Sep 2026"; "lun 21 – dom 27 sep" -> "Mon Sep 21 – Sun Sep 27"; "lun 29 sep – dom 5 oct" too. */
+function fechaInglesa_(s) {
+  var t = String(s || '').trim(), m;
+  if ((m = t.match(/^([a-z]{3})\.? (\d{4})$/i)) && MESES_INGLES[m[1].toLowerCase()]) return MESES_INGLES[m[1].toLowerCase()] + ' ' + m[2];
+  if ((m = t.match(/^([a-zé]{3}) (\d{1,2})(?: ([a-z]{3}))? – ([a-zá]{3}) (\d{1,2}) ([a-z]{3})$/i)) && DIAS_INGLES[m[1].toLowerCase()] && MESES_INGLES[m[6].toLowerCase()]) {
+    var m1 = MESES_INGLES[(m[3] || m[6]).toLowerCase()], m2 = MESES_INGLES[m[6].toLowerCase()];
+    return DIAS_INGLES[m[1].toLowerCase()] + ' ' + m1 + ' ' + m[2] + ' – ' + DIAS_INGLES[m[4].toLowerCase()] + ' ' + m2 + ' ' + m[5];
+  }
+  return null;
+}
+function nPlural_(n, uno, varios) { return n + ' ' + (Number(String(n).replace(/\./g, '')) === 1 ? uno : varios); }
+function duracionInglesa_(s) {
+  var m;
+  if (s === 'no queda nada') return 'none left';
+  if (s === 'un día') return 'one day';
+  if (s === 'menos de un día') return 'less than a day';
+  if ((m = s.match(/^unas (\d+) semanas$/))) return 'about ' + m[1] + ' weeks';
+  if ((m = s.match(/^unos (\d+) días$/))) return 'about ' + m[1] + ' days';
+  return s;
+}
+function haceIngles_(s) {
+  var m = String(s).match(/^hace (\d+) (h|días)$/);
+  return m ? m[1] + (m[2] === 'h' ? ' h' : ' days') + ' ago' : s;
+}
+var INGLES_REGLAS = [
+  // dates and the lines built on them
+  [/^([a-z]{3} \d{4}|[a-zé]{3} \d{1,2}(?: [a-z]{3})? – [a-zá]{3} \d{1,2} [a-z]{3})$/i, function (x, a) { return fechaInglesa_(a) || x; }],
+  [/^Resultado de (.+)$/, function (x, a) { return 'Result for ' + (fechaInglesa_(a) || a); }],
+  [/^Este mes: (.+)$/, function (x, a) { return 'This month: ' + (fechaInglesa_(a) || a); }],
+  [/^Esta semana: (.+)$/, function (x, a) { return 'This week: ' + (fechaInglesa_(a) || a); }],
+  [/^La semana pasada \((.+)\): ventas (.+) \((\d+) frascos?\), resultado (.+)\.$/, function (x, a, b, n, c) {
+    return 'Last week (' + (fechaInglesa_(a) || a) + '): sales ' + b + ' (' + nPlural_(n, 'jar', 'jars') + '), result ' + c + '.'; }],
+  [/^Ventas \((\d+) frascos?\)$/, function (x, n) { return 'Sales (' + nPlural_(n, 'jar', 'jars') + ')'; }],
+  // "Leído …" and why the sheet could not be read
+  [/^Leído de la planilla (.+)$/, function (x, a) { return 'Read from the sheet ' + inglesDe_(a); }],
+  [/^Leído (el |a las )(.+)$/, function (x, a, b) { return 'Read ' + inglesDe_(a + b); }],
+  [/^el (\d\d\/\d\d) a las (\d\d:\d\d)(.*)$/, function (x, d, h, cola) { return 'on ' + d + ' at ' + h + inglesDe_(cola); }],
+  [/^a las (\d\d:\d\d)(.*)$/, function (x, h, cola) { return 'at ' + h + inglesDe_(cola); }],
+  [/^ · actualizando…$/, ' · updating…'],
+  [/^ · no se pudo actualizar(: (.+))?$/, function (x, y, a) { return ' · could not update' + (a ? ': ' + inglesDe_(a) : ''); }],
+  [/^No pude leer la planilla: (.+)$/, function (x, a) { return 'Could not read the sheet: ' + inglesDe_(a); }],
+  // the tiles and the tables
+  [/^(\d+) (frascos?|vasitos?) · (\d+) (frascos?|vasitos?)$/, function (x, a, b, c, d) { return inglesDe_(a + ' ' + b) + ' · ' + inglesDe_(c + ' ' + d); }],
+  [/^(\d+) frascos?$/, function (x, n) { return nPlural_(n, 'jar', 'jars'); }],
+  [/^(\d+) vasitos?$/, function (x, n) { return nPlural_(n, 'cup', 'cups'); }],
+  [/^promedio de los lotes · último (.+)$/, function (x, a) { return 'average of the batches · latest ' + a; }],
+  [/^(\d+%) a (Gs.+)$/, function (x, p, g) { return p + ' at ' + g; }],
+  [/^(Gs.+) c\/u$/, function (x, g) { return g + ' each'; }],
+  [/^(\d+) compras?$/, function (x, n) { return nPlural_(n, 'purchase', 'purchases'); }],
+  [/^(\d+) compras? · ponela en la planilla, columna Cuenta$/, function (x, n) { return nPlural_(n, 'purchase', 'purchases') + ' · add it in the sheet, column "Cuenta"'; }],
+  [/^(.+) Efectivo$/, function (x, a) { return a + ' Cash'; }],
+  [/^Margen por frasco a (Gs.+)$/, function (x, g) { return 'Margin per jar at ' + g; }],
+  [/^Frascos vacíos \((\d+) de 350 ml, (\d+) de 100 ml\)$/, function (x, a, b) { return 'Empty jars (' + a + ' of 350 ml, ' + b + ' of 100 ml)'; }],
+  [/^sin los (.+) de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras$/, function (x, g) {
+    return 'not counting the ' + g + ' of batch 1\'s ingredients, paid before the sheet and not entered as purchases'; }],
+  [/^Gochugaru \((\d+) g\) y etiquetas( \((\d+)\))? en stock$/, function (x, g, y, e) { return 'Gochugaru (' + g + ' g) and labels' + (e ? ' (' + e + ')' : '') + ' in stock'; }],
+  [/^Inversión neta de (.+?)(: (.+))?$/, function (x, a, y, g) { return a + '\'s net investment' + (g ? ': ' + g : ''); }],
+  [/^El negocio le debe a (.+)$/, function (x, a) { return 'The business owes ' + a; }],
+  [/^(.+) tiene plata del negocio$/, function (x, a) { return a + ' holds the business\'s money'; }],
+  [/^El negocio le debe (Gs.+) a (.+)\.$/, function (x, g, a) { return 'The business owes ' + a + ' ' + g + '.'; }],
+  [/^(.+) tiene (Gs.+) de plata del negocio\.$/, function (x, a, g) { return a + ' holds ' + g + ' of the business\'s money.'; }],
+  [/^(.+) está a mano con el negocio\.$/, function (x, a) { return a + ' is square with the business.'; }],
+  [/^plata del negocio que le llegó $/, 'business money that reached them '],
+  [/^ · ya se le devolvió $/, ' · already paid back '],
+  [/^ya devuelto $/, 'already paid back '],
+  [/^(\d+) pago\(s\) sin "A quién" en la planilla: no cuentan hasta que lo pongas\.$/, function (x, n) { return n + ' payment(s) with no "A quién" in the sheet: not counted until it is filled in.'; }],
+  [/^Anotar: (.+) le pagó a (.+)$/, function (x, a, b) { return 'Record: ' + a + ' paid ' + b; }],
+  [/^(\d+) seguidor(es)?$/, function (x, n) { return nPlural_(n, 'follower', 'followers'); }],
+  [/^(\d+) publicaci(ón|ones)$/, function (x, n) { return nPlural_(n, 'post', 'posts'); }],
+  [/^(\d+) comentarios?$/, function (x, n) { return nPlural_(n, 'comment', 'comments'); }],
+  [/^Leído de Instagram el (.+?)\.( Instagram sigue sumando los números de una publicación durante 48 horas\.)?( La última lectura no se pudo: (.+))?$/, function (x, a, b, c, e) {
+    return 'Read from Instagram on ' + a + '.' + (b ? ' Instagram keeps adding to a post\'s numbers for 48 hours.' : '') + (c ? ' The last read failed: ' + e : ''); }],
+  [/^La última vez no se pudo: (.+)$/, function (x, a) { return 'Last time it failed: ' + a; }],
+  [/^Hay que volver a conectarla en la página de Meta de la app(\. Se vio el (.+))?\.$/, function (x, y, a) { return 'It has to be connected again on the app\'s Meta page' + (a ? '. Seen on ' + a : '') + '.'; }],
+  [/^WhatsApp de Cheviva (.+)$/, function (x, a) { return 'Cheviva\'s WhatsApp ' + a; }],
+  [/^Última lectura del WhatsApp: (.+?)\. Quien escribe por primera vez entra solo en Ventas como consulta\.$/, function (x, a) {
+    return 'Last WhatsApp read: ' + a + '. Whoever writes for the first time goes into Sales by itself as an inquiry.'; }],
+  [/^(← nosotros|→ nos escribió) · (.+)$/, function (x, a, b) { return inglesDe_(a) + ' · ' + b; }],
+  [/^(\d\d\/\d\d(?:\/\d{4})?) · (.+)$/, function (x, d, a) { return d + ' · ' + inglesDe_(a); }],
+  [/^(\d+) × \((.+) − (.+) que se queda (.+)\)$/, function (x, n, a, b, q) { return n + ' × (' + a + ' − ' + b + ' that ' + inglesDe_(q) + ' keeps)'; }],
+  [/^(.+) · (\d+) × (.+)$/, function (x, a, n, p) { return inglesDe_(a) + ' · ' + n + ' × ' + inglesDe_(p); }],
+  [/^(\d+) × (.+)$/, function (x, n, p) { return n + ' × ' + inglesDe_(p); }],
+  [/^(\d+)% del día$/, function (x, n) { return n + '% of the day'; }],
+  [/^desde el (.+) · (\d+) días?( · se queda (.+) por frasco)?$/, function (x, d, n, y, g) { return 'since ' + d + ' · ' + nPlural_(n, 'day', 'days') + (g ? ' · keeps ' + g + ' per jar' : ''); }],
+  [/^(.+) (vendió|regaló|dejó|recuperó) (\d+) × (.+?)( · (Gs.+))?$/, function (x, q, v, n, p, y, g) {
+    return q + ' ' + { 'vendió': 'sold', 'regaló': 'gave away', 'dejó': 'left', 'recuperó': 'got back' }[v] + ' ' + n + ' × ' + inglesDe_(p) + (g ? ' · ' + g : ''); }],
+  [/^¿Borrar lo que (vendió|regaló|dejó|recuperó): (\d+) × (.+?)( del (.+))?\? Queda anulado en la planilla, no se pierde\.$/, function (x, v, n, p, y, f) {
+    return 'Delete this ' + { 'vendió': 'sale', 'regaló': 'gift', 'dejó': 'hand-over', 'recuperó': 'return' }[v] + ': ' + n + ' × ' + inglesDe_(p) + (f ? ' of ' + f : '') +
+      '? It stays voided in the sheet, nothing is lost.'; }],
+  [/^¿Quién (vendió|regaló|dejó|recuperó)\? Tocá (.+)\.$/, function (x, v, a) {
+    return 'Who ' + { 'vendió': 'sold', 'regaló': 'gave it', 'dejó': 'left them', 'recuperó': 'got them back' }[v] + '? Tap ' + a.replace(/ o /g, ' or ') + '.'; }],
+  [/^Picante y Blanco: frascos de 350 ml\. Vasitos: 100 ml\.( Las etiquetas se descuentan solas: (\d+) por frasco y (\d+) por vasito\.)?$/, function (x, y, a, b) {
+    return 'Spicy and White: 350 ml jars. Cups: 100 ml.' + (y ? ' Labels are counted off by themselves: ' + a + ' per jar and ' + b + ' per cup.' : ''); }],
+  [/^Cuántos hay \((.+)\)$/, function (x, u) { return 'How many there are (' + inglesDe_(u) + ')'; }],
+  [/^Según la planilla hay (.+?)\.( Último conteo: (.+?), (.+?)\.| Nunca se contó\.)( Contarlo solo corrige cuánto queda: sus compras ya están en los números\.)?$/, function (x, a, y, f, c, z) {
+    return 'The sheet says there are ' + inglesDe_(a) + '.' + (f ? ' Last count: ' + f + ', ' + inglesDe_(c) + '.' : ' Never counted.') +
+      (z ? ' Counting it only corrects how much is left: its purchases are already in the numbers.' : ''); }],
+  [/^Cantidad( por (frasco|lote))?( \((.+)\))?$/, function (x, y, u, z, un) { return 'Quantity' + (u ? ' per ' + (u === 'frasco' ? 'jar' : 'batch') : '') + (un ? ' (' + inglesDe_(un) + ')' : ''); }],
+  [/^([\d.,]+) (kg|g|litro|ml|unidad|unidades)$/, function (x, n, u) { return n + ' ' + (u === 'litro' ? 'liter' : u === 'unidad' || u === 'unidades' ? 'units' : u); }],
+  [/^Recibos de prueba: te quedan (\d+) de (\d+)$/, function (x, a, b) { return 'Trial receipts: ' + a + ' of ' + b + ' left'; }],
+  [/^Ya usaste tus (\d+) recibos de prueba\. Todo lo demás de la demo sigue abierto\.$/, function (x, n) { return 'You have used your ' + n + ' trial receipts. Everything else in the demo stays open.'; }],
+  // Para revisar
+  [/^recibo\(s\) esperando en "Por revisar" \(no cuadran o parecen repetidos\)$/, 'receipt(s) waiting in the sheet\'s "Por revisar" tab (they do not add up or look repeated)'],
+  [/^recibo\(s\) con problema en la carpeta$/, 'receipt(s) with a problem in the folder'],
+  [/^lote\(s\) sin frascos cargados: (.+)$/, function (x, a) { return 'batch(es) with no jars entered: ' + a; }],
+  [/^carga\(s\) de frascos con un lote que no existe$/, 'jar entries with a batch that does not exist'],
+  [/^frasco\(s\) sin kimchi conocido: elegí el kimchi al cargar los frascos, o poné los gramos de gochugaru del lote$/, 'jar(s) with no known kimchi: choose the kimchi when entering the jars, or enter the batch\'s gochugaru grams'],
+  [/^compra\(s\) con una unidad que no corresponde$/, 'purchase(s) with a unit that does not fit'],
+  [/^compra\(s\) con un nombre que no está en la lista y no cuentan: (.+)$/, function (x, a) { return 'purchase(s) with a name not on the list, not counted: ' + a.replace(/\(fila (\d+)\)/g, '(row $1)'); }],
+  [/^compra\(s\) sin cuenta: en la planilla, pestaña Compras, columna Cuenta$/, 'purchase(s) with no account: in the sheet, tab "Compras", column "Cuenta"'],
+  [/^conteo\(s\) que la planilla no pudo leer y no cuentan$/, 'count(s) the sheet could not read, not counted'],
+  [/^insumo por pedir: (.+?), quedan (.+?) \((.+?)\) · (pedido sugerido: (.+?), como la última compra( en (.+))?|sin compra anterior en la planilla)$/, function (x, n, q, d, y, p, z, donde) {
+    return 'supply to reorder: ' + nombreInsumoIngles_(n) + ', ' + inglesDe_(q) + ' left (' + duracionInglesa_(d) + ') · ' +
+      (p ? 'suggested order: ' + inglesDe_(p) + ', like the last purchase' + (donde ? ' at ' + donde : '') : 'no earlier purchase in the sheet'); }],
+  [/^cliente esperando respuesta: (.+), escribió (hace .+)$/, function (x, a, h) { return 'customer waiting for a reply: ' + nombreIngles_(a) + ', wrote ' + haceIngles_(h); }],
+  [/^frascos con un revendedor hace más de (\d+) días: (.+), (\d+) \((Gs.+) a precio de venta\)$/, function (x, n, q, f, g) {
+    return 'jars with a reseller for more than ' + n + ' days: ' + inglesDe_(q) + ', ' + f + ' (' + g + ' at the sale price)'; }],
+  // what the door answers after a save, or why it refused
+  [/^Guardado: (.+?), ([\d.,]+) (\S+), (Gs[^,]+), el (.+?)\.( (.+): se vigila desde ahora\.)?$/, function (x, q, n, u, g, f, y, q2) {
+    return 'Saved: ' + inglesDe_(q) + ', ' + inglesDe_(n + ' ' + u) + ', ' + g + ', on ' + f + '.' + (y ? ' ' + inglesDe_(q2) + ': watched from now on.' : ''); }],
+  [/^Guardado: (.+?), ([^,]+)(, (\d+) × ([^,]+))?(, (Gs.+))?\.$/, function (x, n, e, y, c, p, z, g) {
+    return 'Saved: ' + n + ', ' + (inglesDe_(e.charAt(0).toUpperCase() + e.slice(1)) || e).toLowerCase() + (c ? ', ' + c + ' × ' + inglesDe_(p) : '') + (g ? ', ' + g : '') + '.'; }],
+  [/^"(.+)" no se compra en "(.+)"\. Puede ser: (.+)\.$/, function (x, q, u, l) { return '"' + inglesDe_(q) + '" is not bought in "' + inglesDe_(u) + '". It can be: ' + l.split(', ').map(inglesDe_).join(', ') + '.'; }],
+  [/^Falta la cantidad que usa cada (frasco|lote) \(o no elijas por frasco ni por lote\)\.$/, function (x, u) { return 'The quantity each ' + (u === 'frasco' ? 'jar' : 'batch') + ' uses is missing (or choose neither per jar nor per batch).'; }],
+  [/^La cantidad que usa cada (frasco|lote) tiene que ser un número mayor que cero\.$/, function (x, u) { return 'The quantity each ' + (u === 'frasco' ? 'jar' : 'batch') + ' uses has to be a number above zero.'; }],
+  [/^El lote (.+) ya existe \((.+)\)\. Si querés cargar frascos, usá "Frascos llenados"\.$/, function (x, l, f) { return 'Batch ' + l + ' already exists (' + f + '). To enter jars, use "Jars filled".'; }],
+  [/^Lote (.+) guardado: (Gs.+) comprados el (.+) \+ gochugaru = (Gs.+) de ingredientes\.( Ojo: no hay compras de ingredientes con esa fecha\.)?$/, function (x, l, a, f, b, o) {
+    return 'Batch ' + l + ' saved: ' + a + ' bought on ' + f + ' + gochugaru = ' + b + ' of ingredients.' + (o ? ' Careful: there are no ingredient purchases on that date.' : ''); }],
+  [/^No existe el lote (.+)\. Cargalo primero en "Nuevo lote"\.$/, function (x, l) { return 'Batch ' + l + ' does not exist. Enter it first under "New batch".'; }],
+  [/^Lote (.+): (\d+) frascos de 350 ml y (\d+) vasitos hasta ahora(\. Costo por frasco de 350 ml: (Gs.+))?\.$/, function (x, l, a, b, y, g) {
+    return 'Batch ' + l + ': ' + nPlural_(a, 'jar', 'jars') + ' of 350 ml and ' + nPlural_(b, 'cup', 'cups') + ' so far' + (g ? '. Cost per 350 ml jar: ' + g : '') + '.'; }],
+  [/^No existe la pestaña "?([^"]+)"?\.( Corré "Instalar \/ actualizar el sistema" desde el menú Cheviva\.)?$/, function (x, t, c) {
+    return 'The "' + t + '" tab does not exist.' + (c ? ' Run "Instalar / actualizar el sistema" from the Cheviva menu.' : ''); }],
+  [/^La pestaña "?([^"]+?)"? no tiene la columna (.+)\.$/, function (x, t, c) { return 'The "' + t + '" tab has no "' + c + '" column.'; }],
+  [/^¿Quién pagó\? Elegí (.+)\.$/, function (x, a) { return 'Who paid? Choose ' + a.replace(/, ([^,]+)$/, ' or $1') + '.'; }],
+  [/^¿A quién le pagó\? Elegí (.+)\.$/, function (x, a) { return 'Who was paid? Choose ' + a.replace(/, ([^,]+)$/, ' or $1') + '.'; }],
+  [/^Anotado: (.+) le pagó (Gs.+) a (.+) el (.+)\.$/, function (x, a, g, b, f) { return 'Recorded: ' + a + ' paid ' + b + ' ' + g + ' on ' + f + '.'; }],
+  [/^Elegí qué contaste: (.+)\.$/, function (x, a) { return 'Choose what you counted: ' + a.split(', ').map(inglesDe_).join(', ') + '.'; }],
+  [/^(.+): anotado, (.+)\. Solo corrige cuánto queda: sus compras ya están en los números\.$/, function (x, q, c) {
+    return inglesDe_(q) + ': recorded, ' + inglesDe_(c) + '. It only corrects how much is left: its purchases are already in the numbers.'; }],
+  [/^Anotado: (.+), (.+)\.$/, function (x, q, c) { return 'Recorded: ' + inglesDe_(q) + ', ' + inglesDe_(c) + '.'; }],
+  [/^(.+): contaste (.+), lo mismo que decía la planilla\.$/, function (x, q, c) { return inglesDe_(q) + ': you counted ' + inglesDe_(c) + ', the same as the sheet said.'; }],
+  [/^(.+): la planilla decía (.+) y contaste (.+)\. (Faltaban|Sobraban) (.+) \((Gs.+)\): (va como gasto|baja el gasto) de (.+)\.$/, function (x, q, a, c, fs, d, g, v, mes) {
+    return inglesDe_(q) + ': the sheet said ' + inglesDe_(a) + ' and you counted ' + inglesDe_(c) + '. ' + (fs === 'Faltaban' ? inglesDe_(d) + ' missing' : inglesDe_(d) + ' extra') +
+      ' (' + g + '): ' + (v === 'va como gasto' ? 'it goes as an expense of ' : 'it lowers the expense of ') + (fechaInglesa_(mes) || mes) + '.'; }],
+  [/^¿Quién (vendió|lo llevó|regaló)\? Elegí (.+)\.$/, function (x, v, a) { return 'Who ' + { 'vendió': 'sold', 'lo llevó': 'took them', 'regaló': 'gave it' }[v] + '? Choose ' + a.replace(/ o /g, ' or ') + '.'; }],
+  [/^(.+) tiene (\d+) × (.+) en consignación, no (\d+)\.$/, function (x, q, a, p, b) { return q + ' has ' + a + ' × ' + inglesDe_(p) + ' on consignment, not ' + b + '.'; }],
+  [/^(Venta guardada|Regalo guardado) \((.+?)\): (.+?)(, (Gs[^,]+))?, el (.+)\.$/, function (x, t, q, r, y, g, f) {
+    return (t === 'Venta guardada' ? 'Sale saved' : 'Gift saved') + ' (' + q + '): ' + r.split(', ').map(inglesDe_).join(', ') + (g ? ', ' + g : '') + ', on ' + f + '.'; }],
+  [/^(Quedaron con|Volvieron de) (.+?): (.+), el (.+)\.$/, function (x, t, q, r, f) {
+    return (t === 'Quedaron con' ? 'Left with ' : 'Came back from ') + q + ': ' + r.split(', ').map(inglesDe_).join(', ') + ', on ' + f + '.'; }],
+  [/^Anulado: (.+)\.$/, function (x, a) { return 'Voided: ' + inglesDe_(a) + '.'; }],
+  [/^(\d+) leído\(s\), (\d+) con problema\.$/, function (x, a, b) { return a + ' read, ' + b + ' with a problem.'; }],
+  [/^No se pudo empezar de nuevo: (.*)$/, function (x, a) { return 'Could not start over: ' + inglesDe_(a); }],
+  [/^No se pudo subir: (.*)$/, function (x, a) { return 'Could not upload: ' + inglesDe_(a); }],
+  [/^No se pudo preparar el archivo: (.*)$/, function (x, a) { return 'Could not prepare the file: ' + inglesDe_(a); }],
+  [/^La copia no llegó: (.*)$/, function (x, a) { return 'The copy did not arrive: ' + a; }],
+  [/^La app no conoce (.+)$/, function (x, a) { return 'The app does not know ' + a; }],
+  [/^Esta misma foto ya se leyó el (.+)$/, function (x, a) { return 'This same photo was already read on ' + a; }],
+  [/^Esa foto no parece un recibo: (.+)\. Quedó apartada, no se cargó nada\.$/, function (x, a) { return 'That photo does not look like a receipt: ' + a + '. It was set aside; nothing was entered.'; }],
+  // the receipt card
+  [/^(.+?)( \(no se leyó la fecha: se puso hoy\))? · (\d+) líneas? · leído por (.+)$/, function (x, f, n, c, l) {
+    return f + (n ? ' (the date was not read: today was used)' : '') + ' · ' + nPlural_(c, 'line', 'lines') + ' · read by ' + l; }],
+  [/^Descuento de (Gs.+), ya descontado de las líneas de productos\.$/, function (x, g) { return 'Discount of ' + g + ', already taken off the product lines.'; }],
+  [/^✓ Listo: (\d+) compras? por (Gs.+?)( \(el envío de (Gs.+) se repartió entre los productos\))?\.$/, function (x, n, g, y, e) {
+    return '✓ Done: ' + nPlural_(n, 'purchase', 'purchases') + ' for ' + g + (e ? ' (the ' + e + ' delivery was spread over the products)' : '') + '.'; }],
+  // the strip of the demo
+  [/^números reales de Cheviva del (.+) · nombres cambiados$/, function (x, a) { return 'real Cheviva numbers from ' + a + ' · names changed'; }]
+];
+
+/** A made-up or real name as the screen shows it: a shop's WhatsApp group reads "Group …", the rest stays as written. */
+function nombreIngles_(s) {
+  var t = String(s || '');
+  if (INGLES.hasOwnProperty(t)) return INGLES[t];
+  return t.replace(/^Grupo /, 'Group ').replace(/^sin nombre$/, 'no name');
+}
+/** "gochugaru", "etiquetas", "frascos de 350 ml" as the supply line names them. */
+function nombreInsumoIngles_(s) {
+  var t = String(s || ''), m = t.match(/^frascos de (.+)$/);
+  if (m) return m[1] + ' jars';
+  var cap = t.charAt(0).toUpperCase() + t.slice(1);
+  return INGLES.hasOwnProperty(cap) ? INGLES[cap].toLowerCase() : t;
+}
+
+/**
+ * The English of one line, or the line itself when it is not one of ours (a customer's words, a place, a name). Keeps the
+ * spaces around it, so a piece of a line keeps its place.
+ */
+function alIngles_(s) {
+  if (s === null || s === undefined) return s;
+  var t = String(s);
+  if (!/[A-Za-zÁÉÍÓÚáéíóúñÑ¿]/.test(t)) return t;
+  var m = t.match(/^(\s*)([\s\S]*?)(\s*)$/), a = m[1], x = m[2], z = m[3];
+  if (INGLES.hasOwnProperty(x)) return a + INGLES[x] + z;
+  var sin = x.replace(/\u00A0/g, ' ');
+  if (sin !== x && INGLES.hasOwnProperty(sin)) return a + INGLES[sin] + z;
+  for (var i = 0; i < INGLES_REGLAS.length; i++) {
+    var r = INGLES_REGLAS[i];
+    if (r[0].test(x)) return a + x.replace(r[0], r[1]) + z;
+    // a leading or trailing space that belongs to the line itself (" · actualizando…")
+    if (r[0].test(a + x + z)) return (a + x + z).replace(r[0], r[1]);
+  }
+  // a line of pieces ("Consulta · WhatsApp · 23/09/2026"): each piece on its own; the rest stays as written
+  if (x.indexOf(' · ') > 0) return a + x.split(' · ').map(function (p) { return alIngles_(p); }).join(' · ') + z;
+  return t;
+}
+
+/**
+ * The door's answer in English (a call that carries idioma 'en'): the words the door writes itself — what a save says,
+ * why it refused, the review lines, the month and week names, the per-jar block — never a value the page sends back
+ * (the lists, names and amounts stay as they are, and the page shows them in English itself).
+ */
+function respuestaEnIngles_(salida) {
+  if (!salida || typeof salida !== 'object') return salida;
+  ['mensaje', 'error', 'aviso'].forEach(function (k) { if (typeof salida[k] === 'string') salida[k] = alIngles_(salida[k]); });
+  var av = salida.avisos;
+  if (av && typeof av === 'object') ['insumos', 'esperando', 'consignas'].forEach(function (k) {
+    (av[k] || []).forEach(function (x) { if (x && typeof x.texto === 'string') x.texto = alIngles_(x.texto); });
+  });
+  if (salida.mes && typeof salida.mes.nombre === 'string') salida.mes.nombre = fechaInglesa_(salida.mes.nombre) || salida.mes.nombre;
+  (salida.semanas || []).forEach(function (w) { if (w && typeof w.texto === 'string') w.texto = fechaInglesa_(w.texto) || w.texto; });
+  (salida.porFrasco || []).forEach(function (x) { if (x && typeof x.texto === 'string') x.texto = alIngles_(x.texto); });
+  (salida.resultados || []).forEach(function (x) { if (x && typeof x === 'object') ['mensaje', 'aviso'].forEach(function (k) { if (typeof x[k] === 'string') x[k] = alIngles_(x[k]); }); });
+  if (salida.instagram && typeof salida.instagram.error === 'string') salida.instagram.error = alIngles_(salida.instagram.error);
+  return salida;
+}
+
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -43,6 +430,10 @@
     empezarDeNuevo: function () { return { accion: 'empezarDeNuevo' }; }   // the demo's button (23 Sep); the live door refuses it
   };
   function codigo() { try { return localStorage.getItem(K) || ''; } catch (e) { return ''; } }
+  function idioma() {
+    if (window.CHEVIVA_IDIOMA) return window.CHEVIVA_IDIOMA;
+    try { return localStorage.getItem('cheviva-idioma') || localStorage.getItem('cheviva-idioma-demo') || 'es'; } catch (e) { return 'es'; }
+  }
   function pedirCodigo(aviso) {
     var ir = function () {
       var caja = document.getElementById('entrada');
@@ -53,6 +444,10 @@
           '<input id="entradaCodigo" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Contraseña">' +   // digits today; drop inputmode if it ever gets letters
           '<button class="btn primario" id="entradaBoton" type="button">Entrar</button>';
         document.body.appendChild(caja);
+        caja.querySelectorAll('.idiomas button[data-l]').forEach(function (b) {   // the demo's sign-in: ES | EN before the password
+          b.classList.toggle('on', b.dataset.l === idioma());
+          b.onclick = function () { try { localStorage.setItem('cheviva-idioma', b.dataset.l); } catch (e) {} location.reload(); };
+        });
         document.getElementById('entradaBoton').onclick = function () {
           var v = document.getElementById('entradaCodigo').value.trim();
           if (!v) return;
@@ -70,6 +465,7 @@
     if (!c) { pedirCodigo(); return; }
     if (!ACCIONES[nombre]) { if (mal) mal(new Error('La app no conoce ' + nombre)); return; }
     var cuerpo = ACCIONES[nombre].apply(null, args); cuerpo.clave = c;
+    cuerpo.idioma = idioma();   // 24 Sep (cheviva-demo stage 4): the door answers in the phone's language
     fetch(PUERTA, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(cuerpo), redirect: 'follow' })
       .then(function (r) { return r.json(); })
       .then(function (j) {
@@ -230,6 +626,10 @@
   .demo-tira b { font-family: 'Archivo Black', 'Archivo', sans-serif; letter-spacing: .12em; color: var(--white); background: var(--seal); padding: 1px 6px; }
   .demo-tira span { flex: 1 1 180px; min-width: 0; }
   .demo-tira button { flex: 0 0 auto; font: 12px/1 'Archivo', sans-serif; font-weight: 600; background: var(--paper); color: var(--ink); border: 0; border-radius: 6px; padding: 7px 10px; }
+  /* 24 Sep (cheviva-demo stage 4, his C5): ES | EN at a tap, on the demo's strip and its sign-in; the choice stays on the phone */
+  .idiomas, .demo-tira .idiomas { display: inline-flex; flex: 0 0 auto; min-width: auto; border: 1px solid var(--kraft); border-radius: 6px; overflow: hidden; }
+  .idiomas button, .demo-tira .idiomas button { font: 600 12px/1 'Archivo', sans-serif; border: 0; border-radius: 0; background: var(--paper); color: var(--ink); padding: 7px 9px; margin: 0; width: auto; max-width: none; }
+  .idiomas button.on, .demo-tira .idiomas button.on { background: var(--seal); color: var(--white); }
 </style>
 </head>
 <body class="sin-datos">
@@ -239,7 +639,7 @@
   <div class="marca">CHEVIVA</div>
   <div class="hoy" id="hoy"></div>
 </header>
-<div class="demo-tira" id="demoTira" hidden><span><b>DEMO</b> <span id="demoTexto"></span></span><button type="button" id="demoOtraVez">Empezar de nuevo</button></div>
+<div class="demo-tira" id="demoTira" hidden><span><b>DEMO</b> <span id="demoTexto"></span></span><button type="button" id="demoOtraVez">Empezar de nuevo</button><span class="idiomas" id="demoIdioma"><button type="button" data-l="es">ES</button><button type="button" data-l="en">EN</button></span></div>
 
 <main>
   <!-- ============ INICIO ============ -->
@@ -521,7 +921,75 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-24-insumos';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-24-ingles';   // must match what the sheet hands over; see below
+
+  /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
+     The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
+     otherwise Spanish, which is all the live app ever is (its page has no switch and no such setting). In English every
+     word the page shows goes through the one list the door also uses (src/18_ingles.js, put into the page by
+     tools/construir-app-web.py): text, placeholders, list headings, toasts and the phone's own boxes. What the page
+     sends back never changes language: every list keeps its Spanish value, only its words on screen are English. */
+  var IDIOMA_ELEGIDO = 'cheviva-idioma', IDIOMA_DE_LA_DEMO = 'cheviva-idioma-demo';   // the demo page saves both under names of its own
+  function guardado(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+  var TRADUCE = typeof alIngles_ === 'function';                           // Google's own copy of the page (tests) has no list
+  var IDIOMA = TRADUCE && /^(es|en)$/.test(guardado(IDIOMA_ELEGIDO) || guardado(IDIOMA_DE_LA_DEMO)) ? (guardado(IDIOMA_ELEGIDO) || guardado(IDIOMA_DE_LA_DEMO)) : 'es';
+  window.CHEVIVA_IDIOMA = IDIOMA;                                          // the wrapper sends it with every call, so the door answers in it
+  document.documentElement.lang = IDIOMA;
+  function enIngles(s) { return IDIOMA === 'en' && TRADUCE ? alIngles_(s) : s; }
+  function traducirTexto(n) {
+    var p = n.parentNode, v = n.nodeValue;
+    if (!p || p.nodeName === 'SCRIPT' || p.nodeName === 'STYLE' || !v || !v.trim()) return;
+    var e = alIngles_(v);
+    if (e !== v) n.nodeValue = e;
+  }
+  function traducirAtributos(el) {
+    ['placeholder', 'label'].forEach(function (a) {
+      if (!el.hasAttribute || !el.hasAttribute(a)) return;
+      var v = el.getAttribute(a), e = alIngles_(v);
+      if (e !== v) el.setAttribute(a, e);
+    });
+  }
+  function traducirTodo(raiz) {
+    if (IDIOMA !== 'en' || !TRADUCE || !raiz) return;
+    if (raiz.nodeType === 3) { traducirTexto(raiz); return; }
+    var w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT, null), n, nodos = [];
+    while ((n = w.nextNode())) nodos.push(n);
+    nodos.forEach(traducirTexto);
+    traducirAtributos(raiz);
+    if (raiz.querySelectorAll) raiz.querySelectorAll('[placeholder],optgroup[label]').forEach(traducirAtributos);
+  }
+  if (IDIOMA === 'en' && TRADUCE) {
+    traducirTodo(document.body);
+    new MutationObserver(function (cambios) {
+      cambios.forEach(function (m) {
+        if (m.type === 'characterData') traducirTexto(m.target);
+        else if (m.type === 'attributes') traducirAtributos(m.target);
+        else m.addedNodes.forEach(function (x) { traducirTodo(x); });
+      });
+    }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'label'] });
+    var alertaPropia = window.alert.bind(window), preguntaPropia = window.confirm.bind(window);
+    window.alert = function (m) { return alertaPropia(alIngles_(String(m))); };
+    window.confirm = function (m) { return preguntaPropia(alIngles_(String(m))); };
+  }
+  function elegirIdioma(l) {
+    try { localStorage.setItem(IDIOMA_ELEGIDO, l); } catch (e) {}
+    if (l !== IDIOMA) location.reload();
+  }
+  document.querySelectorAll('.idiomas button[data-l]').forEach(function (b) {
+    b.classList.toggle('on', b.dataset.l === IDIOMA);
+    b.addEventListener('click', function () { elegirIdioma(b.dataset.l); });
+  });
+  /* The demo's "Idioma al abrir", as the sheet says it: kept for the next opening; a phone that never chose follows it now */
+  function idiomaDeLaDemo(demo) {
+    if (!TRADUCE || !demo || !demo.es || !/^(es|en)$/.test(demo.idioma || '')) return;
+    try { localStorage.setItem(IDIOMA_DE_LA_DEMO, demo.idioma); } catch (e) {}
+    var par = 'idioma>' + demo.idioma, ya = false;
+    try { ya = sessionStorage.getItem('cheviva-idioma-recarga') === par; } catch (e) { ya = true; }
+    if (!guardado(IDIOMA_ELEGIDO) && demo.idioma !== IDIOMA && !ya) {
+      try { sessionStorage.setItem('cheviva-idioma-recarga', par); } catch (e) {}
+      location.reload();
+    }
+  }
 
   /* ---------- helpers ---------- */
   function gs(n) { var v = Number(n) || 0; n = Math.sign(v) * Math.round(Math.abs(v)); var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n < 0 ? '−' : '') + 'Gs\u00A0' + s; }   // half a guaraní rounds away from zero, like the sheet; the no-break space keeps Gs on its number
@@ -603,13 +1071,14 @@
   function leerGuardados() {
     var g = null;
     try { g = JSON.parse(localStorage.getItem(GUARDADOS) || 'null'); } catch (e) { g = null; }
-    if (g && g.datos && g.datos.version === VERSION_PAGINA && Number(g.leido) > 0) return g;
+    // numbers kept in the other language are not drawn (24 Sep): the door wrote some of their words in it
+    if (g && g.datos && g.datos.version === VERSION_PAGINA && Number(g.leido) > 0 && (g.idioma || 'es') === IDIOMA) return g;
     try { localStorage.removeItem(GUARDADOS); } catch (e) {}
     return null;
   }
   function guardarLeidos(d) {
     try {
-      if (d && d.version === VERSION_PAGINA) localStorage.setItem(GUARDADOS, JSON.stringify({ leido: LEIDO, datos: d }));
+      if (d && d.version === VERSION_PAGINA) localStorage.setItem(GUARDADOS, JSON.stringify({ leido: LEIDO, datos: d, idioma: IDIOMA }));
       else localStorage.removeItem(GUARDADOS);
     } catch (e) {}   // a phone that keeps nothing (private browsing, a full memory) still works: it waits, as before
   }
@@ -623,15 +1092,18 @@
   /* THE DEMO'S STRIP (23 Sep, cheviva-demo stage 1): only when the sheet says it is the demo. The time of the last refill
      comes as a number and is written in the phone's own time, so a phone in London reads its own clock. */
   var DIAS_DEMO = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'], MESES_DEMO = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  var DAYS_DEMO = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MONTHS_DEMO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   function fechaDemo(ms) {
-    var t = new Date(ms), dd = function (n) { return ('0' + n).slice(-2); };
-    return DIAS_DEMO[t.getDay()] + ' ' + t.getDate() + ' ' + MESES_DEMO[t.getMonth()] + ', ' + dd(t.getHours()) + ':' + dd(t.getMinutes());
+    var t = new Date(ms), dd = function (n) { return ('0' + n).slice(-2); }, hora = dd(t.getHours()) + ':' + dd(t.getMinutes());
+    if (IDIOMA === 'en') return DAYS_DEMO[t.getDay()] + ' ' + MONTHS_DEMO[t.getMonth()] + ' ' + t.getDate() + ', ' + hora;   // American order: Wed Sep 23
+    return DIAS_DEMO[t.getDay()] + ' ' + t.getDate() + ' ' + MESES_DEMO[t.getMonth()] + ', ' + hora;
   }
   function pintarDemo(demo) {
     var tira = $('demoTira');
     if (!demo || !demo.es) { tira.hidden = true; return; }
-    $('demoTexto').textContent = demo.rellenado ? 'números reales de Cheviva del ' + fechaDemo(demo.rellenado) + ' · nombres cambiados'
-                                                : 'todavía sin los números de Cheviva';
+    $('demoTexto').textContent = demo.rellenado ? (IDIOMA === 'en' ? 'real Cheviva numbers from ' + fechaDemo(demo.rellenado) + ' · names changed'
+                                                                    : 'números reales de Cheviva del ' + fechaDemo(demo.rellenado) + ' · nombres cambiados')
+                                                : enIngles('todavía sin los números de Cheviva');
     tira.hidden = false;
   }
   $('demoOtraVez').addEventListener('click', function () {
@@ -931,6 +1403,9 @@
       d.preguntasLote.forEach(function (q, i) { if (gramosAntes[q]) $('l-g' + i).value = gramosAntes[q]; });
     }
     $('cargando').hidden = true; $('inicio').hidden = false;
+    // in English: every word drawn above at once, before the tiles are fitted to their width (24 Sep)
+    if (IDIOMA === 'en') { traducirTodo(document.body); ajustarKpis(); }
+    if (!leidoAntes) idiomaDeLaDemo(d.demo);
     return true;
   }
   // 16 Sep: "sigue en el negocio Gs 1.435.868" ran out of its tile. Every amount is one unbreakable piece now, so a
