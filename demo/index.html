@@ -672,6 +672,9 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
   /* the demo's strip (23 Sep, cheviva-demo): shown only when the sheet says it is the demo */
   .demo-tira { position: sticky; top: calc(61px + env(safe-area-inset-top)); z-index: 4; background: var(--ink); color: var(--paper); padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font: 12px/1.35 'IBM Plex Mono', monospace; }
   .demo-tira[hidden] { display: none; }
+  /* 25 Sep (stage 5, W12, S13): the strip turns red when the nightly copy did not run, so whoever opens the demo sees it first */
+  .demo-tira.vieja { background: var(--seal); }
+  .demo-tira.vieja b { background: transparent; padding: 0; }
   /* 24 Sep (cheviva-demo stage 3): a labeled example of the demo, never a row of the books */
   .ejemplo { font: 600 10px/1 'IBM Plex Mono', monospace; letter-spacing: .08em; background: var(--ink); color: var(--paper); padding: 2px 5px; border-radius: 3px; vertical-align: 2px; white-space: nowrap; }
   label.btn.apagado { opacity: .45; pointer-events: none; }
@@ -975,7 +978,7 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-25-ingles-4';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-25-noche';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1156,12 +1159,24 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     if (IDIOMA === 'en') return DAYS_DEMO[t.getDay()] + ' ' + t.getDate() + ' ' + MONTHS_DEMO[t.getMonth()] + ', ' + hora;   // "Wed 23 Sep", as his map document
     return DIAS_DEMO[t.getDay()] + ' ' + t.getDate() + ' ' + MESES_DEMO[t.getMonth()] + ', ' + hora;
   }
+  /* How old the numbers are, in the phone's own clock: "30 h" under two days, "2 días" after (the live app's line says the same). */
+  function edadDemo(horas) {
+    if (horas < 48) return horas + ' h';
+    var dias = Math.floor(horas / 24);
+    return IDIOMA === 'en' ? dias + ' days' : dias + ' días';
+  }
   function pintarDemo(demo) {
     var tira = $('demoTira');
     if (!demo || !demo.es) { tira.hidden = true; return; }
-    $('demoTexto').textContent = demo.rellenado ? (IDIOMA === 'en' ? 'real Cheviva numbers from ' + fechaDemo(demo.rellenado) + ' · names changed'
-                                                                    : 'números reales de Cheviva del ' + fechaDemo(demo.rellenado) + ' · nombres cambiados')
-                                                : enIngles('todavía sin los números de Cheviva');
+    // 25 Sep (stage 5, W12): older than the demo's own "Horas sin copia antes de avisar", the strip turns red and says how old
+    var limite = (Number(demo.horasSinCopia) > 0 ? Number(demo.horasSinCopia) : 26) * 3600000, edad = demo.rellenado ? Date.now() - demo.rellenado : 0;
+    var vieja = !!demo.rellenado && edad > limite;
+    tira.classList.toggle('vieja', vieja);
+    $('demoTexto').textContent = !demo.rellenado ? enIngles('todavía sin los números de Cheviva')
+      : vieja ? (IDIOMA === 'en' ? 'numbers from ' + edadDemo(Math.floor(edad / 3600000)) + ' ago: last night\'s copy did not run · names changed'
+                                 : 'números de hace ' + edadDemo(Math.floor(edad / 3600000)) + ': la copia de la noche no corrió · nombres cambiados')
+      : (IDIOMA === 'en' ? 'real Cheviva numbers from ' + fechaDemo(demo.rellenado) + ' · names changed'
+                         : 'números reales de Cheviva del ' + fechaDemo(demo.rellenado) + ' · nombres cambiados');
     tira.hidden = false;
   }
   $('demoOtraVez').addEventListener('click', function () {
@@ -1312,6 +1327,8 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     (av.insumos || []).forEach(function (x) { items.push([1, x.texto, { ir: 'compra', que: x.item }]); });
     (av.esperando || []).forEach(function (x) { items.push([1, x.texto, { ir: 'mensajes' }, x.ejemplo]); });
     (av.consignas || []).forEach(function (x) { items.push([1, x.texto, { ir: 'registro', consigna: true }, x.ejemplo]); });   // the Venta screen
+    // 25 Sep (cheviva-demo stage 5, S13): the watchman's lines about the reader and the demo, in the live app only
+    (av.vigilancia || []).forEach(function (x) { items.push([1, x.texto, x.ir ? { ir: x.ir } : (x.planilla ? { url: d.urls.planilla } : {})]); });
     $('pendientes').innerHTML = items.length ? items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>'; }).join('')
                                             : '<p class="sub" style="margin:0">Nada pendiente.</p>';
     $('pendientes').querySelectorAll('.pendiente[data-i]').forEach(function (el) {
