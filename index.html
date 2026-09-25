@@ -388,9 +388,17 @@
     <div class="tarjeta">
       <label>Fecha de compra</label><input type="date" id="c-fecha">
       <label>Qué</label><select id="c-que"></select>
+      <div id="c-nuevo" hidden><label>Nombre</label><input id="c-nombre" placeholder="Tapas de colores" autocomplete="off"></div>
       <div class="fila2">
         <div><label>Cantidad</label><input id="c-cantidad" inputmode="decimal" placeholder="1,5"></div>
         <div><label>Unidad</label><select id="c-unidad"></select></div>
+      </div>
+      <!-- 24 Sep (W16): only for what is not watched yet; left empty, it is only a purchase -->
+      <div id="c-avisar" hidden>
+        <label>¿Avisar cuando se esté acabando?</label>
+        <label>Se usa</label>
+        <div class="seg" id="c-uso"><button type="button" data-t="frasco">por frasco</button><button type="button" data-t="lote">por lote</button></div>
+        <label id="c-avisar-cuanto">Cantidad</label><input id="c-avisar-cantidad" inputmode="decimal" placeholder="opcional">
       </div>
       <label>Total pagado, Gs</label><input id="c-total" inputmode="numeric" placeholder="74500">
       <label>Cuenta (de dónde salió la plata)</label><select id="c-cuenta"></select>
@@ -513,7 +521,7 @@
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-24-suma';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-24-insumos';   // must match what the sheet hands over; see below
 
   /* ---------- helpers ---------- */
   function gs(n) { var v = Number(n) || 0; n = Math.sign(v) * Math.round(Math.abs(v)); var s = String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n < 0 ? '−' : '') + 'Gs\u00A0' + s; }   // half a guaraní rounds away from zero, like the sheet; the no-break space keeps Gs on its number
@@ -844,11 +852,13 @@
     var queAntes = $('c-que').value;
     if (!antes || JSON.stringify([antes.gruposItems, antes.items]) !== JSON.stringify([d.gruposItems, d.items])) {
       $('c-que').innerHTML = '<option value="">Elegí…</option>' + d.gruposItems.map(function (g) {
-        return '<optgroup label="' + esc(g) + '">' + d.items.filter(function (i) { return i.grupo === g; }).map(function (i) { return '<option value="' + esc(i.nombre) + '">' + esc(i.nombre) + '</option>'; }).join('') + '</optgroup>';
+        return '<optgroup label="' + esc(g) + '">' + d.items.filter(function (i) { return i.grupo === g; }).map(function (i) { return '<option value="' + esc(i.nombre) + '">' + esc(i.nombre) + '</option>'; }).join('') +
+               (d.vigilados ? '<option value="+nuevo:' + esc(g) + '">+ Nuevo</option>' : '') + '</optgroup>';   // 24 Sep (W16): a name new to the list, in its group (a sheet that knows it)
       }).join('');
       if (queAntes) $('c-que').value = queAntes;
     }
     unidadesDe(true);
+    pintarAvisar();
     var cuentaAntes = $('c-cuenta').value || ultimaCuenta();
     llenarSelect($('c-cuenta'), d.cuentas, 'Sin especificar');
     if (cuentaAntes && d.cuentas.indexOf(cuentaAntes) >= 0) $('c-cuenta').value = cuentaAntes;
@@ -963,7 +973,9 @@
     var u = x && x.unidad && x.unidad !== 'unidad' ? ' ' + x.unidad : '';
     $('k-cuanto').textContent = 'Cuántos hay' + (u ? ' (' + u.trim() + ')' : '');
     $('k-dice').textContent = !x ? '' : 'Según la planilla hay ' + cant(x.stock) + u + '.' +
-      (x.ultimo ? ' Último conteo: ' + x.ultimo.fecha + ', ' + cant(x.ultimo.contado) + u + '.' : ' Nunca se contó.');
+      (x.ultimo ? ' Último conteo: ' + x.ultimo.fecha + ', ' + cant(x.ultimo.contado) + u + '.' : ' Nunca se contó.') +
+      // 24 Sep (W16): an added supply was already an expense when it was bought, so its count moves no figure
+      (x.agregado ? ' Contarlo solo corrige cuánto queda: sus compras ya están en los números.' : '');
   }
   $('k-que').addEventListener('change', function () { $('k-hecho').hidden = true; decirConteo(); });
   /* Instagram next to WhatsApp (21 Sep, his point 9). The numbers come from the sheet, which reads Instagram at most once
@@ -1173,7 +1185,22 @@
     var it = (D ? D.items : []).filter(function (i) { return i.nombre === $('c-que').value; })[0];
     (mantener ? llenarSelectMantener : llenarSelect)($('c-unidad'), it ? it.unidades : (D ? D.unidades : []));
   }
-  $('c-que').addEventListener('change', function () { unidadesDe(); });
+  /* 24 Sep (W16 as rewritten, his question: "Is the supply not simply being added by adding a purchase?"): "+ Nuevo" asks
+     for the name; what is not watched yet asks "¿Avisar cuando se esté acabando?" (7 + 7 days, not shown), in the unit bought */
+  var USO_AVISAR = '';                                                 // no way chosen: left empty, it is only a purchase
+  function compraNueva() { return /^\+nuevo:/.test($('c-que').value); }
+  function pintarAvisar() {
+    var v = $('c-que').value, nueva = compraNueva();
+    var it = (D ? D.items : []).filter(function (i) { return i.nombre === v; })[0];
+    $('c-nuevo').hidden = !nueva;
+    $('c-avisar').hidden = !(D && D.vigilados) || !(nueva || (it && it.unidades.length && ((D && D.vigilados) || []).indexOf(v) < 0));   // an older sheet: never asked
+    $('c-avisar-cuanto').textContent = 'Cantidad' + (USO_AVISAR ? ' por ' + USO_AVISAR : '') + ($('c-unidad').value ? ' (' + $('c-unidad').value + ')' : '');
+  }
+  $('c-que').addEventListener('change', function () { unidadesDe(); pintarAvisar(); });
+  $('c-unidad').addEventListener('change', pintarAvisar);
+  $('c-uso').querySelectorAll('button').forEach(function (bt) {
+    bt.addEventListener('click', function () { USO_AVISAR = bt.dataset.t; $('c-uso').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === bt); }); pintarAvisar(); });
+  });
   // the numbers kept on the phone, at once (21 Sep); then the sheet's
   var guardados = leerGuardados();
   if (guardados) {
@@ -1197,8 +1224,12 @@
   }
   $('c-guardar').addEventListener('click', function () {
     recordarCuenta($('c-cuenta').value);
-    guardar($('c-guardar'), 'guardarCompra', { fecha: $('c-fecha').value, que: $('c-que').value, cantidad: $('c-cantidad').value, unidad: $('c-unidad').value, total: $('c-total').value, cuenta: $('c-cuenta').value, nota: $('c-nota').value },
-      function () { $('c-cantidad').value = ''; $('c-total').value = ''; $('c-nota').value = ''; });
+    var nueva = compraNueva();
+    guardar($('c-guardar'), 'guardarCompra', { fecha: $('c-fecha').value, que: nueva ? '' : $('c-que').value, cantidad: $('c-cantidad').value, unidad: $('c-unidad').value, total: $('c-total').value, cuenta: $('c-cuenta').value, nota: $('c-nota').value,
+      nuevo: nueva ? { nombre: $('c-nombre').value, grupo: $('c-que').value.replace(/^\+nuevo:/, '') } : null,
+      avisar: $('c-avisar').hidden ? null : { uso: USO_AVISAR, cantidad: $('c-avisar-cantidad').value } },
+      function () { $('c-cantidad').value = ''; $('c-total').value = ''; $('c-nota').value = ''; $('c-nombre').value = ''; $('c-avisar-cantidad').value = '';
+                    USO_AVISAR = ''; $('c-uso').querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); }); pintarAvisar(); });
   });
   $('l-guardar').addEventListener('click', function () {
     var gramos = {}; (D ? D.preguntasLote : []).forEach(function (q, i) { gramos[q] = $('l-g' + i).value; });
