@@ -175,9 +175,10 @@ function fechaInglesa_(s) {
 }
 var MESES_CORTOS_INGLES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /**
- * What the English SCREEN shows of dates (the chat's word of 25 Sep): "25 Sep 2026" or "25 Sep" for the books' 25/09/2026. Numbers
- * keep the books' own writing in both languages, "Gs 2.320.968" (his approved plan, W5: "the guaraní keeps its dots in both
- * languages"); commas are a taste question for his and Alex's read, not the build. The sheet and the Spanish screens never change.
+ * What the English SCREEN shows of numbers and dates (his yes, 25 Sep 7:5x AM ET, W5 as amended; the English of his map document): money with
+ * comma thousands ("Gs 210,000", "Gs 22.03"), counts too ("1,230"), and a date "25 Sep 2026" or "25 Sep". Only the page uses it,
+ * once per piece of text: the door keeps the books' own way of writing numbers in its English words, and the sheet and the
+ * Spanish screens never change. Every number reaching it is written the books' way (dot for thousands, comma for decimals).
  */
 function formatoIngles_(s) {
   if (s === null || s === undefined) return s;
@@ -186,9 +187,10 @@ function formatoIngles_(s) {
       var dd = Number(d), mm = Number(m);
       if (dd < 1 || dd > 31 || mm < 1 || mm > 12) return x;
       return antes + dd + ' ' + MESES_CORTOS_INGLES[mm - 1] + (a ? ' ' + a : '');
-    });
+    })
+    .replace(/\d+(?:[.,]\d+)+/g, function (x) { return x.replace(/[.,]/g, function (c) { return c === '.' ? ',' : '.'; }); });
 }
-/** A piece of text as the English screen shows it: its words, then its dates. */
+/** A piece of text as the English screen shows it: its words, then its numbers and dates. */
 function alInglesPantalla_(s) { return formatoIngles_(alIngles_(s)); }
 function nPlural_(n, uno, varios) { return n + ' ' + (Number(String(n).replace(/\./g, '')) === 1 ? uno : varios); }
 function duracionInglesa_(s) {
@@ -973,7 +975,7 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-25-ingles-3';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-25-ingles-4';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -993,7 +995,7 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     var p = n.parentNode, v = n.nodeValue;
     if (!p || p.nodeName === 'SCRIPT' || p.nodeName === 'STYLE' || !v || !v.trim()) return;
     if (p.closest && p.closest('[translate="no"]')) return;               // a customer's words, a translated caption, a receipt's own words
-    if (HECHOS && HECHOS.get(n) === v) return;                           // already English: nothing to do again
+    if (HECHOS && HECHOS.get(n) === v) return;                           // already English: its numbers are never formatted twice
     var e = alInglesPantalla_(v);
     if (e !== v) n.nodeValue = e;
     if (HECHOS) HECHOS.set(n, n.nodeValue);
