@@ -29,7 +29,7 @@ var INGLES = {
   'Monto, Gs': 'Amount, Gs', 'Fecha': 'Date', 'Nota (opcional)': 'Note (optional)', 'por ejemplo: efectivo de la feria': 'for example: cash from the market',
   'Anotar el pago': 'Record the payment', 'Anotar un pago entre nosotros': 'Record a payment between us', 'Compras por cuenta': 'Purchases by account',
   'Sin cuenta todavía': 'No account yet', 'Todavía no hay compras.': 'No purchases yet.', 'Todavía no hay nadie en las cuentas.': 'Nobody in the accounts yet.',
-  'Puso de su plata': 'Put in of own money', 'Saldo': 'Balance', 'Puso': 'Put in', 'Tiene': 'Holds', 'Quién': 'Who',
+  'Puso de su plata': 'Put in', 'Saldo': 'Balance', 'Puso': 'Put in', 'Tiene': 'Holds', 'Quién': 'Who',
   // Mensajes
   'Todavía no llegan mensajes: falta vincular el WhatsApp de la empresa.': 'No messages yet: the business\'s WhatsApp is not linked yet.',
   'Abrir': 'Open', '← nosotros': '← us', '→ nos escribió': '→ wrote to us', 'Publicación': 'Post', 'Alcance': 'Reach', 'Vistas': 'Views',
@@ -50,6 +50,29 @@ var INGLES = {
   'Lo que el negocio tiene hoy (activo)': 'What the business has today (assets)',
   'Kimchi: costo por gramo (promedio, lotes con frascos)': 'Kimchi: cost per gram (average, batches with jars)', 'Costo por frasco de 350 ml': 'Cost per 350 ml jar',
   'Costo por vasito de 100 ml': 'Cost per 100 ml cup', 'Margen por frasco, % del precio': 'Margin per jar, % of the price',
+  // 25 Sep (cheviva-next-round stage 2): the five places, the six tiles, the month by function, margins, movements, accounts
+  'Leer recibos pendientes': 'Read pending receipts', 'Márgenes': 'Margins', 'Movimientos': 'Movements', 'Anotar un pago': 'Record a payment',
+  'Adónde fue la plata': 'Where the money went', 'Cómo se calcula': 'How it is worked out', 'Cómo funciona': 'How it works', 'Para qué sirve': 'What it is for',
+  'Enlaces': 'Links', 'Anotar una compra': 'Record a purchase', 'Cómo se cuentan': 'How they are counted',
+  'Un gasto pasa al resultado cuando se usa: al vender o regalar un frasco, al pagar un viaje o la feria, y una parte del equipo cada mes. El resto está en cosas que el negocio todavía tiene.':
+    'An expense moves into net income when it is used: when a jar is sold or given away, when a trip or the market is paid for, and a share of the equipment every month. The rest is in things the business still has.',
+  'ej.: efectivo de la feria': 'e.g. cash from the market', 'vacío = partes iguales': 'empty = equal shares', 'vacío = sin acuerdo': 'empty = not agreed',
+  'Aceptar': 'Accept', 'Más tarde': 'Later', 'En stock': 'In stock', 'Margen/frasco': 'Margin/jar', 'Costo/frasco': 'Cost/jar', 'Clientes': 'Customers',
+  'Inversión neta': 'Net investment', 'esperando respuesta': 'waiting for a reply', 'a precio de lista': 'at list price', 'Precio de lista': 'List price',
+  'Costo de ventas': 'Cost of goods sold', 'Margen bruto': 'Gross margin', 'Gastos de venta': 'Selling costs', 'Gastos de administración': 'Administrative costs',
+  'Resultado del mes': 'Net income', 'Muestras regaladas, al costo': 'Samples given away, at cost', 'Pérdida de inventario': 'Inventory loss',
+  'Depreciación del equipo': 'Equipment depreciation', 'Comisión de revendedores': 'Reseller commission', 'Otros gastos': 'Other expenses',
+  'Margen bruto por frasco vendido': 'Gross margin per jar sold', 'precio promedio cobrado': 'average price charged',
+  'Compras de la semana': 'Bought this week', 'Ventas de la semana': 'Sold this week', 'Nada comprado ni vendido.': 'Nothing bought or sold.',
+  'Todavía no hay compras ni ventas.': 'No purchases or sales yet.', 'ventas': 'sales', 'Plata del negocio que le llegó': 'Business money received',
+  'Ya se le devolvió': 'Paid back', 'a mano': 'even',
+  // 26 Sep (the checker's second round): the parts of every sum
+  'Compras': 'Purchases', 'sin cuenta': 'no account', 'Venta cobrada': 'Sale collected', 'Pagó a': 'Paid', 'Le pagó': 'Paid by', 'Entregó a': 'Handed to',
+  'Recibió de': 'Received from', 'Le devolvió': 'Paid back by', 'En frascos': 'In jars', 'En lotes sin envasar': 'In batches not yet filled',
+  'Menos lo del lote 1 que no pasó por Compras': 'Less batch 1\'s share, not entered as purchases', 'Costó': 'Cost', 'Ya usado (depreciación)': 'Already used (depreciation)',
+  'Kimchi hecho sin vender': 'Kimchi made and not sold', 'Gochugaru y etiquetas': 'Gochugaru and labels', 'Plata del negocio en manos de': 'The business\'s money held by',
+  'Kimchi en frascos': 'Kimchi in jars', 'Kimchi en lotes sin envasar': 'Kimchi in batches not yet filled', 'Frascos vacíos': 'Empty jars', 'Kimchi': 'Kimchi',
+  'compras': 'purchases', 'menos': 'less', 'resultado': 'net income',
   // Inicio
   'Plata que salió': 'Money out', 'Frascos en stock': 'Jars in stock', 'picante': 'spicy', 'blanco': 'white', 'Costo por frasco': 'Cost per jar',
   'promedio de los lotes': 'average of the batches', 'Margen por frasco': 'Margin per jar', 'Costo de lo vendido': 'Cost of what was sold',
@@ -58,7 +81,7 @@ var INGLES = {
   'Diferencia de caja': 'Cash difference',
   'Cada compra cuenta el día que se pagó, aunque los frascos y los ingredientes sigan en el negocio. Por eso la caja no es el resultado.':
     'Each purchase counts on the day it was paid, even while the jars and ingredients are still in the business. That is why cash is not the result.',
-  'Regalos, al costo': 'Gifts, at cost', 'Gastos (viajes, feria, Canva…)': 'Expenses (trips, market, Canva…)', 'Resultado de la semana': 'Result for the week',
+  'Regalos, al costo': 'Gifts, at cost', 'Gastos (viajes, feria, Canva…)': 'Expenses (trips, market, Canva…)', 'Resultado de la semana': 'Net income for the week',
   'Nada pendiente.': 'Nothing pending.',
   // Recibo
   'Subir un recibo': 'Upload a receipt',
@@ -74,7 +97,7 @@ var INGLES = {
   'La foto pesa más de 20 MB y no se pudo achicar.': 'The photo is over 20 MB and could not be shrunk.', 'no se pudo abrir la foto': 'the photo could not be opened',
   'no se pudo leer el archivo': 'the file could not be read', 'sin JPEG': 'no JPEG', 'Leyendo…': 'Reading…', 'No se pudo.': 'It did not work.',
   // Compra
-  'Cada vez que sale plata. El total incluye el delivery.': 'Every time money goes out. The total includes delivery.', 'Fecha de compra': 'Purchase date',
+  'Cada vez que sale plata. El total incluye el delivery.': 'Every time money goes out. The total includes delivery.', 'Fecha de compra': 'Date of purchase',
   'Qué': 'What', 'Nombre': 'Name', 'Tapas de colores': 'Colored lids', 'Cantidad': 'Quantity', 'Unidad': 'Unit',
   '¿Avisar cuando se esté acabando?': 'Warn when it is running low?', 'Se usa': 'Used', 'por frasco': 'per jar', 'por lote': 'per batch', 'opcional': 'optional',
   'Total pagado, Gs': 'Total paid, Gs', 'Cuenta (de dónde salió la plata)': 'Account (where the money came from)', 'Nota': 'Note', 'Dónde, o qué era': 'Where, or what it was',
@@ -119,7 +142,7 @@ var INGLES = {
   'Acelga japonesa': 'Napa cabbage', 'Ajo': 'Garlic', 'Azúcar': 'Sugar', 'Cebolla': 'Onion', 'Cebollita': 'Scallion', 'Gochugaru': 'Gochugaru',
   'Harina de arroz': 'Rice flour', 'Jengibre': 'Ginger', 'Manzana': 'Apple', 'Pera': 'Pear', 'Rábano': 'Radish', 'Sal': 'Salt', 'Salsa de pescado': 'Fish sauce',
   'Vinagre': 'Vinegar', 'Zanahoria': 'Carrot', 'Otro ingrediente': 'Other ingredient', 'Etiquetas': 'Labels', 'Frasco 100 ml': '100 ml jar', 'Frasco 350 ml': '350 ml jar',
-  'Tapas': 'Lids', 'Otro envase': 'Other container', 'Envío': 'Delivery', 'Feria y venta': 'Market and selling', 'Publicidad': 'Advertising', 'Servicios': 'Services',
+  'Tapas': 'Lids', 'Otro envase': 'Other container', 'Envío': 'Shipping', 'Feria y venta': 'Market and selling', 'Publicidad': 'Advertising', 'Servicios': 'Services',
   'Software y diseño': 'Software and design', 'Transporte': 'Transportation', 'Otro': 'Other', 'Diferencia de conteo': 'Stock count difference',
   'kg': 'kg', 'g': 'g', 'litro': 'liter', 'ml': 'ml', 'unidad': 'unit',
   'Kimchi Picante': 'Spicy Kimchi', 'Kimchi Blanco': 'White Kimchi', 'Vasito 100 ml': '100 ml cup', 'Gochugaru (g)': 'Gochugaru (g)',
@@ -174,6 +197,10 @@ var MESES_INGLES = { ene: 'Jan', feb: 'Feb', mar: 'Mar', abr: 'Apr', may: 'May',
 function fechaInglesa_(s) {
   var t = String(s || '').trim(), m;
   if ((m = t.match(/^([a-z]{3})\.? (\d{4})$/i)) && MESES_INGLES[m[1].toLowerCase()]) return MESES_INGLES[m[1].toLowerCase()] + ' ' + m[2];
+  // 25 Sep (stage 2): "21–27 sep" -> "21–27 Sep"; "29 sep – 5 oct" -> "29 Sep – 5 Oct"
+  if ((m = t.match(/^(\d{1,2})–(\d{1,2}) ([a-z]{3})$/i)) && MESES_INGLES[m[3].toLowerCase()]) return m[1] + '–' + m[2] + ' ' + MESES_INGLES[m[3].toLowerCase()];
+  if ((m = t.match(/^(\d{1,2}) ([a-z]{3}) – (\d{1,2}) ([a-z]{3})$/i)) && MESES_INGLES[m[2].toLowerCase()] && MESES_INGLES[m[4].toLowerCase()])
+    return m[1] + ' ' + MESES_INGLES[m[2].toLowerCase()] + ' – ' + m[3] + ' ' + MESES_INGLES[m[4].toLowerCase()];
   if ((m = t.match(/^([a-zé]{3}) (\d{1,2})(?: ([a-z]{3}))? – ([a-zá]{3}) (\d{1,2}) ([a-z]{3})$/i)) && DIAS_INGLES[m[1].toLowerCase()] && MESES_INGLES[m[6].toLowerCase()]) {
     var m2 = MESES_INGLES[m[6].toLowerCase()];
     return DIAS_INGLES[m[1].toLowerCase()] + ' ' + m[2] + (m[3] ? ' ' + MESES_INGLES[m[3].toLowerCase()] : '') + ' – ' + DIAS_INGLES[m[4].toLowerCase()] + ' ' + m[5] + ' ' + m2;
@@ -217,6 +244,16 @@ var INGLES_REGLAS = [
   // dates and the lines built on them
   [/^([a-z]{3} \d{4}|[a-zé]{3} \d{1,2}(?: [a-z]{3})? – [a-zá]{3} \d{1,2} [a-z]{3})$/i, function (x, a) { return fechaInglesa_(a) || x; }],
   [/^Resultado de (.+)$/, function (x, a) { return 'Result for ' + (fechaInglesa_(a) || a); }],
+  // 25 Sep (stage 2): the tiles "Ventas sep" and "Resultado sep", the weeks "21–27 sep" and "29 sep – 5 oct", the balance in words
+  [/^Ventas ([a-z]{3})$/, function (x, a) { return MESES_INGLES[a] ? MESES_INGLES[a] + ' sales' : x; }],
+  [/^Resultado ([a-z]{3})$/, function (x, a) { return MESES_INGLES[a] ? MESES_INGLES[a] + ' result' : x; }],
+  [/^(\d{1,2}–\d{1,2} [a-z]{3}|\d{1,2} [a-z]{3} – \d{1,2} [a-z]{3})$/, function (x, a) { return fechaInglesa_(a) || x; }],
+  [/^Márgenes: (.+)$/, function (x, a) { return 'Margins: ' + (fechaInglesa_(a) || a); }],
+  [/^(\d+) de (\d+ ml)$/, function (x, n, t) { return n + ' of ' + t; }],   // 26 Sep: "132 de 350 ml", a part of the empty jars
+  [/^invirtió (.+)$/, function (x, a) { return 'invested ' + a; }],
+  [/^retiró (.+)$/, function (x, a) { return 'took out ' + a; }],
+  [/^se le debe (.+)$/, function (x, a) { return 'is owed ' + a; }],
+  [/^tiene (.+) del negocio$/, function (x, a) { return 'holds ' + a + ' of the business\'s money'; }],
   [/^Este mes: (.+)$/, function (x, a) { return 'This month: ' + (fechaInglesa_(a) || a); }],
   [/^Esta semana: (.+)$/, function (x, a) { return 'This week: ' + (fechaInglesa_(a) || a); }],
   [/^La semana pasada \((.+)\): ventas (.+) \((\d+) frascos?\), resultado (.+)\.$/, function (x, a, b, n, c) {
@@ -264,9 +301,12 @@ var INGLES_REGLAS = [
   [/^La última vez no se pudo: (.+)$/, function (x, a) { return 'Last time it failed: ' + a; }],
   [/^Hay que volver a conectarla en la página de Meta de la app(\. Se vio el (.+))?\.$/, function (x, y, a) { return 'It has to be connected again on the app\'s Meta page' + (a ? '. Seen on ' + a : '') + '.'; }],
   [/^WhatsApp de Cheviva (.+)$/, function (x, a) { return 'Cheviva\'s WhatsApp ' + a; }],
+  [/^Última lectura del WhatsApp: ([\d\/: ]+)\.$/, function (x, a) { return 'Last WhatsApp read: ' + a + '.'; }],   // 25 Sep (stage 2): its explanation was cut
   [/^Última lectura del WhatsApp: (.+?)\. Quien escribe por primera vez entra solo en Ventas como consulta\.$/, function (x, a) {
     return 'Last WhatsApp read: ' + a + '. Whoever writes for the first time goes into Sales by itself as an inquiry.'; }],
   [/^(← nosotros|→ nos escribió) · (.+)$/, function (x, a, b) { return inglesDe_(a) + ' · ' + b; }],
+  // 25 Sep (stage 2, the translation gap of the 19 labels): a receipt's "3 líneas · leído por …" after its date, the reader's name kept as written
+  [/^(\d+) líneas? · leído por(?: (.+))?$/, function (x, c, l) { return nPlural_(c, 'line', 'lines') + ' · read by' + (l ? ' ' + l : ''); }],
   [/^(\d\d\/\d\d(?:\/\d{4})?) · (.+)$/, function (x, d, a) { return d + ' · ' + inglesDe_(a); }],
   [/^(\d+) × \((.+) − (.+) que se queda (.+)\)$/, function (x, n, a, b, q) { return n + ' × (' + a + ' − ' + b + ' that ' + inglesDe_(q) + ' keeps)'; }],
   [/^(.+) · (\d+) × (.+)$/, function (x, a, n, p) { return inglesDe_(a) + ' · ' + n + ' × ' + inglesDe_(p); }],
@@ -899,6 +939,54 @@ function reglaRegistro_(d, L) {
   .pendiente.rechazada .num { font-size: 16px; }
   .pendiente .botones-cola { display: flex; gap: 8px; margin-top: 6px; }
   .pendiente .botones-cola button { min-height: 44px; }
+  /* 25 Sep (cheviva-next-round stage 2): tiles that open or lead somewhere, lines that open to their parts (a button with
+     aria-expanded, 44 px tall), the accounts with the people as columns, links with their logos, explanations behind a tap */
+  button.kpi, div.kpi { display: block; width: 100%; text-align: left; font: inherit; color: inherit; position: relative; }
+  button.kpi { cursor: pointer; -webkit-appearance: none; appearance: none; }
+  .kpi > span { display: block; }
+  button.kpi[data-abre]::after, button.kpi[data-ir]::after { content: '▾'; position: absolute; right: 6px; top: 9px; font-size: 11px; color: var(--seal); }
+  button.kpi[data-abre][aria-expanded="true"]::after { content: '▴'; }
+  button.kpi[data-ir]::after { content: '›'; font-size: 16px; top: 5px; }
+  .partes-kpi { margin-top: 6px; border-top: 1px solid var(--ph); padding-top: 4px; }
+  .partes-kpi .pk { display: block; font-size: 12px; line-height: 1.35; color: var(--muted); padding: 2px 0; }
+  .partes-kpi .pk .nb { color: var(--ink); }
+  table.lineas td { vertical-align: middle; }
+  tr.con-partes > td { padding-top: 0; padding-bottom: 0; }
+  button.abre { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 44px; padding: 0; margin: 0; background: none; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; -webkit-appearance: none; appearance: none; }
+  button.abre::after { content: '▾'; color: var(--seal); font-size: 11px; flex: none; }
+  button.abre[aria-expanded="true"]::after { content: '▴'; }
+  tr.parte td { font-size: 13px; color: var(--muted); padding-left: 10px; background: var(--paper); }
+  tr.parte td.n { color: var(--ink); }
+  tr.parte small { display: block; }
+  tr.sub td { font-weight: 600; }
+  small.pc { display: inline; font-size: 12px; color: var(--muted); font-weight: 400; }
+  td.n small { display: block; }
+  small.nota-parte { display: block; font-size: 12px; line-height: 1.35; }
+  #semanasAntes { margin-top: 8px; }
+  table.movs tr.titulo-semana th { padding-top: 2px; }
+  table.movs b.dia { font: 500 12px 'IBM Plex Mono', monospace; color: var(--muted); }
+  table.movs tr.suma td { font-weight: 600; border-bottom: 0; }
+  tr.semana-vacia td { min-height: 44px; padding-top: 12px; padding-bottom: 12px; }
+  h3.sub3 { margin: 16px 0 0; }
+  table.personas th.n, table.personas td.n { width: 1%; }
+  table.personas tr.rotulo td { font-size: 12px; color: var(--muted); padding: 8px 4px 0; border-bottom: 0; }
+  table.personas { font-size: clamp(12px, 3.8vw, 15px); }   /* three people's figures side by side still fit 320 px */
+  table.personas tr.total td, table.persona tr.total td { white-space: normal; font-weight: 700; }
+  table.persona { margin-bottom: 12px; }
+  table.personas tr.rotulo.con-partes td { padding: 0 4px; }
+  table.personas tr.rotulo button.abre { min-height: 44px; font-size: 12px; color: var(--muted); }
+  table.partes-persona { margin: 4px 0 8px; font-size: 13px; }
+  table.partes-persona th { text-transform: none; font: 600 12px 'Archivo', sans-serif; color: var(--ink); letter-spacing: 0; }
+  table.partes-persona td { color: var(--muted); padding: 4px 2px; }
+  table.partes-persona td.n { color: var(--ink); }
+  .enlaces a.enlace-logo { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 0; padding: 6px 0; color: var(--ink); border-bottom: 1px solid var(--ph); }
+  .enlace-logo svg { width: 22px; height: 22px; flex: none; }
+  details.explica { margin: 0 0 6px; }
+  details.explica summary { display: flex; align-items: center; min-height: 44px; list-style: none; color: var(--seal); font-weight: 600; font-size: 14px; cursor: pointer; }
+  details.explica summary::-webkit-details-marker { display: none; }
+  details.explica summary::after { content: ' ▾'; margin-left: 4px; font-size: 11px; }
+  details.explica[open] summary::after { content: ' ▴'; }
+  details.explica p { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
 </style>
 </head>
 <body class="sin-datos">
@@ -917,45 +1005,52 @@ function reglaRegistro_(d, L) {
     <div id="inicio" hidden>
       <div class="leido"><span id="actualizado"></span><a href="#" id="btnActualizar">Actualizar</a></div>
       <!-- 21 Sep, his point 9: four things — what needs attention, the tiles, this month, this week — and three buttons -->
+      <!-- 25 Sep (cheviva-next-round stage 2, S6): To review, the six tiles, this month and this week; no buttons -->
       <div class="tarjeta" id="pendientesTarjeta">
         <h3>Para revisar</h3>
         <div id="pendientes"></div>
-        <button class="btn chico" id="btnLeer">Leer los recibos que quedaron en la carpeta</button>
+        <button class="btn chico" id="btnLeer">Leer recibos pendientes</button>
       </div>
 
       <div class="kpis" id="kpis"></div>
 
       <div class="tarjeta">
         <h3 id="mesTitulo">Este mes</h3>
-        <table id="mesTabla"></table>
-        <table id="mesCaja" class="caja"></table>
+        <table id="mesTabla" class="lineas"></table>
+        <table id="mesCaja" class="caja lineas"></table>
       </div>
 
       <div class="tarjeta">
         <h3 id="semanaTitulo">Esta semana</h3>
-        <table id="semanaTabla"></table>
-        <table id="semanaCaja" class="caja"></table>
-        <small id="semanaNota"></small>
-      </div>
-
-      <div class="tarjeta botones" id="botones">
-        <button type="button" class="ir" data-ir="cuentas"><span class="t"><b>Cuentas</b><small>Quién le debe a quién, anotar un pago, compras por cuenta</small></span><span class="flecha">›</span></button>
-        <button type="button" class="ir" data-ir="mensajes"><span class="t"><b>Mensajes</b><small>WhatsApp e Instagram</small></span><span class="flecha">›</span></button>
-        <button type="button" class="ir" data-ir="numeros"><span class="t"><b>Números</b><small>Ventas por persona, lotes, en qué se convirtió la plata, costos por frasco, enlaces</small></span><span class="flecha">›</span></button>
+        <table id="semanaTabla" class="lineas"></table>
+        <table id="semanaCaja" class="caja lineas"></table>
+        <table id="semanasAntes" class="lineas antes"></table>
       </div>
     </div>
   </section>
 
-  <!-- ============ CUENTAS (behind the front page's first button) ============ -->
-  <section id="p-cuentas" class="pantalla" hidden>
-    <div class="arriba"><a href="#inicio" class="volver" data-ir="inicio">‹ Inicio</a><span class="cuando" data-leido></span></div>
-    <h2>Cuentas</h2>
+
+
+  <!-- ============ NÚMEROS (a tab of its own since 25 Sep, stage 2) ============ -->
+  <section id="p-numeros" class="pantalla" hidden>
+    <h2>Números</h2>
     <div class="tarjeta sin-datos-aviso"><span class="spinner"></span>Leyendo la planilla…</div>
     <div class="con-datos">
+      <div class="leido"><span data-leido></span></div>
+      <div class="tarjeta" id="margenes-card">
+        <h3 id="margenesTitulo">Márgenes</h3>
+        <table id="margenesTabla" class="lineas"></table>
+      </div>
+
+      <div class="tarjeta" id="movimientos-card">
+        <h3>Movimientos</h3>
+        <table id="movimientosTabla" class="lineas movs"></table>
+      </div>
+
       <div class="tarjeta" id="cuenta-card">
-        <h3>Quién le debe a quién</h3>
-        <p class="sub" id="cuentaFrase" style="margin:0 0 8px"></p>
-        <table id="cuentaTabla" class="densa"></table>
+        <h3>Cuentas</h3>
+        <div id="cuentaTabla"></div>
+        <h3 class="sub3">Anotar un pago</h3>
         <div class="fila2">
           <div><label>Quién paga</label><select id="cta-quien"></select></div>
           <div><label>A quién</label><select id="cta-a"></select></div>
@@ -966,47 +1061,16 @@ function reglaRegistro_(d, L) {
           <div><label>Monto, Gs</label><input id="cta-monto" inputmode="numeric" placeholder="0"></div>
           <div><label>Fecha</label><input type="date" id="cta-fecha"></div>
         </div>
-        <label>Nota (opcional)</label><input id="cta-nota" placeholder="por ejemplo: efectivo de la feria">
+        <label>Nota (opcional)</label><input id="cta-nota" placeholder="ej.: efectivo de la feria">
         <button class="btn primario" id="cta-guardar">Anotar el pago</button>
+        <h3 class="sub3">Compras por cuenta</h3>
+        <table id="cuentasTabla" class="lineas"></table>
       </div>
 
       <div class="tarjeta">
-        <h3>Compras por cuenta</h3>
-        <table id="cuentasTabla"></table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ MENSAJES ============ -->
-  <section id="p-mensajes" class="pantalla" hidden>
-    <div class="arriba"><a href="#inicio" class="volver" data-ir="inicio">‹ Inicio</a><span class="cuando" data-leido></span></div>
-    <h2>Mensajes</h2>
-    <div class="tarjeta sin-datos-aviso"><span class="spinner"></span>Leyendo la planilla…</div>
-    <div class="con-datos">
-      <div class="tarjeta">
-        <h3>WhatsApp</h3>
-        <div id="waMensajes"></div>
-        <small id="waEstado"></small>
-      </div>
-
-      <div class="tarjeta" id="ig-card">
-        <h3>Instagram</h3>
-        <p class="sub" id="igCuenta" style="margin:0 0 8px"></p>
-        <table id="igTabla" class="densa"></table>
-        <small id="igEstado"></small>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ NÚMEROS ============ -->
-  <section id="p-numeros" class="pantalla" hidden>
-    <div class="arriba"><a href="#inicio" class="volver" data-ir="inicio">‹ Inicio</a><span class="cuando" data-leido></span></div>
-    <h2>Números</h2>
-    <div class="tarjeta sin-datos-aviso"><span class="spinner"></span>Leyendo la planilla…</div>
-    <div class="con-datos">
-      <div class="tarjeta">
-        <h3>Ventas por persona</h3>
-        <table id="vendedoresTabla" class="densa"></table>
+        <h3>Adónde fue la plata</h3>
+        <table id="balanceTabla" class="lineas"></table>
+        <details class="explica"><summary>Cómo se calcula</summary><p>Un gasto pasa al resultado cuando se usa: al vender o regalar un frasco, al pagar un viaje o la feria, y una parte del equipo cada mes. El resto está en cosas que el negocio todavía tiene.</p></details>
       </div>
 
       <div class="tarjeta">
@@ -1015,46 +1079,39 @@ function reglaRegistro_(d, L) {
       </div>
 
       <div class="tarjeta">
-        <h3>En qué se convirtió la plata que salió</h3>
-        <p class="sub" style="margin:0 0 8px">Un gasto pasa al Resultado cuando se usa: al vender o regalar un frasco, al pagar un viaje o la feria, y una parte del equipo cada mes. El resto está en cosas que el negocio todavía tiene.</p>
-        <table id="balanceTabla"></table>
+        <h3>Costos y margen por frasco</h3>
+        <table id="frascoTabla" class="lineas"></table>
       </div>
 
       <div class="tarjeta">
-        <h3>Costos y margen por frasco</h3>
-        <table id="frascoTabla"></table>
+        <h3>Ventas por persona</h3>
+        <table id="vendedoresTabla" class="densa"></table>
       </div>
 
-      <div class="tarjeta enlaces">
-        <h3>Abrir</h3>
-        <a id="lnkPlanilla" href="#">La planilla</a>
-        <a id="lnkCompra" href="#">Formulario de compra</a>
-        <a id="lnkLote" href="#">Formulario de lote</a>
-        <a id="lnkFrascos" href="#">Formulario de frascos</a>
-        <a id="lnkRegistro" href="#">Formulario de registro</a>
-        <a id="lnkCarpeta" href="#">Carpeta de recibos</a>
-        <a id="lnkWhatsApp" href="#">WhatsApp de Cheviva</a>
+      <div class="tarjeta enlaces" id="enlaces-card">
+        <h3>Enlaces</h3>
+        <div id="enlaces"></div>
       </div>
     </div>
   </section>
 
-  <!-- ============ RECIBO ============ -->
-  <section id="p-recibo" class="pantalla" hidden>
-    <h2>Subir un recibo</h2>
-    <p>Sacale una foto al recibo, o elegí una foto o un PDF. Se lee en el momento y te muestro lo que leyó.</p>
-    <label class="btn primario">Sacar foto<input type="file" id="camara" accept="image/*" capture="environment"></label>
-    <label class="btn">Elegir foto o PDF<input type="file" id="archivo" accept="image/*,application/pdf" multiple></label>
-    <p class="sub" id="socioRecibos" hidden></p>
-    <p class="error" id="faltaLector" hidden>Falta conectar el lector: en la planilla, menú Cheviva → Conectar el lector de recibos.</p>
-    <div id="progreso" hidden><div class="tarjeta"><span class="spinner"></span><span id="progresoTexto">Subiendo…</span></div></div>
-    <div id="resultados"></div>
-  </section>
+
 
   <!-- ============ COMPRA ============ -->
   <section id="p-compra" class="pantalla" hidden>
     <h2>Compra</h2>
-    <p class="sub">Cada vez que sale plata. El total incluye el delivery.</p>
-    <div class="tarjeta">
+    <!-- 25 Sep (stage 2, S6): the receipt sits at the top of Compra -->
+    <div class="tarjeta" id="recibo-card">
+      <h3>Subir un recibo</h3>
+      <div class="dos"><label class="btn primario">Sacar foto<input type="file" id="camara" accept="image/*" capture="environment"></label>
+      <label class="btn">Elegir foto o PDF<input type="file" id="archivo" accept="image/*,application/pdf" multiple></label></div>
+      <p class="sub" id="socioRecibos" hidden></p>
+      <p class="error" id="faltaLector" hidden>Falta conectar el lector: en la planilla, menú Cheviva → Conectar el lector de recibos.</p>
+      <div id="progreso" hidden><div class="tarjeta"><span class="spinner"></span><span id="progresoTexto">Subiendo…</span></div></div>
+      <div id="resultados"></div>
+    </div>
+    <div class="tarjeta" id="compra-card">
+      <h3>Anotar una compra</h3>
       <label>Fecha de compra</label><input type="date" id="c-fecha">
       <label>Qué</label><select id="c-que"></select>
       <div id="c-nuevo" hidden><label>Nombre</label><input id="c-nombre" placeholder="Tapas de colores" autocomplete="off"></div>
@@ -1081,19 +1138,18 @@ function reglaRegistro_(d, L) {
     <h2>Lote</h2>
     <div class="tarjeta">
       <h3>Nuevo lote</h3>
-      <p class="sub">Todo lo comprado como ingrediente el día del lote entra en el lote. El gochugaru va por gramos porque se compra aparte.</p>
+      <details class="explica"><summary>Cómo se calcula</summary><p>Todo lo comprado como ingrediente el día del lote entra en el lote. El gochugaru va por gramos porque se compra aparte.</p></details>
       <div class="fila2">
-        <div><label>Lote (número)</label><input id="l-lote" inputmode="numeric"></div>
-        <div><label>Fecha (el día de la compra)</label><input type="date" id="l-fecha"></div>
+        <div><label>Lote</label><input id="l-lote" inputmode="numeric"></div>
+        <div><label>Fecha de compra</label><input type="date" id="l-fecha"></div>
       </div>
       <div id="l-gramos"></div>
-      <label>Parte de la compra del día (%)</label><input id="l-parte" inputmode="numeric" placeholder="solo si ese día hay más de un lote; vacío = partes iguales">
+      <label>Parte de la compra del día (%)</label><input id="l-parte" inputmode="numeric" placeholder="vacío = partes iguales">
       <label>Nota</label><textarea id="l-nota"></textarea>
       <button class="btn primario" id="l-guardar">Guardar el lote</button>
     </div>
     <div class="tarjeta">
       <h3>Frascos llenados</h3>
-      <p class="sub">Cada vez que llenás frascos: cuántos salieron de cada uno. Un lote puede dar Picante y Blanco a la vez.</p>
       <div class="fila2">
         <div><label>Lote</label><select id="f-lote"></select></div>
         <div><label>Fecha</label><input type="date" id="f-fecha"></div>
@@ -1103,18 +1159,16 @@ function reglaRegistro_(d, L) {
         <div><label>Blanco</label><input id="f-blanco" inputmode="numeric" placeholder="0"></div>
         <div><label>Vasitos</label><input id="f-vasitos" inputmode="numeric" placeholder="0"></div>
       </div>
-      <p class="sub" id="f-tamanos" style="margin:6px 0 0">Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.</p>
+      <details class="explica"><summary>Cómo se cuentan</summary><p id="f-tamanos">Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.</p></details>
       <label>Nota</label><textarea id="f-nota"></textarea>
       <button class="btn primario" id="f-guardar">Guardar los frascos</button>
     </div>
     <!-- 21 Sep, his point 7: count the box, type the number once, and the sheet holds exactly that -->
     <div class="tarjeta" id="conteo-card" hidden>
       <h3>Contar lo que hay</h3>
-      <p class="sub">Contá lo que hay de verdad y la planilla queda en ese número. La diferencia entra como gasto del mes.</p>
-      <div class="fila2">
-        <div><label>Qué</label><select id="k-que"></select></div>
-        <div><label>Fecha</label><input type="date" id="k-fecha"></div>
-      </div>
+      <details class="explica"><summary>Cómo funciona</summary><p>Contá lo que hay de verdad y la planilla queda en ese número. La diferencia entra como gasto del mes.</p></details>
+      <label>Qué</label><select id="k-que"></select>
+      <label>Fecha</label><input type="date" id="k-fecha">
       <label id="k-cuanto">Cuántos hay</label><input id="k-cantidad" inputmode="decimal" placeholder="0">
       <p class="sub" id="k-dice" style="margin:6px 0 0"></p>
       <label>Nota</label><input id="k-nota" placeholder="opcional">
@@ -1126,23 +1180,22 @@ function reglaRegistro_(d, L) {
   <!-- ============ VENTA (the sheet tab keeps its name, Registro) ============ -->
   <section id="p-registro" class="pantalla" hidden>
     <h2>Venta</h2>
-    <p class="sub">Qué vendiste o regalaste, cuándo, dónde y a quién. Nuestro WhatsApp: <a id="lnkWa2" href="#" style="color:var(--seal);font-weight:600"></a></p>
     <div class="seg tipo" id="v-tipo"><button type="button" data-t="Compró" class="on">Vendí</button><button type="button" data-t="Regaló">Regalé</button><button type="button" data-t="En consignación">Dejé</button><button type="button" data-t="Contacto">Contacto</button></div>
     <p class="sub" id="v-explica" hidden>Frascos que dejás con alguien para que los venda. Siguen siendo del negocio hasta que los venda: no es una venta y no entra plata.</p>
     <div class="tarjeta" id="v-card">
       <label>Quién</label><div class="seg" id="v-quien"></div>
       <label>Fecha</label><input type="date" id="v-fecha">
       <label>Cuántos</label><div class="fila3" id="v-cantidades"></div>
-      <div id="v-cobrado-wrap"><label>Total cobrado, Gs</label><input id="v-cobrado" inputmode="numeric" placeholder="se completa con el precio de lista">
+      <div id="v-cobrado-wrap"><label>Total cobrado, Gs</label><input id="v-cobrado" inputmode="numeric" placeholder="vacío = precio de lista">
         <p class="sub" id="v-cobrado-nota" hidden style="margin:6px 0 0"></p></div>
       <div id="v-cuenta-wrap"><label>¿A qué bolsillo fue la plata?</label><select id="v-cuenta"></select></div>
-      <div id="v-queda-wrap" hidden><label>Se queda por frasco, Gs (opcional)</label><input id="v-queda" inputmode="numeric" placeholder="lo dejás en blanco si todavía no arreglaron">
-        <p class="sub" style="margin:6px 0 0">Si lo ponés, la app te propone sola cuánto cobrar cuando esa persona te pague.</p></div>
+      <div id="v-queda-wrap" hidden><label>Se queda por frasco, Gs (opcional)</label><input id="v-queda" inputmode="numeric" placeholder="vacío = sin acuerdo">
+        <details class="explica"><summary>Para qué sirve</summary><p>Si lo ponés, la app te propone sola cuánto cobrar cuando esa persona te pague.</p></details></div>
       <label>Dónde</label><input id="v-donde" list="lugares" placeholder="Feria de Karu"><datalist id="lugares"></datalist>
       <label>Canal</label><select id="v-canal"></select>
       <div class="fila2">
         <div><label id="v-nombre-label">A quién (opcional)</label><input id="v-nombre"></div>
-        <div><label>Teléfono (opcional)</label><input id="v-telefono" inputmode="tel" placeholder="0981 123 456"></div>
+        <div><label>Teléfono (opcional)</label><input id="v-telefono" inputmode="tel" placeholder="0981…"></div>
       </div>
       <label>Nota</label><textarea id="v-nota"></textarea>
       <button class="btn primario" id="v-guardar">Guardar la venta</button>
@@ -1158,7 +1211,7 @@ function reglaRegistro_(d, L) {
     <div class="tarjeta" id="r-card" hidden>
       <div class="fila2">
         <div><label>Nombre</label><input id="r-nombre"></div>
-        <div><label>Teléfono</label><input id="r-telefono" inputmode="tel" placeholder="0981 123 456"></div>
+        <div><label>Teléfono</label><input id="r-telefono" inputmode="tel" placeholder="0981…"></div>
       </div>
       <a id="r-wa" class="wa" href="#" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px" hidden>Abrir el chat en WhatsApp</a>
       <label>Qué pasó</label><select id="r-estado"></select>
@@ -1175,15 +1228,27 @@ function reglaRegistro_(d, L) {
       <h3>Últimos contactos</h3>
       <div id="contactos"></div>
     </div>
+    <!-- 25 Sep (stage 2): the messages moved here from their own screen (#mensajes opens this card) -->
+    <div class="tarjeta" id="mensajes-card">
+      <h3>WhatsApp</h3>
+      <div id="waMensajes"></div>
+      <small id="waEstado"></small>
+    </div>
+    <div class="tarjeta" id="ig-card">
+      <h3>Instagram</h3>
+      <p class="sub" id="igCuenta" style="margin:0 0 8px"></p>
+      <table id="igTabla" class="densa"></table>
+      <small id="igEstado"></small>
+    </div>
   </section>
 </main>
 
 <nav class="barra">
   <button data-p="inicio" class="on"><span class="ic">▤</span>Inicio</button>
-  <button data-p="recibo"><span class="ic">▣</span>Recibo</button>
   <button data-p="compra"><span class="ic">₲</span>Compra</button>
   <button data-p="lote"><span class="ic">◍</span>Lote</button>
   <button data-p="registro"><span class="ic">◆</span>Venta</button>
+  <button data-p="numeros"><span class="ic">▣</span>Números</button>
 </nav>
 
 <script>
@@ -1192,7 +1257,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-25-ronda-1';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-25-ronda-2';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1328,13 +1393,26 @@ function reglaRegistro_(d, L) {
 
   /* ---------- navigation ---------- */
   var botones = document.querySelectorAll('nav.barra button');
-  // the three screens behind the front page's buttons (21 Sep): the bottom bar keeps Inicio lit while one is open
-  var DEBAJO_DE_INICIO = { cuentas: true, mensajes: true, numeros: true };
+  /* 25 Sep (cheviva-next-round stage 2, S6): five places, Inicio · Compra · Lote · Venta · Números. A screen that moved
+     opens its new place at its own card, from an old address (#recibo, #cuentas, #mensajes) or from a line that still
+     points at it (To review, the sheet's own lines) */
+  var MOVIDAS = { recibo: ['compra', 'recibo-card'], cuentas: ['numeros', 'cuenta-card'], mensajes: ['registro', 'mensajes-card'] };
+  var TARJETA_PENDIENTE = '';
+  function irATarjeta(t) {   // the card's top just under the header (and the demo's strip), never under them
+    try {
+      var el = $(t), tira = $('demoTira'), arriba = document.querySelector('header.top').offsetHeight + (tira && !tira.hidden ? tira.offsetHeight : 0) + 8;
+      window.scrollTo(0, Math.max(0, el.getBoundingClientRect().top + window.pageYOffset - arriba));
+    } catch (e) {}
+  }
   function ir(p) {
+    var tarjeta = '';
+    if (MOVIDAS[p]) { tarjeta = MOVIDAS[p][1]; p = MOVIDAS[p][0]; }
+    if (!document.getElementById('p-' + p)) p = 'inicio';
     document.querySelectorAll('.pantalla').forEach(function (s) { s.hidden = s.id !== 'p-' + p; });
-    var enLaBarra = DEBAJO_DE_INICIO[p] ? 'inicio' : p;
-    botones.forEach(function (b) { b.classList.toggle('on', b.dataset.p === enLaBarra); });
+    botones.forEach(function (b) { b.classList.toggle('on', b.dataset.p === p); });
     window.scrollTo(0, 0);
+    // the card is found again once the numbers are drawn: before that the screen is empty and the card sits at its top
+    if (tarjeta && $(tarjeta)) { irATarjeta(tarjeta); TARJETA_PENDIENTE = document.body.classList.contains('sin-datos') ? tarjeta : ''; }
     // the front page gets no "#inicio" in the address (21 Sep): that is also the id of its own block, and a browser
     // scrolls to it when the page finishes loading after the numbers are drawn — measured: 71 px down, "Para revisar"
     // under the header. Every other screen keeps its name there, so a reload reopens it.
@@ -1347,7 +1425,7 @@ function reglaRegistro_(d, L) {
     ev.preventDefault(); ir(el.dataset.ir);
   });
   var inicial = (location.hash || '#inicio').slice(1);
-  if (!document.getElementById('p-' + inicial)) inicial = 'inicio';
+  if (!document.getElementById('p-' + inicial) && !MOVIDAS[inicial]) inicial = 'inicio';
   ir(inicial);
 
   /* ---------- load, and keep it fresh ---------- */
@@ -1504,29 +1582,7 @@ function reglaRegistro_(d, L) {
     var n = d.numeros;
     var pp = d.porProducto || {}, pic = pp['Kimchi Picante'] ? pp['Kimchi Picante'].stock : 0, bla = pp['Kimchi Blanco'] ? pp['Kimchi Blanco'].stock : 0, vas = pp['Vasito 100 ml'] ? pp['Vasito 100 ml'].stock : 0;
     var ultimoLote = (d.lotes || []).filter(function (l) { return l.costoFrasco; })[0];   // newest batch with 350 ml jars: each batch costs a bit different
-    $('kpis').innerHTML =
-      kpi('Plata que salió', gs(n['Dinero gastado'])) +
-      kpi('Ventas', gs(d.total.ventas) + (d.vendidos ? '<small class="linea">' + cuantos(d.vendidos['350 ml'], 'frasco', 'frascos') + ' · ' + cuantos(d.vendidos['100 ml'], 'vasito', 'vasitos') + '</small>' : '')) +
-      kpi('Resultado de ' + d.mes.nombre, gs(d.mes.resultado), d.mes.resultado < 0) +
-      kpi('Frascos en stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>' + (vas ? '<small class="linea">' + vas + ' vasitos</small>' : '')) +
-      kpi('Costo por frasco', d.costoFrasco['350 ml'] ? gs(d.costoFrasco['350 ml']) + '<small class="linea">promedio de los lotes' + (ultimoLote ? ' · último ' + gs(ultimoLote.costoFrasco) : '') + '</small>' : '—') +
-      kpi('Margen por frasco', d.costoFrasco['350 ml'] ? gs(d.margenFrasco.margen) + '<small class="linea">' + pct(d.margenFrasco.pct) + ' a ' + gs(d.margenFrasco.precio) + '</small>' : '—', d.margenFrasco.margen < 0);
-    ajustarKpis();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarKpis);   // the web fonts are wider than the fallback
-    $('mesTitulo').textContent = 'Este mes: ' + d.mes.nombre;
-    var gastosMes = (d.mes.gastosItems || []).filter(function (g) { return g[1]; });   // every expense by its own name
-    // 24 Sep: the lines as printed come from the sheet, rounded so that they add up to the result under them
-    var mo = d.mes.mostrado || { ventas: d.mes.ventas, cmv: d.mes.cmv, muestras: d.mes.muestras, depreciacion: d.mes.depreciacion, resultado: d.mes.resultado, gastos: {} };
-    $('mesTabla').innerHTML =
-      fila('Ventas (' + d.mes.vendidos + ' frascos)', gs(mo.ventas)) +
-      fila('Costo de lo vendido', gs(-mo.cmv)) +
-      fila('Muestras regaladas', gs(-mo.muestras)) +
-      gastosMes.map(function (g) { return fila(esc(g[0]), gs(-(mo.gastos[g[0]] !== undefined ? mo.gastos[g[0]] : g[1]))); }).join('') +
-      (gastosMes.length ? '' : fila('Gastos', gs(0))) +
-      fila('Equipo, uso del mes', gs(-mo.depreciacion)) +
-      fila('Resultado', gs(mo.resultado), 'total');
-    // 16 Sep, his yes: next to the estimate, the cash that really came in and went out (every purchase counts the day it was paid)
-    $('mesCaja').innerHTML = caja('Caja del mes', d.mes.cobrado, d.mes.compras || 0);
+    pintarInicio(d, n, pp, pic, bla, vas, ultimoLote);
     $('faltaLector').hidden = d.hayClave !== false;
     // 24 Sep (S14): a partner of the demo sees how many of the 3 test receipts are left; at 0 the upload is off
     var so = d.socio, sinRecibos = !!(so && so.quedan <= 0);
@@ -1534,18 +1590,16 @@ function reglaRegistro_(d, L) {
     if (so) $('socioRecibos').textContent = sinRecibos ? 'Ya usaste tus ' + so.limite + ' recibos de prueba. Todo lo demás de la demo sigue abierto.'
                                                        : 'Recibos de prueba: te quedan ' + so.quedan + ' de ' + so.limite;
     ['camara', 'archivo'].forEach(function (id) { $(id).disabled = sinRecibos; $(id).parentNode.classList.toggle('apagado', sinRecibos); });
-    var w = d.semanas[0], w1 = d.semanas[1], wm = w.mostrado || w;
-    $('semanaTitulo').textContent = 'Esta semana: ' + w.texto;
-    $('semanaTabla').innerHTML =
-      fila('Ventas (' + w.vendidos + ' frasco' + (w.vendidos === 1 ? '' : 's') + ')', gs(wm.ventas)) +
-      fila('Costo de lo vendido', gs(-wm.cmv)) +
-      fila('Regalos, al costo', gs(-wm.muestras)) +
-      fila('Gastos (viajes, feria, Canva…)', gs(-wm.gastos)) +
-      fila('Resultado de la semana', gs(wm.resultado), 'total');
-    $('semanaCaja').innerHTML = caja('Caja de la semana', w.cobrado, w.compras || 0);
-    $('semanaNota').textContent = w1 ? 'La semana pasada (' + w1.texto + '): ventas ' + gs(w1.ventas) + ' (' + w1.vendidos + ' frascos), resultado ' + gs(w1.resultado) + '.' : '';
-    var cuentasFilas = (d.porCuenta || []).map(function (c) { return fila(esc(c.cuenta) + '<small>' + c.compras + ' compra' + (c.compras === 1 ? '' : 's') + '</small>', gs(c.total)); });
-    if (d.sinCuenta && d.sinCuenta.compras) cuentasFilas.push(fila('Sin cuenta todavía<small>' + d.sinCuenta.compras + ' compra' + (d.sinCuenta.compras === 1 ? '' : 's') + ' · ponela en la planilla, columna Cuenta</small>', gs(d.sinCuenta.total), 'suave'));
+    pintarNumeros(d);
+    // 26 Sep (the checker's second round, his rule "everywhere"): each account opens to the purchases paid from it
+    var pc = d.comprasPorCuenta || {};
+    var compraPartes = function (lista, total) {
+      if (!lista || !lista.length) return null;
+      var r = cuadrar(lista.map(function (x) { return x.total; }), total);
+      return lista.map(function (x, i) { return ['<b class="dia">' + x.fecha.slice(8, 10) + '/' + x.fecha.slice(5, 7) + '</b> <span>' + esc(x.que) + '</span>' + (x.nota ? '<small translate="no">' + esc(x.nota) + '</small>' : ''), gs(r[i])]; });
+    };
+    var cuentasFilas = (d.porCuenta || []).map(function (c) { return linea('pc-' + c.cuenta, esc(c.cuenta) + '<small>' + c.compras + ' compra' + (c.compras === 1 ? '' : 's') + '</small>', gs(c.total), compraPartes(pc[c.cuenta], c.total)); });
+    if (d.sinCuenta && d.sinCuenta.compras) cuentasFilas.push(linea('pc-', 'Sin cuenta todavía<small>' + d.sinCuenta.compras + ' compra' + (d.sinCuenta.compras === 1 ? '' : 's') + ' · ponela en la planilla, columna Cuenta</small>', gs(d.sinCuenta.total), compraPartes(pc[''], d.sinCuenta.total), 'suave'));
     $('cuentasTabla').innerHTML = cuentasFilas.length ? cuentasFilas.join('') : '<tr><td class="placeholder">Todavía no hay compras.</td></tr>';
     pintarCuenta(d);
     var pvs = d.porVendedor || [], sumar = function (k) { return pvs.reduce(function (t, v) { return t + (v[k] || 0); }, 0); };
@@ -1561,7 +1615,7 @@ function reglaRegistro_(d, L) {
       return '<div class="contacto"><div class="quien"><b>' + (m.ejemplo ? '<span class="ejemplo">EJEMPLO</span> ' : '') + esc(m.nombre || m.telefono) + ' <small style="display:inline">' + esc(m.direccion === 'enviado' ? '← nosotros' : '→ nos escribió') + ' · ' + esc(m.cuando) + '</small></b><small translate="no">' + esc(m.texto) + '</small></div>' +
              (m.whatsapp ? '<a class="wa" href="' + esc(m.whatsapp) + '" target="_blank" rel="noopener">Abrir</a>' : '') + '</div>';
     }).join('') : '<p class="sub" style="margin:0">Todavía no llegan mensajes: falta vincular el WhatsApp de la empresa.</p>';
-    $('waEstado').textContent = d.whatsapp.ultimo ? 'Última lectura del WhatsApp: ' + d.whatsapp.ultimo + '. Quien escribe por primera vez entra solo en Ventas como consulta.' : '';
+    $('waEstado').textContent = d.whatsapp.ultimo ? 'Última lectura del WhatsApp: ' + d.whatsapp.ultimo + '.' : '';
     pintarInstagram(d.instagram);
     var p = d.pendientes, items = [];
     if (p.recibos) items.push([p.recibos, 'recibo(s) esperando en "Por revisar" (no cuadran o parecen repetidos)', { url: d.urls.planilla }]);
@@ -1595,34 +1649,82 @@ function reglaRegistro_(d, L) {
       }).join('') : '<tr><td colspan="4" class="placeholder">Todavía no hay lotes.</td></tr>');
     var b = d.balance, dn = d.dinero, dm = d.dineroMostrado || { salio: dn.salio, usado: dn.usado, vacios: dn.vacios, kimchi: dn.kimchi - (dn.enEspecie || 0),
       sinLote: dn.sinLote, gochuEtiquetas: dn.gochuEtiquetas, equipoNeto: dn.equipoNeto, suma: dn.suma };   // 24 Sep: lines that add up as printed
+    /* 26 Sep (the checker's second round; his rule "everywhere"): every line of this block that is a sum opens to its parts,
+       whole guaraníes adding up to the line as printed; the lines themselves are the block of today */
+    var partes = function (lista, total) {   // [[label (already escaped), raw value], ...] -> rows that add up to the total as printed
+      lista = lista.filter(function (x) { return Math.round(Number(x[1]) || 0) !== 0; });
+      if (!lista.length) return null;
+      var r = cuadrar(lista.map(function (x) { return x[1]; }), total);
+      return lista.map(function (x, i) { return [x[0], gs(r[i])]; });
+    };
+    var tp = (d.total || {}).partes, cu = d.cuenta || {}, gentes = cu.todos || [], duenoC = cu.dueno || '';
+    var pcs = (d.porCuenta || []).map(function (c) { return ['<span>' + esc(c.cuenta) + '</span>', c.total]; })
+      .concat(d.sinCuenta && d.sinCuenta.total ? [['<span>Sin cuenta todavía</span>', d.sinCuenta.total]] : []);
+    var gastado = tp ? [['<span>Costo de ventas</span>', tp.cmv], ['<span>Muestras regaladas, al costo</span>', tp.muestras]]
+      .concat((tp.gastos || []).map(function (g) { return ['<span>' + esc(TERMINOS[g[0]] || g[0]) + '</span>', g[1]]; }))
+      .concat([['<span>Depreciación del equipo</span>', tp.depreciacion]]) : [];
+    var vv = b.vaciosValor || {};
+    var vacios = [['<span>' + esc((b.vacios['350 ml'] || 0) + ' de 350 ml') + '</span>', vv['350 ml']], ['<span>' + esc((b.vacios['100 ml'] || 0) + ' de 100 ml') + '</span>', vv['100 ml']]];
+    var kimchi = [['<span>En frascos</span>', b.kimchiStock], ['<span>En lotes sin envasar</span>', b.enProceso]].concat(dn.enEspecie ? [['<span>Menos lo del lote 1 que no pasó por Compras</span>', -dn.enEspecie]] : []);
+    var sinLote = (b.sinLoteDetalle || []).map(function (x) { return ['<b class="dia">' + esc(String(x.fecha).slice(0, 5)) + '</b>', x.total]; });
+    var gochu = [['<span>Gochugaru</span>', b.gochuStockValor], ['<span>Etiquetas</span>', b.etiquetasStockValor]];
+    var equipo = b.equipoCosto !== undefined ? [['<span>Costó</span>', b.equipoCosto], ['<span>Ya usado (depreciación)</span>', -b.depAcum]] : [];
+    var suma = [['<span>Ya es gasto</span>', dm.usado], ['<span>Frascos vacíos</span>', dm.vacios], ['<span>Kimchi hecho sin vender</span>', dm.kimchi]]
+      .concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', dm.sinLote]] : []).concat([['<span>Gochugaru y etiquetas</span>', dm.gochuEtiquetas], ['<span>Equipo</span>', dm.equipoNeto]]);
+    var enManos = gentes.filter(function (x) { return x.quien !== duenoC && Math.round(x.saldo || 0) < 0; })
+      .map(function (x) { return ['<span>Plata del negocio en manos de</span> <span>' + esc(x.quien) + '</span>', -x.saldo]; });
+    var activo = [['<span>Kimchi en frascos</span>', b.kimchiStock], ['<span>Kimchi en lotes sin envasar</span>', b.enProceso]].concat(vacios.map(function (x) { return ['<span>Frascos vacíos</span> · ' + x[0], x[1]]; }))
+      .concat([['<span>Gochugaru</span>', b.gochuStockValor], ['<span>Etiquetas</span>', b.etiquetasStockValor]]).concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', dn.sinLote]] : [])
+      .concat([['<span>Equipo</span>', dn.equipoNeto]]).concat(enManos);
+    var saldoPartes = function (x, signo) {   // a saldo is what was put in, less what reached them and what was paid back
+      return [['<span>Puso de su plata</span>', signo * x.puso], ['<span>Plata del negocio que le llegó</span>', -signo * x.tiene], ['<span>Ya se le devolvió</span>', -signo * x.devuelto]];
+    };
+    var delDueno = gentes.filter(function (x) { return x.quien === duenoC; })[0];
     $('balanceTabla').innerHTML =
-      fila('Salió en compras', gs(dm.salio), 'total') +   // his point 2: no "desde el principio" in a heading
-      fila('Ya es gasto', gs(dm.usado)) +
-      fila('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)', gs(dm.vacios)) +
-      fila('Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dm.kimchi)) +
-      (dn.sinLote ? fila('Ingredientes comprados sin lote', gs(dm.sinLote)) : '') +
-      fila('Gochugaru (' + Math.round(b.gochuStockG || 0) + ' g) y etiquetas' + (b.etiquetasStock !== undefined ? ' (' + Math.round(b.etiquetasStock) + ')' : '') + ' en stock', gs(dm.gochuEtiquetas)) +
-      fila('Equipo, lo que le queda de vida', gs(dm.equipoNeto)) +
-      fila('Suma', gs(dm.suma), 'total') +
-      fila('Lo que el negocio tiene hoy (activo)', gs(b.activo), 'suave') +
+      linea('b-salio', '<span>Salió en compras</span>', gs(dm.salio), partes(pcs, dm.salio), 'total') +   // his point 2: no "desde el principio" in a heading
+      linea('b-usado', '<span>Ya es gasto</span>', gs(dm.usado), partes(gastado, dm.usado)) +
+      linea('b-vacios', esc('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)'), gs(dm.vacios), vv['350 ml'] !== undefined ? partes(vacios, dm.vacios) : null) +
+      linea('b-kimchi', 'Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dm.kimchi), partes(kimchi, dm.kimchi)) +
+      (dn.sinLote ? linea('b-sinlote', '<span>Ingredientes comprados sin lote</span>', gs(dm.sinLote), partes(sinLote, dm.sinLote)) : '') +
+      linea('b-gochu', esc('Gochugaru (' + Math.round(b.gochuStockG || 0) + ' g) y etiquetas' + (b.etiquetasStock !== undefined ? ' (' + Math.round(b.etiquetasStock) + ')' : '') + ' en stock'), gs(dm.gochuEtiquetas), b.gochuStockValor !== undefined ? partes(gochu, dm.gochuEtiquetas) : null) +
+      linea('b-equipo', '<span>Equipo, lo que le queda de vida</span>', gs(dm.equipoNeto), partes(equipo, dm.equipoNeto)) +
+      linea('b-suma', '<span>Suma</span>', gs(dm.suma), partes(suma, dm.suma), 'total') +
+      linea('b-activo', '<span>Lo que el negocio tiene hoy (activo)</span>', gs(b.activo), b.vaciosValor ? partes(activo, b.activo) : null, 'suave') +
       // the same words as the Balance (22 Sep, the accounting view): the owner's saldo is his investment, anyone else's
       // is what the business owes them or the business's money in their hands, and the words follow the sign
-      fila('Inversión neta de ' + esc((d.cuenta || {}).dueno || ''), gs(b.aporteDueno || 0), 'suave') +
+      linea('b-inversion', 'Inversión neta de ' + esc(duenoC), gs(b.aporteDueno || 0), delDueno ? partes(saldoPartes(delDueno, 1), b.aporteDueno || 0) : null, 'suave') +
       // 20 Sep: a line STAYS at zero. Being square is exactly what success looks like here, and a line that
       // disappears then reads as something broken. The words flip instead of printing a minus.
-      ((d.cuenta || {}).gente || []).map(function (x) {
-        return fila(x.saldo >= 0 ? 'El negocio le debe a ' + esc(x.quien) : esc(x.quien) + ' tiene plata del negocio',
-                    gs(Math.abs(x.saldo || 0)), 'suave');
+      (cu.gente || []).map(function (x) {
+        var t = gentes.filter(function (y) { return y.quien === x.quien; })[0], signo = x.saldo >= 0 ? 1 : -1;
+        return linea('b-p-' + x.quien, x.saldo >= 0 ? 'El negocio le debe a ' + esc(x.quien) : esc(x.quien) + ' tiene plata del negocio',
+                     gs(Math.abs(x.saldo || 0)), t ? partes(saldoPartes(t, signo), Math.abs(x.saldo || 0)) : null, 'suave');
       }).join('');
     // the per-jar block: the sheet hands over the very rows Resultado prints (21 Sep), so the phone cannot disagree
     var enCifra = function (x) { return x.forma === 'pct' ? pct(x.valor) : x.forma === 'gs2' ? gs2(x.valor) : gs(x.valor); };
+    // 26 Sep (the chat, on the plan's words): in a month with no sale yet the averaged cost per jar and per cup, the margin per
+    // jar and its percentage show "—", as the Home tile; the cost per gram is not a per-jar figure and stays; each batch's own
+    // figures (the batches table) and the sheet's own tabs stay as they are
+    var vacioMes = mesSinVentas(d);
     $('frascoTabla').innerHTML = (d.porFrasco || []).length
-      ? d.porFrasco.map(function (x) { return fila(esc(x.texto), enCifra(x)); }).join('')
+      ? d.porFrasco.map(function (x) {
+          if (vacioMes && x.forma !== 'gs2') return fila(esc(x.texto), '—');
+          var cf = d.componentesFrasco || {}, tam = /^Costo por frasco de 350 ml$/.test(x.texto) ? '350 ml' : /^Costo por vasito de 100 ml$/.test(x.texto) ? '100 ml' : '';
+          var pj = null;
+          if (tam && cf[tam]) {   // 26 Sep (the checker's second round): what a jar's cost is made of, adding up to the line as printed
+            var k = cf[tam], lista = [['<span>Kimchi</span> · <span class="nb">' + esc(num(k.gramos) + ' g × ' + gs2(k.porGramo)) + '</span>', k.gramos * k.porGramo],
+                                      ['<span>' + esc(tam === '350 ml' ? 'Frasco 350 ml' : 'Frasco 100 ml') + '</span>', k.frasco],
+                                      ['<span>Etiquetas</span> · <span class="nb">' + esc(num(k.etiquetas) + ' × ' + gs(k.precioEtiqueta)) + '</span>', k.etiquetas * k.precioEtiqueta]]
+                                      .filter(function (y) { return Math.round(y[1]) !== 0; });
+            var r = cuadrar(lista.map(function (y) { return y[1]; }), x.valor);
+            pj = lista.map(function (y, i) { return [y[0], gs(r[i])]; });
+          } else if (/^Margen por frasco a /.test(x.texto) && d.margenFrasco) {
+            var mf2 = d.margenFrasco, r2 = cuadrar([mf2.precio, -mf2.costo], x.valor);
+            pj = [['<span>Precio de lista</span>', gs(r2[0])], ['<span>Costo/frasco</span>', gs(r2[1])]];
+          }
+          return linea('f-' + x.texto, esc(x.texto), enCifra(x), pj);
+        }).join('')
       : fila('Costo por frasco de 350 ml', d.costoFrasco && d.costoFrasco['350 ml'] ? gs(d.costoFrasco['350 ml']) : '—');   // a sheet from before 21 Sep
-    $('lnkCompra').href = d.urls.compra; $('lnkLote').href = d.urls.lote; $('lnkFrascos').href = d.urls.frascos;
-    $('lnkRegistro').href = d.urls.registro; $('lnkCarpeta').href = d.urls.carpeta; $('lnkPlanilla').href = d.urls.planilla;
-    $('lnkWhatsApp').href = d.whatsapp.url; $('lnkWhatsApp').textContent = 'WhatsApp de Cheviva ' + d.whatsapp.numero;
-    $('lnkWa2').href = d.whatsapp.url; $('lnkWa2').textContent = d.whatsapp.numero;
     // the last contacts, each one a tap away on WhatsApp; tapping the name fills the form for a new entry
     $('contactos').innerHTML = (d.registroReciente || []).length ? d.registroReciente.map(function (r, i) {
       return '<div class="contacto"><div class="quien" data-i="' + i + '"><b>' + esc(r.nombre) + '</b><small>' + esc([r.estado, r.producto && r.producto !== '—' ? (r.cantidad || '') + ' × ' + r.producto : '', r.canal, r.fecha].filter(Boolean).join(' · ')) + '</small></div>' +
@@ -1652,7 +1754,7 @@ function reglaRegistro_(d, L) {
     // the sale: one quantity box per product, the amount charged prefilled at list price, the place remembered
     if (!mismaLista(antes && antes.productos, d.productos)) {
       var cantidadesAntes = {}; ((antes && antes.productos) || []).forEach(function (p, i) { if ($('v-q' + i)) cantidadesAntes[p] = $('v-q' + i).value; });
-      $('v-cantidades').innerHTML = d.productos.map(function (p, i) { return '<div><label>' + esc(p.replace('Kimchi ', '').replace(' 100 ml', '')) + '</label><input id="v-q' + i + '" inputmode="numeric" placeholder="0"></div>'; }).join('');
+      $('v-cantidades').innerHTML = d.productos.map(function (p, i) { return '<div><label>' + esc(corto(p)) + '</label><input id="v-q' + i + '" inputmode="numeric" placeholder="0"></div>'; }).join('');
       d.productos.forEach(function (p, i) { if (cantidadesAntes[p]) $('v-q' + i).value = cantidadesAntes[p]; $('v-q' + i).addEventListener('input', prellenarCobrado); });
     }
     var canalAntes = $('v-canal').value || ultimo('cheviva-canal');
@@ -1702,6 +1804,7 @@ function reglaRegistro_(d, L) {
       });
     });
     llenarSelectMantener($('r-producto'), d.productos.concat(['—']), 'Elegí…');
+    [].forEach.call($('r-producto').options, function (o) { if (o.value && o.value !== '—') o.textContent = corto(o.value); });   // the value stays the product's name
     llenarSelectMantener($('r-canal'), d.canales, 'Sin especificar');
     llenarSelectMantener($('f-lote'), d.lotes.map(function (l) { return l.lote; }), d.lotes.length ? 'Elegí…' : 'No hay lotes');
     // the labels are no longer typed (21 Sep): the card says how many each jar takes, from Ajustes
@@ -1719,8 +1822,267 @@ function reglaRegistro_(d, L) {
     $('cargando').hidden = true; $('inicio').hidden = false;
     // in English: every word drawn above at once, before the tiles are fitted to their width (24 Sep)
     if (IDIOMA === 'en') { traducirTodo(document.body); ajustarKpis(); }
+    if (TARJETA_PENDIENTE) { var t = TARJETA_PENDIENTE; TARJETA_PENDIENTE = ''; irATarjeta(t); }   // an old address (#cuentas, #mensajes) at its card
     if (!leidoAntes && !redibujo) idiomaDeLaDemo(d.demo);
     return true;
+  }
+  /* ---------- 25 Sep (cheviva-next-round stage 2): the five places' figures ----------
+     S7: a line that is a sum opens underneath on a tap and closes on a second one (W3C disclosure pattern: a button with
+     aria-expanded; 44 px targets, Apple). Which lines are open is kept here, so a draw while one is open keeps it open.
+     The parts are whole guaraníes that add up to the line as printed (cuadrar). */
+  var ABIERTAS = {};
+  function cuadrar(vals, total) {
+    var r = vals.map(function (v) { return Math.round(Number(v) || 0); });
+    var dif = Math.round(Number(total) || 0) - r.reduce(function (a, b) { return a + b; }, 0);
+    if (dif && r.length) { var i = 0; vals.forEach(function (v, j) { if (Math.abs(Number(v) || 0) > Math.abs(Number(vals[i]) || 0)) i = j; }); r[i] += dif; }
+    return r;
+  }
+  function corto(p) { return String(p || '').replace('Kimchi ', '').replace(' 100 ml', ''); }   // the product's short name (the sale's boxes, the contact's list)
+  function porc(x, de) { return Number(de) ? pct(x / de) : '—'; }   // an empty month: "—", never a division by zero (plan, case 6)
+  // a month with no sale yet (plan, Home's worked example and case 6): every percentage and every per-jar figure "—"
+  function mesSinVentas(d) { var m = d.mes || {}; return !Number(m.vendidos) && !Number((m.mostrado || m).ventas); }
+  // a line: its label (already escaped, each word piece on its own), its figure, and its parts [[label, figure], ...]
+  function linea(clave, texto, cifra, partes, cls) {
+    var tiene = !!(partes && partes.length), abierta = tiene && !!ABIERTAS[clave];
+    var html = '<tr class="' + (cls || '') + (tiene ? ' con-partes' : '') + '"><td>' +
+      (tiene ? '<button type="button" class="abre" data-abre="' + esc(clave) + '" aria-expanded="' + abierta + '">' + texto + '</button>' : texto) +
+      '</td><td class="n">' + cifra + '</td></tr>';
+    if (tiene) html += partes.map(function (x) {
+      return '<tr class="parte" data-de="' + esc(clave) + '"' + (abierta ? '' : ' hidden') + '>' +
+        (x[1] === null ? '<td colspan="2">' + x[0] + '</td>' : '<td>' + x[0] + '</td><td class="n">' + x[1] + '</td>') + '</tr>';
+    }).join('');
+    return html;
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest('[data-abre]') : null;
+    if (!b) return;
+    ev.preventDefault();
+    var k = b.getAttribute('data-abre'), abrir = !ABIERTAS[k];
+    ABIERTAS[k] = abrir;
+    document.querySelectorAll('[data-abre="' + k + '"]').forEach(function (x) { x.setAttribute('aria-expanded', String(abrir)); });
+    document.querySelectorAll('[data-de="' + k + '"]').forEach(function (x) { x.hidden = !abrir; });
+  });
+  function uds(n350, n100) {   // "15 frascos · 6 vasitos", each piece on its own for the English screen
+    var t = [];
+    if (n350 || !n100) t.push(cuantos(n350, 'frasco', 'frascos'));
+    if (n100) t.push(cuantos(n100, 'vasito', 'vasitos'));
+    return t.join(' · ');
+  }
+  function unDecimal(v) { var r = Math.round((Number(v) || 0) * 10) / 10; return 'Gs ' + num(Math.trunc(r)) + (r % 1 ? ',' + Math.round(Math.abs(r % 1) * 10) : ''); }
+  var TERMINOS = { 'Diferencia de conteo': 'Pérdida de inventario' };   // the official term for what a count found missing (IAS 2 §34)
+  /* The month by function (plan, "Best or official practice" 5): Ventas · Costo de ventas · Margen bruto · Gastos de venta ·
+     Gastos de administración · Resultado del mes, from the lines as the sheet prints them, so every group adds up. */
+  function mesPorFuncion(d) {
+    var m = d.mes, mo = m.mostrado || { ventas: m.ventas, cmv: m.cmv, muestras: m.muestras, depreciacion: m.depreciacion, resultado: m.resultado, gastos: {} };
+    var gi = (m.gastosItems || []).filter(function (g) { return g[1]; });
+    var impreso = function (g) { return mo.gastos && mo.gastos[g[0]] !== undefined ? mo.gastos[g[0]] : Math.round(g[1]); };
+    var venta = [['Muestras regaladas, al costo', mo.muestras, 'muestras']].concat(gi.filter(function (g) { return g[2] === 'venta'; }).map(function (g) { return [TERMINOS[g[0]] || g[0], impreso(g)]; }));
+    var admin = gi.filter(function (g) { return g[2] !== 'venta'; }).map(function (g) { return [TERMINOS[g[0]] || g[0], impreso(g)]; }).concat([['Depreciación del equipo', mo.depreciacion]]);
+    var suma = function (l) { return l.reduce(function (t, x) { return t + (Number(x[1]) || 0); }, 0); };
+    return { mo: mo, ventas: mo.ventas, cmv: mo.cmv, bruto: mo.ventas - mo.cmv, venta: venta.filter(function (x) { return x[1] || x[2] === 'muestras'; }), admin: admin,
+             gVenta: suma(venta), gAdmin: suma(admin), resultado: mo.resultado };
+  }
+  /* The parts of the month's lines, the same on Home and in the margins (26 Sep, the checker's second round: the margins'
+     selling and administrative costs opened nothing while Home's did) */
+  function partesDelMes(d, f) {
+    var m = d.mes, vp = m.vendidosPor || {}, cp = m.cmvPor || {}, rp = m.regaladosPor || {}, mp = m.muestrasPor || {};
+    // the sales of the month by person, adding up to the line as printed
+    var vend = (m.vendedores || []).filter(function (x) { return x.ventas || x.unidades; });
+    var vendR = cuadrar(vend.map(function (x) { return x.ventas; }), f.ventas);
+    var ventas = vend.map(function (x, i) { return ['<span>' + esc(x.quien) + '</span> · <span>' + esc(cuantos(x.unidades, 'frasco', 'frascos')) + '</span>', gs(vendR[i])]; });
+    // the cost of sales by size: "15 frascos · Gs 12.256,3 c/u"
+    var tamanos = Object.keys(cp).filter(function (k) { return vp[k]; });
+    var cmvR = cuadrar(tamanos.map(function (k) { return cp[k]; }), f.cmv);
+    var cmv = tamanos.map(function (k, i) {
+      return ['<span>' + esc(k === '100 ml' ? cuantos(vp[k], 'vasito', 'vasitos') : cuantos(vp[k], 'frasco', 'frascos')) + '</span> · <span>' + esc(unDecimal(cp[k] / vp[k]) + ' c/u') + '</span>', gs(-cmvR[i])];
+    });
+    var venta = f.venta.map(function (x) {
+      var t = '<span>' + esc(x[0]) + '</span>';
+      if (x[2] === 'muestras') {   // "21 vasitos · Gs 5.593 c/u"
+        var ks = Object.keys(rp).filter(function (k) { return rp[k]; });
+        t += ks.map(function (k) { return ' · <span>' + esc(k === '100 ml' ? cuantos(rp[k], 'vasito', 'vasitos') : cuantos(rp[k], 'frasco', 'frascos')) + '</span> · <span>' + esc(unDecimal(mp[k] / rp[k]) + ' c/u') + '</span>'; }).join('');
+      }
+      return [t, gs(-x[1])];
+    });
+    var admin = f.admin.map(function (x) { return ['<span>' + esc(x[0]) + '</span>', gs(-x[1])]; });
+    var bruto = [['<span>Ventas</span>', gs(f.ventas)], ['<span>Costo de ventas</span>', gs(-f.cmv)]];
+    var resultado = [['<span>Margen bruto</span>', gs(f.bruto)], ['<span>Gastos de venta</span>', gs(-f.gVenta)], ['<span>Gastos de administración</span>', gs(-f.gAdmin)]];
+    return { ventas: ventas, cmv: cmv, venta: venta, admin: admin, bruto: bruto, resultado: resultado, vp: vp };
+  }
+  function pintarInicio(d, n, pp, pic, bla, vas, ultimoLote) {
+    var m = d.mes, f = mesPorFuncion(d), mes3 = String(m.nombre || '').split(' ')[0];
+    var P = partesDelMes(d, f), vp = P.vp, partesVentas = P.ventas, partesCmv = P.cmv, partesVenta = P.venta, partesAdmin = P.admin;
+    // THE SIX TILES (his "A1, yes", 25 Sep): the month's sales and net income, the margin per jar at list price, the jars
+    // in stock, the customers waiting, the owner's net investment. Money out moved to Números; cost per jar is inside the margin.
+    var mf = d.margenFrasco || {}, costo = d.costoFrasco && d.costoFrasco['350 ml'];
+    // the plan's worked example for Home (26 Sep, the chat on its words): "on 1 Oct before any sale, Sales Gs 0 · 0 jars; Net
+    // income shows its costs; every percentage and per-jar figure '—'" — the list-price margin included, and its cost with it
+    var sinVentas = mesSinVentas(d), margenSi = costo && !sinVentas;
+    var esperan = ((d.avisos || {}).esperando || []).filter(function (x) { return !x.ejemplo; }).length;   // a labeled example of the demo is never counted
+    var c = d.cuenta || {}, dueno = c.dueno || '';
+    var tile = function (clave, e, cifra, chico, partes, neg, irA) {
+      var abierta = !!ABIERTAS[clave] && partes && partes.length;
+      var tag = irA || (partes && partes.length) ? 'button' : 'div';   // a tile with nothing behind it is not a button
+      return '<' + tag + (tag === 'button' ? ' type="button"' : '') + ' class="kpi' + (neg ? ' neg' : '') + '"' + (irA ? ' data-ir="' + irA + '"' : partes && partes.length ? ' data-abre="' + clave + '" aria-expanded="' + !!abierta + '"' : '') + '>' +
+        '<span class="e">' + esc(e) + '</span><span class="n">' + cifra + (chico ? '<small class="linea">' + chico + '</small>' : '') + '</span>' +
+        (partes && partes.length ? '<span class="partes-kpi" data-de="' + clave + '"' + (abierta ? '' : ' hidden') + '>' + partes.map(function (x) { return '<span class="pk">' + x[0] + ' <span class="nb">' + x[1] + '</span></span>'; }).join('') + '</span>' : '') +
+        '</' + tag + '>';
+    };
+    $('kpis').innerHTML =
+      tile('k-ventas', 'Ventas ' + mes3, gs(f.ventas), esc(uds(vp['350 ml'] || 0, vp['100 ml'] || 0)), partesVentas) +
+      tile('k-resultado', 'Resultado ' + mes3, gs(f.resultado), esc(porc(f.resultado, f.ventas)), P.resultado, f.resultado < 0) +
+      tile('k-margen', 'Margen/frasco', margenSi ? gs(mf.margen) : '—', margenSi ? '<span>' + esc(pct(mf.pct)) + '</span> · <span>a precio de lista</span>' : '',
+           margenSi ? [['<span>Precio de lista</span>', gs(mf.precio)], ['<span>Costo/frasco</span>', gs(-costo)]] : null, margenSi && mf.margen < 0) +
+      tile('k-stock', 'En stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>', vas ? esc(vas + ' vasitos') : '') +
+      tile('k-clientes', 'Clientes', String(esperan), '<span>esperando respuesta</span>', null, false, 'mensajes') +
+      tile('k-inversion', 'Inversión neta', gs(c.aporteDueno || 0), esc(dueno), null, false, 'cuentas');
+    ajustarKpis();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarKpis);   // the web fonts are wider than the fallback
+    // THIS MONTH, by function, each sum opening to its parts
+    $('mesTitulo').textContent = 'Este mes: ' + m.nombre;
+    $('mesTabla').innerHTML =
+      linea('m-ventas', '<span>Ventas</span>', gs(f.ventas), partesVentas) +
+      linea('m-cmv', '<span>Costo de ventas</span>', gs(-f.cmv), partesCmv) +
+      linea('m-bruto', '<span>Margen bruto</span> <small class="pc">' + esc(porc(f.bruto, f.ventas)) + '</small>', gs(f.bruto), P.bruto, 'sub') +
+      linea('m-venta', '<span>Gastos de venta</span>', gs(-f.gVenta), partesVenta) +
+      linea('m-admin', '<span>Gastos de administración</span>', gs(-f.gAdmin), partesAdmin) +
+      linea('m-resultado', '<span>Resultado del mes</span> <small class="pc">' + esc(porc(f.resultado, f.ventas)) + '</small>', gs(f.resultado), P.resultado, 'total');
+    // 16 Sep, his yes: next to the estimate, the cash that really came in and went out; why it differs sits behind the tap
+    $('mesCaja').innerHTML = cajaLinea('m-caja', 'Caja del mes', m.cobrado, m.compras || 0);
+    // THIS WEEK, open; the earlier weeks behind a tap each
+    var sem = d.semanas || [], w = sem[0] || { ventas: 0, cmv: 0, muestras: 0, gastos: 0, resultado: 0, vendidos: 0, cobrado: 0, compras: 0, clave: '' };
+    $('semanaTitulo').textContent = 'Esta semana: ' + rango(w.clave, w.texto);
+    // 26 Sep (the checker, S7/S11 "a week with nothing"): a week with nothing says so, in the words Movimientos uses
+    $('semanaTabla').innerHTML = semanaVacia(w) ? NADA_EN_LA_SEMANA : semanaLineas(w, 's0', d);
+    $('semanaCaja').innerHTML = semanaVacia(w) ? '' : cajaLinea('s0-caja', 'Caja de la semana', w.cobrado, w.compras || 0);
+    $('semanasAntes').innerHTML = sem.slice(1).map(function (x) {
+      var wm = x.mostrado || x;
+      if (semanaVacia(x)) return '<tr class="semana-vacia"><td colspan="2"><span>' + esc(rango(x.clave, x.texto)) + '</span> · <span class="placeholder">Nada comprado ni vendido.</span></td></tr>';
+      return linea('s-' + x.clave, '<span>' + esc(rango(x.clave, x.texto)) + '</span>', '<small>' + esc('resultado') + '</small> ' + gs(wm.resultado), semanaPartes(x));   // an earlier week's figure says what it is
+    }).join('');
+  }
+  var NADA_EN_LA_SEMANA = '<tr><td colspan="2" class="placeholder">Nada comprado ni vendido.</td></tr>';
+  function semanaVacia(w) {   // nothing sold, given, bought or spent that week
+    return !w || !['ventas', 'cobrado', 'vendidos', 'cmv', 'muestras', 'gastos', 'compras'].some(function (k) { return Math.round(Number(w[k]) || 0); });
+  }
+  function semanaPartes(w) {
+    var wm = w.mostrado || w;
+    return [['<span>' + esc('Ventas') + '</span> · <span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span>', gs(wm.ventas)], ['<span>Costo de ventas</span>', gs(-wm.cmv)],
+            ['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]];
+  }
+  /* the week's sales, one line per sale (the same sales of a day, person, place and price together, as in Movimientos),
+     adding up to the week's sales as printed; a reseller's commission, booked as a sale at list price, is its own part */
+  function ventasDeLaSemana(d, w) {
+    var l = [], vistos = {};
+    (d.movimientos || []).filter(function (x) { return x.semana === w.clave && x.tipo === 'venta'; }).forEach(function (x) {
+      var k = [x.fecha, x.que, x.cantidad, x.quien, x.donde, x.monto].join('|');
+      if (vistos[k]) { vistos[k].veces++; vistos[k].total += x.monto; } else { vistos[k] = { x: x, veces: 1, total: x.monto }; l.push(vistos[k]); }
+    });
+    return l;
+  }
+  function semanaLineas(w, clave, d) {
+    var wm = w.mostrado || w, gastos = wm.muestras + wm.gastos;
+    var vs = d ? ventasDeLaSemana(d, w) : [], suma = vs.reduce(function (t, g) { return t + g.total; }, 0);
+    var partesV = vs.map(function (g) {
+      var x = g.x;
+      return ['<b class="dia">' + x.fecha.slice(8, 10) + '/' + x.fecha.slice(5, 7) + '</b> <span class="nb">' + (g.veces > 1 ? g.veces + ' × ' : '') + esc(num(x.cantidad)) + '</span> <span>' + esc(x.que) + '</span>' +
+              (x.quien ? ' · <span>' + esc(x.quien) + '</span>' : ''), g.total];
+    });
+    if (partesV.length && Math.abs(Math.round(wm.ventas) - suma) >= 1) partesV.push(['<span>Comisión de revendedores</span>', Math.round(wm.ventas) - suma]);
+    var rv = cuadrar(partesV.map(function (x) { return x[1]; }), wm.ventas);
+    partesV = partesV.map(function (x, i) { return [x[0], gs(rv[i])]; });
+    var partesC = w.vendidos && wm.cmv ? [['<span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span> · <span>' + esc(unDecimal(w.cmv / w.vendidos) + ' c/u') + '</span>', gs(-wm.cmv)]] : null;
+    return linea(clave + '-ventas', '<span>Ventas</span> · <span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span>', gs(wm.ventas), partesV) +
+      linea(clave + '-cmv', '<span>Costo de ventas</span>', gs(-wm.cmv), partesC) +
+      linea(clave + '-gastos', '<span>Gastos</span>', gs(-gastos), [['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]]) +
+      linea(clave + '-resultado', '<span>Resultado de la semana</span>', gs(wm.resultado),
+            [['<span>Ventas</span>', gs(wm.ventas)], ['<span>Costo de ventas</span>', gs(-wm.cmv)], ['<span>Gastos</span>', gs(-gastos)]], 'total');
+  }
+  function cajaLinea(clave, titulo, entro, salio) {
+    return linea(clave, '<span>' + esc(titulo) + '</span>', gs(Math.round(entro) - Math.round(salio)),
+      [['<span>Entró: ventas cobradas</span>', gs(entro)], ['<span>Salió: todas las compras</span>', gs(-salio)],
+       ['<small class="nota-parte">Cada compra cuenta el día que se pagó, aunque los frascos y los ingredientes sigan en el negocio. Por eso la caja no es el resultado.</small>', null]]);
+  }
+  // "21–27 sep", or "29 sep – 5 oct" (the 19 shorter labels); the sheet's own words when the week has no key
+  function rango(clave, texto) {
+    var p = String(clave || '').split('-');
+    if (p.length !== 3) return texto || '';
+    var l = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])), dm = new Date(l.getTime() + 6 * 86400000);
+    return l.getUTCMonth() === dm.getUTCMonth() ? l.getUTCDate() + '–' + dm.getUTCDate() + ' ' + MESES_DEMO[dm.getUTCMonth()]
+      : l.getUTCDate() + ' ' + MESES_DEMO[l.getUTCMonth()] + ' – ' + dm.getUTCDate() + ' ' + MESES_DEMO[dm.getUTCMonth()];
+  }
+  /* LOGOS for the links (plan: "each with its logo"), drawn here so nothing is fetched from another site */
+  var LOGOS = {
+    planilla: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#0F9D58" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path fill="#87CEAC" d="M15 2v5h5z"/><path fill="#fff" d="M7 10h10v8H7zm1.5 1.5v1.5h3v-1.5zm4.5 0v1.5h3v-1.5zm-4.5 3v1.5h3v-1.5zm4.5 0v1.5h3v-1.5z"/></svg>',
+    carpeta: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#0066DA" d="M3.5 18.5 5 21h14l1.5-2.5z"/><path fill="#00AC47" d="M8.5 3 2 14.5l1.5 4L10 7z"/><path fill="#FFBA00" d="M15.5 3h-7L10 7l6.5 11.5h4L22 14.5z"/><path fill="#EA4335" d="M2 14.5h7.2l-5.7 4z" opacity=".0"/></svg>',
+    whatsapp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#25D366" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/><path fill="#fff" d="M17.2 14.4c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1l-.9 1.1c-.2.2-.3.2-.6.1-1.6-.8-2.7-1.5-3.8-3.3-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 4.9 4.3 1.8.8 2.5.8 3.4.7.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.2-.3-.3-.6-.4z"/></svg>',
+    formulario: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#7248B9" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path fill="#B9A4DC" d="M15 2v5h5z"/><path fill="#fff" d="M8 11h1.5v1.5H8zm3 0h5v1.5h-5zm-3 3h1.5v1.5H8zm3 0h5v1.5h-5zm-3 3h1.5v1.5H8zm3 0h5v1.5h-5z"/></svg>'
+  };
+  function pintarNumeros(d) {
+    var f = mesPorFuncion(d), m = d.mes, n = Number(m.vendidos) || 0, P = partesDelMes(d, f);
+    // MÁRGENES (S8): the month, each as a share of the sales, and the gross margin per jar sold (never read as the list-price figure)
+    $('margenesTitulo').textContent = 'Márgenes: ' + m.nombre;
+    var cobradoProm = n ? f.ventas / n : 0;
+    $('margenesTabla').innerHTML =
+      linea('g-bruto', '<span>Margen bruto</span>', gs(f.bruto) + '<small>' + esc(porc(f.bruto, f.ventas)) + '</small>', P.bruto) +
+      linea('g-venta', '<span>Gastos de venta</span>', gs(-f.gVenta) + '<small>' + esc(porc(f.gVenta, f.ventas)) + '</small>', P.venta) +
+      linea('g-admin', '<span>Gastos de administración</span>', gs(-f.gAdmin) + '<small>' + esc(porc(f.gAdmin, f.ventas)) + '</small>', P.admin) +
+      linea('g-resultado', '<span>Resultado del mes</span>', gs(f.resultado) + '<small>' + esc(porc(f.resultado, f.ventas)) + '</small>', P.resultado, 'total') +
+      linea('g-frasco', '<span>Margen bruto por frasco vendido</span><small>' + (n ? '<span>precio promedio cobrado</span> <span class="nb">' + gs(cobradoProm) + '</span>' : '') + '</small>',
+            n ? gs(f.bruto / n) : '—');
+    pintarMovimientos(d);
+    // ENLACES (S12): each with its logo; a link with nothing behind it is not drawn
+    var u = d.urls || {}, wa = d.whatsapp || {};
+    var enlaces = [['planilla', 'La planilla', u.planilla], ['carpeta', 'Carpeta de recibos', u.carpeta], ['whatsapp', 'WhatsApp de Cheviva', wa.url],
+                   ['formulario', 'Formulario de compra', u.compra], ['formulario', 'Formulario de lote', u.lote], ['formulario', 'Formulario de frascos', u.frascos],
+                   ['formulario', 'Formulario de registro', u.registro]].filter(function (x) { return x[2]; });
+    $('enlaces').innerHTML = enlaces.map(function (x) {
+      return '<a class="enlace-logo" href="' + esc(x[2]) + '" target="_blank" rel="noopener">' + LOGOS[x[0]] + '<span>' + esc(x[1]) + '</span></a>';
+    }).join('');
+    $('enlaces-card').hidden = !enlaces.length;
+  }
+  /* MOVIMIENTOS (S11): what was bought and what was sold, by date; this week open, the earlier weeks behind a tap. The
+     same sales of one day, person, place and price are one line ("6 × 1 Kimchi Picante"). */
+  function pintarMovimientos(d) {
+    var movs = d.movimientos || [], semanas = [], porSemana = {};
+    var estaSemana = ((d.semanas || [])[0] || {}).clave || (movs[0] && movs[0].semana) || '';
+    movs.forEach(function (x) {
+      if (!porSemana[x.semana]) { porSemana[x.semana] = []; semanas.push(x.semana); }
+      var l = porSemana[x.semana], clave = [x.fecha, x.tipo, x.que, x.cantidad, x.quien, x.donde, x.monto, x.nota].join('|');
+      var igual = x.tipo === 'venta' ? l.filter(function (y) { return y.clave === clave; })[0] : null;
+      if (igual) { igual.veces++; igual.total += x.monto; } else l.push({ clave: clave, x: x, veces: 1, total: x.monto });
+    });
+    if (semanas.indexOf(estaSemana) < 0 && estaSemana) semanas.unshift(estaSemana);
+    semanas.sort(function (a, b) { return a < b ? 1 : a > b ? -1 : 0; });
+    // 26 Sep (the checker, S11 "a week with nothing"): every week from the first one with an entry up to this one, none left out
+    var todas = [], lunes = function (k, dias) { var p = k.split('-'), t = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]) + dias * 86400000); return t.toISOString().slice(0, 10); };
+    if (semanas.length) for (var k = semanas[0]; k >= semanas[semanas.length - 1] && todas.length < 60; k = lunes(k, -7)) todas.push(k);
+    semanas = todas;
+    var filaDe = function (g) {
+      var x = g.x, dia = x.fecha.slice(8, 10) + '/' + x.fecha.slice(5, 7);
+      var que = x.tipo === 'venta'
+        ? '<span>Venta</span> · <span class="nb">' + (g.veces > 1 ? g.veces + ' × ' : '') + esc(num(x.cantidad)) + '</span> <span>' + esc(x.que) + '</span>'
+        : '<span>Compra</span> · <span>' + esc(x.que) + '</span>';
+      var detalle = x.tipo === 'venta' ? [x.quien, x.donde].filter(Boolean).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join(' · ')
+        : (x.nota ? '<span translate="no">' + esc(x.nota) + '</span>' : '');
+      return ['<b class="dia">' + dia + '</b> ' + que + (detalle ? '<small>' + detalle + '</small>' : ''), gs(x.tipo === 'venta' ? g.total : -g.total)];
+    };
+    var totales = function (l) {
+      var c = 0, v = 0; l.forEach(function (g) { if (g.x.tipo === 'venta') v += g.total; else c += g.total; });
+      return [['<span>Compras de la semana</span>', gs(-c)], ['<span>Ventas de la semana</span>', gs(v)]];
+    };
+    $('movimientosTabla').innerHTML = semanas.map(function (k, i) {
+      var l = porSemana[k] || [], filas = l.map(filaDe);
+      if (!l.length && k !== estaSemana) return '<tr class="semana-vacia"><td colspan="2"><span>' + esc(rango(k)) + '</span> · <span class="placeholder">Nada comprado ni vendido.</span></td></tr>';
+      if (!l.length) filas = [['<span class="placeholder">Nada comprado ni vendido.</span>', null]];
+      else filas = filas.concat(totales(l));
+      if (k === estaSemana) {
+        return '<tr class="titulo-semana"><th colspan="2">' + esc('Esta semana: ' + rango(k)) + '</th></tr>' +
+          filas.map(function (x) { return x[1] === null ? '<tr><td colspan="2">' + x[0] + '</td></tr>' : '<tr class="' + (/Compras de la semana|Ventas de la semana/.test(x[0]) ? 'suma' : '') + '"><td>' + x[0] + '</td><td class="n">' + x[1] + '</td></tr>'; }).join('');
+      }
+      var v = l.reduce(function (t, g) { return t + (g.x.tipo === 'venta' ? g.total : 0); }, 0), c = l.reduce(function (t, g) { return t + (g.x.tipo === 'compra' ? g.total : 0); }, 0);
+      return linea('mv-' + k, '<span>' + esc(rango(k)) + '</span>', '<small>' + esc('compras') + '</small> ' + gs(-c) + '<small>' + esc('ventas') + '</small> ' + gs(v), filas);
+    }).join('') || '<tr><td class="placeholder">Todavía no hay compras ni ventas.</td></tr>';
   }
   /* To review: first what waits on this phone or came back from the sheet (25 Sep, stage 1: S3, S22), then the sheet's own
      lines. Drawn again whenever the queue moves, without waiting for a read. */
@@ -1859,36 +2221,75 @@ function reglaRegistro_(d, L) {
        saldo is his investment, anyone else's is a debt of the business or the business's money in their hands. */
     var lista = (c.todos && c.todos.length) ? c.todos.filter(function (x) { return x.quien === dueno; })
       .concat(c.todos.filter(function (x) { return x.quien !== dueno; })) : gente;
-    // one piece per sentence (25 Sep): the English screen puts each sentence into English on its own, never two at once
-    $('cuentaFrase').innerHTML = !lista.length ? esc('Todavía no hay nadie en las cuentas.')
-      : lista.map(function (x) {
-          var s = Math.round(x.saldo || 0);
-          return '<span>' + esc(x.quien === dueno ? 'Inversión neta de ' + x.quien + ': ' + gs(s) + '.'
-               : s > 0 ? 'El negocio le debe ' + gs(s) + ' a ' + x.quien + '.'
-               : s < 0 ? x.quien + ' tiene ' + gs(-s) + ' de plata del negocio.'
-               : x.quien + ' está a mano con el negocio.') + '</span>';
-        }).join(' ');
-    /* 21 Sep (the Cuentas screen): everyone with the same four figures, the owner included, as on the sheet's tab since
-       step two. Puso and the saldo are columns; what they hold and what was paid back sit under the name, so three
-       columns of guaraníes still fit a 320 px phone. A sheet from before step two has no "todos": the old table stays. */
-    var todos = c.todos || [];
-    $('cuentaTabla').innerHTML = todos.length
-      /* the sheet's own words and order since 22 Sep (the accounting view): the owner first, "Puso de su plata", what of
-         the business's money reached each one, and the saldo — his is his investment, theirs a debt or money they hold */
-      ? '<tr><th>Quién</th><th class="n envuelve">Puso de su plata</th><th class="n">Saldo</th></tr>' +
-        todos.filter(function (x) { return x.quien === dueno; }).concat(todos.filter(function (x) { return x.quien !== dueno; })).map(function (x) {
-          return '<tr><td>' + esc(x.quien) + '<small>plata del negocio que le llegó <span class="nb">' + gs(x.tiene) + '</span> · ya se le devolvió <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
-                 '<td class="n">' + gs(x.puso) + '</td><td class="n">' + gs(x.saldo) + '</td></tr>';
+    /* 25 Sep (cheviva-next-round stage 2, S10): the people as columns and the four figures as rows, the owner first; the
+       balance in words and never a minus: his is his investment, anyone else's a debt of the business or its money in their
+       hands, zero "a mano". Up to three people fit 320 px as columns; four or more get one block each. */
+    var todos = (c.todos && c.todos.length) ? c.todos : gente.map(function (x) { return { quien: x.quien, puso: x.compras, tiene: x.tiene, devuelto: x.devuelto, saldo: x.saldo }; });
+    todos = todos.filter(function (x) { return x.quien === dueno; }).concat(todos.filter(function (x) { return x.quien !== dueno; }));
+    var saldoEnPalabras = function (x) {
+      var v = Math.round(x.saldo || 0);
+      if (!v) return 'a mano';
+      if (x.quien === dueno) return (v > 0 ? 'invirtió ' : 'retiró ') + num(Math.abs(v));
+      return v > 0 ? 'se le debe ' + num(v) : 'tiene ' + num(-v) + ' del negocio';
+    };
+    var FILAS_CUENTA = [['Puso de su plata', 'puso'], ['Plata del negocio que le llegó', 'tiene'], ['Ya se le devolvió', 'devuelto']];
+    var aviso = c.sinDestino ? '<p class="sub" style="margin:6px 0 0">' + esc(c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.') + '</p>' : '';
+    /* 26 Sep (the checker's second round; his rule "everywhere"): each figure opens to its parts, per person, adding up to it
+       as printed: what they put in (purchases by account, payments made), the business's money that reached them (sales
+       collected, payments received or handed on) and what was paid back to them; the balance to those three */
+    var dia = function (f) { return '<b class="dia">' + esc(String(f || '').slice(0, 5)) + '</b>'; };
+    var partesDe = function (x) {
+      var dueno_ = x.quien === dueno, puso = [], tiene = [], devuelto = [];
+      (x.comprasPorCuenta || []).forEach(function (k) { puso.push(['<span>Compras</span> · <span>' + esc(k.cuenta || 'sin cuenta') + '</span> <span class="nb">(' + k.n + ')</span>', k.total]); });
+      (x.cobros || []).forEach(function (k) { tiene.push([dia(k.fecha) + ' <span>Venta cobrada</span>' + (k.que ? '<small translate="no">' + esc(k.que) + '</small>' : ''), k.total]); });
+      (x.pagos || []).forEach(function (e) {
+        var con = ' <span>' + esc(e.con || '') + '</span>';
+        if (e.clase === 'Inversión') puso.push([dia(e.fecha) + ' <span>Pagó a</span>' + con, e.total]);
+        else if (e.clase === 'Plata del negocio que le llegó') tiene.push([dia(e.fecha) + ' <span>Le pagó</span>' + con, e.total]);
+        else if (e.clase === 'Plata del negocio que entregó') tiene.push([dia(e.fecha) + ' <span>Entregó a</span>' + con, -e.total]);
+        else if (e.clase === 'Plata del negocio en su mano') tiene.push([dia(e.fecha) + ' <span>Recibió de</span>' + con, e.total]);
+        else if (e.clase === 'Reembolso') devuelto.push([dia(e.fecha) + ' <span>Le devolvió</span>' + con, e.total]);
+        else if (e.clase === 'Reembolso y plata del negocio') {
+          devuelto.push([dia(e.fecha) + ' <span>Le devolvió</span>' + con, e.devuelto || 0]);
+          tiene.push([dia(e.fecha) + ' <span>Recibió de</span>' + con, e.total - (e.devuelto || 0)]);
+        }
+      });
+      var hecho = function (lista, total) {   // a part that takes away reads "menos …" with its figure, never a minus sign (S10)
+        lista = lista.filter(function (y) { return Math.round(Number(y[1]) || 0) !== 0; });
+        var r = cuadrar(lista.map(function (y) { return y[1]; }), total);
+        return lista.map(function (y, i) { return r[i] < 0 ? ['<span>menos</span> ' + y[0], gs(-r[i])] : [y[0], gs(r[i])]; });
+      };
+      var signo = x.quien !== dueno_ && Math.round(x.saldo || 0) < 0 ? -1 : 1;   // "tiene 90.000 del negocio": its parts add up to what the words say
+      return { puso: hecho(puso, x.puso), tiene: hecho(tiene, x.tiene), devuelto: hecho(devuelto, x.devuelto),
+               saldo: hecho([['<span>Puso de su plata</span>', signo * x.puso], ['<span>Plata del negocio que le llegó</span>', -signo * x.tiene], ['<span>Ya se le devolvió</span>', -signo * x.devuelto]], signo * Math.round(x.saldo || 0)) };
+    };
+    var PARTES = todos.map(partesDe);
+    var abreFila = function (clave, texto, n) {
+      var ab = !!ABIERTAS[clave];
+      return '<tr class="rotulo con-partes"><td colspan="' + n + '"><button type="button" class="abre" data-abre="' + clave + '" aria-expanded="' + ab + '">' + esc(texto) + '</button></td></tr>';
+    };
+    var partesFila = function (clave, k, n) {   // one small table per person under the figures, in the table's own order
+      return '<tr class="parte" data-de="' + clave + '"' + (ABIERTAS[clave] ? '' : ' hidden') + '><td colspan="' + n + '">' + todos.map(function (x, i) {
+        var l = PARTES[i][k];
+        return '<table class="partes-persona"><tr><th colspan="2">' + esc(x.quien) + '</th></tr>' +
+          (l.length ? l.map(function (y) { return '<tr><td>' + y[0] + '</td><td class="n">' + y[1] + '</td></tr>'; }).join('') : '<tr><td colspan="2" class="placeholder">' + esc('nada') + '</td></tr>') + '</table>';
+      }).join('') + '</td></tr>';
+    };
+    if (!todos.length) $('cuentaTabla').innerHTML = '<p class="sub" style="margin:0">' + esc('Todavía no hay nadie en las cuentas.') + '</p>';
+    else if (todos.length <= 3) {
+      var n = todos.length;
+      $('cuentaTabla').innerHTML = '<table class="personas"><tr>' + todos.map(function (x) { return '<th class="n">' + esc(x.quien) + '</th>'; }).join('') + '</tr>' +
+        FILAS_CUENTA.map(function (r) {
+          return abreFila('cu-' + r[1], r[0], n) + '<tr>' + todos.map(function (x) { return '<td class="n">' + num(Math.round(x[r[1]] || 0)) + '</td>'; }).join('') + '</tr>' + partesFila('cu-' + r[1], r[1], n);
         }).join('') +
-        (c.sinDestino ? '<tr class="suave"><td colspan="3">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '')
-      : '<tr><th>Quién</th><th class="n">Puso</th><th class="n">Tiene</th><th class="n">Saldo</th></tr>' +
-        gente.map(function (x) {
-          return '<tr><td>' + esc(x.quien) + '<small>ya devuelto <span class="nb">' + gs(x.devuelto) + '</span></small></td>' +
-                 '<td class="n">' + gs(x.compras) + '</td><td class="n">' + gs(x.tiene) + '</td>' +
-                 '<td class="n">' + gs(x.saldo) + '</td></tr>';
-        }).join('') +
-        '<tr class="total"><td>' + esc(dueno) + '</td><td class="n" colspan="3">' + gs(c.aporteDueno) + '</td></tr>' +
-        (c.sinDestino ? '<tr class="suave"><td colspan="4">' + c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.</td></tr>' : '');
+        abreFila('cu-saldo', 'Saldo', n) + '<tr class="total">' + todos.map(function (x) { return '<td class="n">' + esc(saldoEnPalabras(x)) + '</td>'; }).join('') + '</tr>' + partesFila('cu-saldo', 'saldo', n) + '</table>' + aviso;
+    } else {
+      $('cuentaTabla').innerHTML = todos.map(function (x, i) {
+        return '<table class="persona lineas"><tr><th colspan="2">' + esc(x.quien) + '</th></tr>' +
+          FILAS_CUENTA.map(function (r) { return linea('cu-' + r[1] + '-' + x.quien, esc(r[0]), num(Math.round(x[r[1]] || 0)), PARTES[i][r[1]].length ? PARTES[i][r[1]] : null); }).join('') +
+          linea('cu-saldo-' + x.quien, esc('Saldo'), esc(saldoEnPalabras(x)), PARTES[i].saldo, 'total') + '</table>';
+      }).join('') + aviso;
+    }
     // the form is filled in with the payment that settles the first open balance; anyone can be picked instead
     var x = abierto[0];
     var paga = x ? (x.saldo > 0 ? dueno : x.quien) : dueno;
@@ -2293,20 +2694,20 @@ function reglaRegistro_(d, L) {
     });
     div.innerHTML = '<h3>' + esc(rec.comercio || r.archivo) + '</h3>' +
       '<div class="sub">' + esc(rec.fecha) + (rec.fechaLeida ? '' : ' (no se leyó la fecha: se puso hoy)') + ' · ' + rec.lineas.length + ' línea' + (rec.lineas.length === 1 ? '' : 's') +
-      ' · leído por ' + esc(rec.lector) + (rec.costoGs !== '' ? ' (Gs ' + esc(rec.costoGs) + ')' : '') + '</div>' +
+      ' · leído por <span translate="no">' + esc(rec.lector) + '</span>' + (rec.costoGs !== '' ? ' (Gs ' + esc(rec.costoGs) + ')' : '') + '</div>' +
       '<div class="recibo-total">' + gs(rec.total) + '</div>' +
       (rec.descuento ? '<div class="sub">Descuento de ' + gs(rec.descuento) + ', ya descontado de las líneas de productos.</div>' : '') +
       (r.cuadra ? '<div class="ok">✓ Las líneas suman lo mismo que el total.</div>' : '<div class="aviso">⚠ ' + esc(r.aviso) + '</div>') +
       '<table><tr><th>Qué</th><th class="n">Cantidad</th><th class="n">Total</th></tr>' + filas + '</table>';
     if (r.cuadra) {
       var cuentaSel = document.createElement('select'); cuentaSel.className = 'cuenta-recibo';
-      llenarSelect(cuentaSel, (D ? D.cuentas : []), '¿De qué cuenta salió la plata? (sin especificar)');
+      llenarSelect(cuentaSel, (D ? D.cuentas : []), 'Sin especificar');
       if (ultimaCuenta()) cuentaSel.value = ultimaCuenta();
       var etiqueta = document.createElement('label'); etiqueta.textContent = 'Cuenta';
       div.appendChild(etiqueta); div.appendChild(cuentaSel);
       var acciones = document.createElement('div'); acciones.className = 'dos';
-      var si = document.createElement('button'); si.className = 'btn primario chico'; si.textContent = 'Aceptar → Compras';
-      var no = document.createElement('button'); no.className = 'btn chico'; no.textContent = 'Lo reviso después';
+      var si = document.createElement('button'); si.className = 'btn primario chico'; si.textContent = 'Aceptar';
+      var no = document.createElement('button'); no.className = 'btn chico'; no.textContent = 'Más tarde';
       si.onclick = function () { recordarCuenta(cuentaSel.value); aceptar(r.lectura, div, si, no, cuentaSel.value); };
       no.onclick = function () { acciones.remove(); div.insertAdjacentHTML('beforeend', '<p class="sub">Quedó en "Por revisar" en la planilla.</p>'); };
       acciones.appendChild(si); acciones.appendChild(no); div.appendChild(acciones);
@@ -2317,11 +2718,11 @@ function reglaRegistro_(d, L) {
   function aceptar(lectura, div, si, no, cuenta) {
     si.disabled = true; no.disabled = true; si.textContent = 'Pasando a Compras…';
     google.script.run.withSuccessHandler(function (r) {
-      if (!r || !r.ok) { si.disabled = false; no.disabled = false; si.textContent = 'Aceptar → Compras'; div.insertAdjacentHTML('beforeend', '<p class="error">' + esc(r && r.mensaje ? r.mensaje : 'No se pudo aceptar.') + '</p>'); return; }
+      if (!r || !r.ok) { si.disabled = false; no.disabled = false; si.textContent = 'Aceptar'; div.insertAdjacentHTML('beforeend', '<p class="error">' + esc(r && r.mensaje ? r.mensaje : 'No se pudo aceptar.') + '</p>'); return; }
       si.parentNode.remove(); div.classList.add('listo');
       div.insertAdjacentHTML('beforeend', '<p class="ok">✓ Listo: ' + r.movidas + ' compra' + (r.movidas === 1 ? '' : 's') + ' por ' + gs(r.total) + (r.envio ? ' (el envío de ' + gs(r.envio) + ' se repartió entre los productos)' : '') + '.</p>');
       cargar();
-    }).withFailureHandler(function (e) { si.disabled = false; no.disabled = false; si.textContent = 'Aceptar → Compras'; div.insertAdjacentHTML('beforeend', '<p class="error">' + esc(e && e.message ? e.message : e) + '</p>'); }).aceptarLectura(lectura, cuenta || '');
+    }).withFailureHandler(function (e) { si.disabled = false; no.disabled = false; si.textContent = 'Aceptar'; div.insertAdjacentHTML('beforeend', '<p class="error">' + esc(e && e.message ? e.message : e) + '</p>'); }).aceptarLectura(lectura, cuenta || '');
   }
 })();
 </script>
