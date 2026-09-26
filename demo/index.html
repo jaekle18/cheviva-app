@@ -113,6 +113,16 @@ var INGLES = {
   'Contar lo que hay': 'Count what there is', 'Contá lo que hay de verdad y la planilla queda en ese número. La diferencia entra como gasto del mes.':
     'Count what is really there and the sheet takes that number. The difference goes in as an expense of the month.',
   'Cuántos hay': 'How many there are', 'Guardar el conteo': 'Save the count', 'Nunca se contó.': 'Never counted.',
+  // 26 Sep (cheviva-next-round stage 3): the stock tables, Broken or lost, the small Count
+  'Frascos de kimchi': 'Jars of kimchi', 'Insumos': 'Supplies', 'Hay': 'Have', 'Semanal': 'Weekly', 'Dura': 'Lasts',
+  'Empezar': 'Start at', 'Avisa': 'Warns at', 'regalados': 'given away', 'sin ventas': 'no sales', 'sin uso': 'not used',
+  'meses': 'months', 'Se rompió o se perdió': 'Broken or lost', 'Se rompió': 'Broke', 'Se perdió': 'Lost', 'Cuántos': 'How many',
+  'Guardar': 'Save', 'Contar': 'Count', 'Elegí qué se rompió o se perdió.': 'Pick what broke or was lost.',
+  '¿Cuántos? Poné un número mayor que cero.': 'How many? Enter a number above zero.', '¿Se rompió o se perdió?': 'Did it break, or was it lost?',
+  'La fecha no puede ser después de hoy.': 'The date cannot be after today.',
+  'De qué insumo': 'Which supply', 'Ninguno, es un gasto': 'None, it is an expense', 'Elegí el insumo de la lista.': 'Pick the supply from the list.',
+  'No encuentro ese envío en Compras.': 'That shipping is not in "Compras".', 'Ese envío ya tiene su insumo.': 'That shipping already has its supply.',
+  'Ese insumo no tiene una compra hasta ese día pagada por la misma persona: elegí "Ninguno, es un gasto".': 'That supply has no purchase by that day paid by the same person: choose "None, it is an expense".',
   // Venta
   'Qué vendiste o regalaste, cuándo, dónde y a quién. Nuestro WhatsApp:': 'What you sold or gave away, when, where and to whom. Our WhatsApp:',
   'Vendí': 'Sold', 'Regalé': 'Gave', 'Dejé': 'Left', 'Contacto': 'Contact',
@@ -234,6 +244,7 @@ function duracionInglesa_(s) {
   if (s === 'menos de un día') return 'less than a day';
   if ((m = s.match(/^unas (\d+) semanas$/))) return 'about ' + m[1] + ' weeks';
   if ((m = s.match(/^unos (\d+) días$/))) return 'about ' + m[1] + ' days';
+  if (s === 'una semana') return 'about a week';   // 26 Sep (stage 3)
   return s;
 }
 function haceIngles_(s) {
@@ -241,6 +252,29 @@ function haceIngles_(s) {
   return m ? m[1] + (m[2] === 'h' ? ' h' : ' days') + ' ago' : s;
 }
 var INGLES_REGLAS = [
+  // 26 Sep (cheviva-next-round stage 3): the stock tables' durations and parts, Broken or lost, the line to start a batch
+  [/^~(\d+) sem\.$/, function (x, n) { return '~' + n + ' wk'; }],
+  [/^~(\d+) (día|días)$/, function (x, n) { return '~' + nPlural_(n, 'day', 'days'); }],
+  [/^Envío de (Gs [\d.,]+) del (\d\d\/\d\d): ¿de qué insumo\?$/, function (x, g, d) { return 'Shipping of ' + g + ' on ' + d + ': which supply?'; }],
+  [/^Listo: el envío de (Gs [\d.,]+)(?: del (\d\d\/\d\d))? se sumó a (.+) del (\d\d\/\d\d)\.$/, function (x, g, d, i, f) {
+    return 'Done: the shipping of ' + g + (d ? ' on ' + d : '') + ' was added into the ' + inglesDe_(i) + ' bought on ' + f + '.'; }],
+  [/^Listo: el envío de (Gs [\d.,]+)(?: del (\d\d\/\d\d))? queda como gasto: no hay una compra de (.+) hasta ese día\.$/, function (x, g, d, i) {
+    return 'Done: the shipping of ' + g + (d ? ' on ' + d : '') + ' stays an expense: no ' + inglesDe_(i) + ' was bought by that day.'; }],
+  [/^Listo: el envío de (Gs [\d.,]+)(?: del (\d\d\/\d\d))? queda como gasto\.$/, function (x, g, d) {
+    return 'Done: the shipping of ' + g + (d ? ' on ' + d : '') + ' stays an expense.'; }],
+  [/^Hay ([\d.,]+)\.$/, function (x, n) { return (n === '1' ? 'There is ' : 'There are ') + n + '.'; }],
+  [/^Últimas (\d+) semanas: ([\d.,]+(?: [a-z]+)?) (vendidos|regalados|usados)(?: y ([\d.,]+) regalados)?\.$/, function (x, s, n, q, r) {
+    return 'Last ' + s + ' weeks: ' + n + ' ' + { vendidos: 'sold', regalados: 'given away', usados: 'used' }[q] + (r ? ' and ' + r + ' given away' : '') + '.'; }],
+  [/^Un lote tarda (\d+) días \+ (\d+) de margen\.$/, function (x, a, b) { return 'A batch takes ' + a + ' days + ' + b + ' of margin.'; }],
+  [/^Entrega (\d+) días \+ (\d+) de margen\.$/, function (x, a, b) { return 'Delivery ' + a + ' days + ' + b + ' of margin.'; }],
+  [/^Empezá uno cuando queden menos de ([\d.,]+)\.$/, function (x, n) { return 'Start one when fewer than ' + n + ' are left.'; }],
+  [/^Avisa cuando quedan menos de ([\d.,]+(?: (?:g|kg|ml|l))?)\.$/, function (x, n) { return 'Warns when less than ' + n + ' is left.'; }],
+  // 26 Sep (stage 3's check: "6 100 ml cup left"): a cup or a jar by its size, a kimchi by its jars, one or more
+  [/^Empezá un lote: quedan ([\d.,]+) (.+) \(([^()]+)\)$/, function (x, n, p, d) {
+    var en = inglesDe_(p), uno = n === '1', m = en.match(/^(\d+ ml) (cup|jar)$/);
+    var que = m ? (uno ? m[2] : m[2] + 's') + ' of ' + m[1] : (uno ? 'jar' : 'jars') + ' of ' + en;
+    return 'Start a batch: ' + n + ' ' + que + ' left (' + duracionInglesa_(d) + ')'; }],
+  [/^Anotado: ([\d.,]+(?: (?:g|kg|ml|l))?) (.+), (se rompió|se perdió)\.$/, function (x, n, i, m) { return 'Recorded: ' + n + ' ' + inglesDe_(i) + ', ' + (m === 'se rompió' ? 'broke' : 'lost') + '.'; }],
   // dates and the lines built on them
   [/^([a-z]{3} \d{4}|[a-zé]{3} \d{1,2}(?: [a-z]{3})? – [a-zá]{3} \d{1,2} [a-z]{3})$/i, function (x, a) { return fechaInglesa_(a) || x; }],
   [/^Resultado de (.+)$/, function (x, a) { return 'Result for ' + (fechaInglesa_(a) || a); }],
@@ -558,6 +592,7 @@ function reglaDeEntrada_(fn, d, L) {
     case 'guardarFrascos':  return reglaFrascos_(d, L);
     case 'guardarPago':     return reglaPago_(d, L);
     case 'guardarConteo':   return reglaConteo_(d, L);
+    case 'guardarPerdida':  return reglaPerdida_(d, L);
     case 'guardarRegistro': return reglaRegistro_(d, L);
   }
   return '';
@@ -610,6 +645,12 @@ function reglaCompra_(d, L) {
   if (!(total > 0)) return 'El total tiene que ser mayor que cero.';
   if (item && item.unidades && item.unidades.length && item.unidades.indexOf(unidad) < 0) {
     return '"' + que + '" no se compra en "' + unidad + '". Puede ser: ' + item.unidades.join(', ') + '.';
+  }
+  // 26 Sep (stage 3, S23): a shipping's supply, from the list or "Ninguno", and one with a purchase to go into, paid by the same person
+  if (que === (L.itemEnvio || 'Envío') && String(d.insumo || '').trim() && String(d.insumo).trim() !== (L.ningunInsumo || 'Ninguno')) {
+    if (!reglaEnLista_(L.insumosEnvio || [], d.insumo)) return 'Elegí el insumo de la lista.';
+    var diaEnvio = /^\d{4}-\d{2}-\d{2}$/.test(String(d.fecha || '')) ? String(d.fecha) : (L.hoy || '');
+    if (reglaOpcionesDeEnvio_(L, diaEnvio, d.cuenta).indexOf(reglaEnLista_(L.insumosEnvio || [], d.insumo)) < 0) return MENSAJE_SIN_DESTINO;
   }
   var av = d.avisar && typeof d.avisar === 'object' ? d.avisar : null;
   var usoAv = av && (av.uso === 'frasco' || av.uso === 'lote') ? av.uso : '';
@@ -676,6 +717,52 @@ function reglaConteo_(d, L) {
   return '';
 }
 
+/** 26 Sep (stage 3, S15): something broke or was lost — on the list, a number above zero, never more than there is. */
+function reglaPerdida_(d, L) {
+  var lista = L.perdibles || [];
+  var item = reglaEnLista_(lista.map(function (x) { return x.item; }), d.que);
+  if (!item) return 'Elegí qué se rompió o se perdió.';
+  var texto = String(d.cantidad === undefined || d.cantidad === null ? '' : d.cantidad).trim();
+  var n = reglaNumero_(texto);
+  if (!/\d/.test(texto) || !(n > 0)) return '¿Cuántos? Poné un número mayor que cero.';
+  if (['se rompió', 'se perdió'].indexOf(String(d.motivo || '').trim().toLowerCase()) < 0) return '¿Se rompió o se perdió?';
+  var f = String(d.fecha || '').trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(f) && L.hoy && f > L.hoy) return 'La fecha no puede ser después de hoy.';
+  var x = lista.filter(function (y) { return y.item === item; })[0];
+  // what this phone has already saved of it and not yet sent counts too
+  var enCola = (L.perdidasEnCola || []).filter(function (e) { return e.que === item; }).reduce(function (t, e) { return t + reglaNumero_(e.cantidad); }, 0);
+  var hay = Math.max((Number(x.stock) || 0) - enCola, 0);
+  if (n > hay + 1e-9) return 'Hay ' + String(Math.round(hay * 1000) / 1000).replace('.', ',') + '.';
+  return '';
+}
+
+/**
+ * 26 Sep (S23, the rule of his yes and of his 22 Sep ruling): where a shipping of this supply can go — the rows of the latest
+ * purchase of it dated on or before the shipping's day ('yyyy-mm-dd'), when every one of them was paid by the same person as the
+ * shipping; null when there is none (then the only choice is "Ninguno"). lista: [{ dia, item, total, persona }]. Pure: the sheet
+ * and the phone use this same function.
+ */
+var MENSAJE_SIN_DESTINO = 'Ese insumo no tiene una compra hasta ese día pagada por la misma persona: elegí "Ninguno, es un gasto".';
+function reglaDestinoEnvio_(lista, insumo, dia, persona) {
+  var suyas = (lista || []).filter(function (x) { return x.item === insumo && x.total > 0 && x.dia && x.dia <= dia; });
+  if (!suyas.length) return null;
+  var cual = suyas.map(function (x) { return x.dia; }).sort().pop();
+  var grupo = suyas.filter(function (x) { return x.dia === cual; });
+  if (grupo.some(function (x) { return x.persona !== persona; })) return null;
+  return { dia: cual, grupo: grupo };
+}
+/** Who paid, as the books count it: the person an account belongs to, the owner for none. */
+function reglaPersonaDeCuenta_(cuenta, L) {
+  var n = String(cuenta || '').trim().split(/\s+/)[0].toLowerCase();
+  var p = (L.personas || []).filter(function (x) { return String(x).toLowerCase() === n; })[0];
+  return p || L.dueno || '';
+}
+/** The supplies a shipping of this day and account can go into (the phone's choices). */
+function reglaOpcionesDeEnvio_(L, dia, cuenta) {
+  var persona = reglaPersonaDeCuenta_(cuenta, L);
+  return (L.insumosEnvio || []).filter(function (n) { return !!reglaDestinoEnvio_(L.comprasInsumos || [], n, dia, persona); });
+}
+
 function reglaRegistro_(d, L) {
   if (!String(d.nombre || '').trim()) return 'Poné el nombre.';
   var estado = String(d.estado || '').trim();
@@ -723,9 +810,11 @@ function reglaRegistro_(d, L) {
     guardarVenta: function (d) { return { accion: 'venta', datos: d }; },
     guardarPago: function (d) { return { accion: 'pago', datos: d }; },
     guardarConteo: function (d) { return { accion: 'conteo', datos: d }; },
+    guardarPerdida: function (d) { return { accion: 'perdida', datos: d }; },
     anularRegistro: function (d) { return { accion: 'anular', datos: d }; },
     subirRecibo: function (c) { return { accion: 'subir', carga: c }; },
-    aceptarLectura: function (l, c) { return { accion: 'aceptar', lectura: l, cuenta: c }; },
+    aceptarLectura: function (l, c, i) { return { accion: 'aceptar', lectura: l, cuenta: c, insumo: i || '' }; },
+    guardarInsumoEnvio: function (d) { return { accion: 'insumoEnvio', datos: d }; },
     leerPendientes: function () { return { accion: 'leer' }; },
     empezarDeNuevo: function () { return { accion: 'empezarDeNuevo' }; }   // the demo's button (23 Sep); the live door refuses it
   };
@@ -939,6 +1028,9 @@ function reglaRegistro_(d, L) {
   .pendiente.rechazada .num { font-size: 16px; }
   .pendiente .botones-cola { display: flex; gap: 8px; margin-top: 6px; }
   .pendiente .botones-cola button { min-height: 44px; }
+  /* 26 Sep (stage 3, S23): a shipping's supplies, one tap each, as many rows as the phone's width needs */
+  .pendiente.envio > span:last-child { min-width: 0; flex: 1; }
+  .pendiente.envio .botones-cola { flex-wrap: wrap; }
   /* 25 Sep (cheviva-next-round stage 2): tiles that open or lead somewhere, lines that open to their parts (a button with
      aria-expanded, 44 px tall), the accounts with the people as columns, links with their logos, explanations behind a tap */
   button.kpi, div.kpi { display: block; width: 100%; text-align: left; font: inherit; color: inherit; position: relative; }
@@ -956,6 +1048,13 @@ function reglaRegistro_(d, L) {
   button.abre::after { content: '▾'; color: var(--seal); font-size: 11px; flex: none; }
   button.abre[aria-expanded="true"]::after { content: '▴'; }
   tr.parte td { font-size: 13px; color: var(--muted); padding-left: 10px; background: var(--paper); }
+  /* 26 Sep (stage 3): the stock tables of Lote, four figures beside a name at 320 px */
+  table.stock th { font-size: 10px; letter-spacing: 0; padding: 6px 2px; vertical-align: bottom; }
+  table.stock td { padding: 7px 2px; }
+  table.stock tr:not(.parte) td:first-child { white-space: nowrap; }   /* 26 Sep (stage 3's check): every row on one line, 320-430 px; its parts wrap */
+  @media (max-width: 374px) { table.stock td { font-size: 12.5px; padding: 7px 1px; } table.stock th { font-size: 9.5px; padding: 6px 1px; } }
+  table.stock td.n small { display: block; font-size: 11px; }
+  table.stock button.abre { text-align: left; }
   tr.parte td.n { color: var(--ink); }
   tr.parte small { display: block; }
   tr.sub td { font-weight: 600; }
@@ -1115,6 +1214,8 @@ function reglaRegistro_(d, L) {
       <label>Fecha de compra</label><input type="date" id="c-fecha">
       <label>Qué</label><select id="c-que"></select>
       <div id="c-nuevo" hidden><label>Nombre</label><input id="c-nombre" placeholder="Tapas de colores" autocomplete="off"></div>
+      <!-- 26 Sep (stage 3, S23): a shipping names the supply it brought; left empty, To review asks -->
+      <div id="c-envio" hidden><label>De qué insumo</label><select id="c-insumo"></select></div>
       <div class="fila2">
         <div><label>Cantidad</label><input id="c-cantidad" inputmode="decimal" placeholder="1,5"></div>
         <div><label>Unidad</label><select id="c-unidad"></select></div>
@@ -1163,6 +1264,24 @@ function reglaRegistro_(d, L) {
       <label>Nota</label><textarea id="f-nota"></textarea>
       <button class="btn primario" id="f-guardar">Guardar los frascos</button>
     </div>
+    <!-- 26 Sep (cheviva-next-round stage 3, his "c"): the stock at the bottom of Lote, then Broken or lost, and the count small -->
+    <div class="tarjeta" id="frascos-stock-card">
+      <h3>Frascos de kimchi</h3>
+      <table id="frascosStockTabla" class="lineas stock"></table>
+    </div>
+    <div class="tarjeta" id="insumos-card">
+      <h3>Insumos</h3>
+      <table id="insumosTabla" class="lineas stock"></table>
+    </div>
+    <div class="tarjeta" id="perdida-card">
+      <h3>Se rompió o se perdió</h3>
+      <label>Qué</label><select id="pe-que"></select>
+      <div class="seg" id="pe-motivo" style="margin-top:10px"><button type="button" data-t="Se rompió" class="on">Se rompió</button><button type="button" data-t="Se perdió">Se perdió</button></div>
+      <label id="pe-cuanto">Cuántos</label><input id="pe-cantidad" inputmode="decimal" placeholder="0">
+      <label>Nota</label><input id="pe-nota" placeholder="opcional">
+      <button class="btn primario" id="pe-guardar">Guardar</button>
+    </div>
+    <button class="btn chico" id="btnContar" type="button" aria-expanded="false" hidden>Contar</button>
     <!-- 21 Sep, his point 7: count the box, type the number once, and the sheet holds exactly that -->
     <div class="tarjeta" id="conteo-card" hidden>
       <h3>Contar lo que hay</h3>
@@ -1257,7 +1376,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-demo-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-25-ronda-2';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-26-ronda-3';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1632,6 +1751,8 @@ function reglaRegistro_(d, L) {
     (av.insumos || []).forEach(function (x) { items.push([1, x.texto, { ir: 'compra', que: x.item }]); });
     (av.esperando || []).forEach(function (x) { items.push([1, x.texto, { ir: 'mensajes' }, x.ejemplo]); });
     (av.consignas || []).forEach(function (x) { items.push([1, x.texto, { ir: 'registro', consigna: true }, x.ejemplo]); });   // the Venta screen
+    (av.lotes || []).forEach(function (x) { items.push([1, x.texto, { ir: 'lote' }]); });   // 26 Sep (stage 3, S13): start a batch
+    (av.envios || []).forEach(function (x) { items.push([1, x.texto, { envio: x }]); });   // 26 Sep (stage 3, S23): which supply
     // 25 Sep (cheviva-demo stage 5, S13): the watchman's lines about the reader and the demo, in the live app only
     (av.vigilancia || []).forEach(function (x) { items.push([1, x.texto, x.ir ? { ir: x.ir } : (x.planilla ? { url: d.urls.planilla } : {})]); });
     ITEMS_HOJA = items;
@@ -1675,7 +1796,7 @@ function reglaRegistro_(d, L) {
       .map(function (x) { return ['<span>Plata del negocio en manos de</span> <span>' + esc(x.quien) + '</span>', -x.saldo]; });
     var activo = [['<span>Kimchi en frascos</span>', b.kimchiStock], ['<span>Kimchi en lotes sin envasar</span>', b.enProceso]].concat(vacios.map(function (x) { return ['<span>Frascos vacíos</span> · ' + x[0], x[1]]; }))
       .concat([['<span>Gochugaru</span>', b.gochuStockValor], ['<span>Etiquetas</span>', b.etiquetasStockValor]]).concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', dn.sinLote]] : [])
-      .concat([['<span>Equipo</span>', dn.equipoNeto]]).concat(enManos);
+      .concat([['<span>Equipo</span>', dn.equipoNetoImpreso !== undefined ? dn.equipoNetoImpreso : dn.equipoNeto]]).concat(enManos);
     var saldoPartes = function (x, signo) {   // a saldo is what was put in, less what reached them and what was paid back
       return [['<span>Puso de su plata</span>', signo * x.puso], ['<span>Plata del negocio que le llegó</span>', -signo * x.tiene], ['<span>Ya se le devolvió</span>', -signo * x.devuelto]];
     };
@@ -1747,6 +1868,7 @@ function reglaRegistro_(d, L) {
     }
     unidadesDe(true);
     pintarAvisar();
+    pintarEnvio();
     var cuentaAntes = $('c-cuenta').value || ultimaCuenta();
     llenarSelect($('c-cuenta'), d.cuentas, 'Sin especificar');
     if (cuentaAntes && d.cuentas.indexOf(cuentaAntes) >= 0) $('c-cuenta').value = cuentaAntes;
@@ -1812,6 +1934,7 @@ function reglaRegistro_(d, L) {
     $('f-tamanos').textContent = 'Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.' +
       (ep ? ' Las etiquetas se descuentan solas: ' + (ep['350 ml'] || 0) + ' por frasco y ' + (ep['100 ml'] || 0) + ' por vasito.' : '');
     pintarConteo(d);
+    pintarExistencias(d); pintarPerdida(d);
     var siguienteLote = String(d.lotes.reduce(function (m, l) { return Math.max(m, Number(l.lote) || 0); }, 0) + 1);
     if (!$('l-lote').value || $('l-lote').value === puesto['l-lote']) { $('l-lote').value = siguienteLote; puesto['l-lote'] = siguienteLote; }
     if (!mismaLista(antes && antes.preguntasLote, d.preguntasLote)) {
@@ -1832,8 +1955,10 @@ function reglaRegistro_(d, L) {
      The parts are whole guaraníes that add up to the line as printed (cuadrar). */
   var ABIERTAS = {};
   function cuadrar(vals, total) {
-    var r = vals.map(function (v) { return Math.round(Number(v) || 0); });
-    var dif = Math.round(Number(total) || 0) - r.reduce(function (a, b) { return a + b; }, 0);
+    // 26 Sep (stage 3's check): half a guaraní rounds away from zero, as the sheet's gsEntero_ and gs() here do (−8.787,5 is −8.788)
+    var redondo = function (v) { v = Number(v) || 0; return (v < 0 ? -1 : 1) * Math.floor(Math.abs(v) + 0.5) || 0; };
+    var r = vals.map(redondo);
+    var dif = redondo(total) - r.reduce(function (a, b) { return a + b; }, 0);
     if (dif && r.length) { var i = 0; vals.forEach(function (v, j) { if (Math.abs(Number(v) || 0) > Math.abs(Number(vals[i]) || 0)) i = j; }); r[i] += dif; }
     return r;
   }
@@ -1933,7 +2058,8 @@ function reglaRegistro_(d, L) {
       tile('k-resultado', 'Resultado ' + mes3, gs(f.resultado), esc(porc(f.resultado, f.ventas)), P.resultado, f.resultado < 0) +
       tile('k-margen', 'Margen/frasco', margenSi ? gs(mf.margen) : '—', margenSi ? '<span>' + esc(pct(mf.pct)) + '</span> · <span>a precio de lista</span>' : '',
            margenSi ? [['<span>Precio de lista</span>', gs(mf.precio)], ['<span>Costo/frasco</span>', gs(-costo)]] : null, margenSi && mf.margen < 0) +
-      tile('k-stock', 'En stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>', vas ? esc(vas + ' vasitos') : '') +
+      tile('k-stock', 'En stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>',
+           [vas ? '<span>' + esc(vas + ' vasitos') + '</span>' : '', primeroEnAcabarse(d)].filter(Boolean).join(' · ')) +
       tile('k-clientes', 'Clientes', String(esperan), '<span>esperando respuesta</span>', null, false, 'mensajes') +
       tile('k-inversion', 'Inversión neta', gs(c.aporteDueno || 0), esc(dueno), null, false, 'cuentas');
     ajustarKpis();
@@ -1962,6 +2088,13 @@ function reglaRegistro_(d, L) {
     }).join('');
   }
   var NADA_EN_LA_SEMANA = '<tr><td colspan="2" class="placeholder">Nada comprado ni vendido.</td></tr>';
+  /* 26 Sep (stage 3, the plan's tile: "Picante lasts about 4 weeks"): of the kimchis that sold in the weeks measured, the one
+     that runs out first, with how long it lasts; nothing when none sold */
+  function primeroEnAcabarse(d) {
+    var l = ((d.existencias || {}).frascos || []).filter(function (x) { return x.vendidos > 0 && x.dias !== null && x.dias !== undefined; })
+      .sort(function (a, b) { return a.dias - b.dias; });
+    return l.length ? '<span>' + esc(corto(l[0].producto).toLowerCase()) + '</span> <span>' + esc(duraTexto(l[0].dias)) + '</span>' : '';
+  }
   function semanaVacia(w) {   // nothing sold, given, bought or spent that week
     return !w || !['ventas', 'cobrado', 'vendidos', 'cmv', 'muestras', 'gastos', 'compras'].some(function (k) { return Math.round(Number(w[k]) || 0); });
   }
@@ -2098,7 +2231,15 @@ function reglaRegistro_(d, L) {
     if (esperan.length) html += '<div class="pendiente cola" data-cola="enviar"><span class="num">' + esperan.length + '</span><span><span>' +
       esc(esperan.length === 1 ? 'entrada esperando para enviarse' : 'entradas esperando para enviarse') + '</span>' +
       esperan.map(function (e) { return '<small class="cola-que">' + esc(e.resumen || '') + '</small>'; }).join('') + '</span></div>';
-    html += items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>'; }).join('');
+    var ninguno = (D && D.ningunInsumo) || 'Ninguno';
+    html += items.map(function (x, i) {
+      var envio = x[2] && x[2].envio;
+      if (envio) return '<div class="pendiente envio"><span class="num">' + x[0] + '</span><span><span>' + esc(x[1]) + '</span><span class="botones-cola">' +
+        (envio.opciones || []).concat([ninguno]).map(function (n) {
+          return '<button type="button" class="wa" data-envio="' + esc(envio.id) + '" data-insumo="' + esc(n) + '">' + esc(n === ninguno ? 'Ninguno, es un gasto' : n) + '</button>';
+        }).join('') + '</span></span></div>';
+      return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>';
+    }).join('');
     $('pendientes').innerHTML = html || '<p class="sub" style="margin:0">Nada pendiente.</p>';
     $('pendientes').querySelectorAll('.pendiente[data-i]').forEach(function (el) {
       el.addEventListener('click', function () {
@@ -2113,6 +2254,16 @@ function reglaRegistro_(d, L) {
       });
     });
     $('pendientes').querySelectorAll('[data-cola="enviar"]').forEach(function (el) { el.addEventListener('click', function () { enviarCola(); }); });
+    $('pendientes').querySelectorAll('button[data-envio]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var botones = b.parentNode.querySelectorAll('button'); botones.forEach(function (x) { x.disabled = true; });
+        google.script.run.withSuccessHandler(function (r) {
+          if (r && r.ok) { toast(r.mensaje || 'Listo.'); cargar(); }
+          else { botones.forEach(function (x) { x.disabled = false; }); toast((r && (r.mensaje || r.error)) || 'No se pudo guardar.', true); }
+        }).withFailureHandler(function (e) { botones.forEach(function (x) { x.disabled = false; }); toast(e && e.message ? e.message : String(e), true); })
+          .guardarInsumoEnvio({ id: b.getAttribute('data-envio'), insumo: b.getAttribute('data-insumo') });
+      });
+    });
     $('pendientes').querySelectorAll('button[data-corregir]').forEach(function (b) { b.addEventListener('click', function () { corregir(b.getAttribute('data-corregir')); }); });
     $('pendientes').querySelectorAll('button[data-borrar]').forEach(function (b) {
       b.addEventListener('click', function () {
@@ -2149,9 +2300,11 @@ function reglaRegistro_(d, L) {
   function cuantos(n, uno, varios) { n = Number(n) || 0; return n + ' ' + (n === 1 ? uno : varios); }
   /* The count card (21 Sep, his point 7): the list of what can be counted comes from the sheet, and so does what the
      sheet has of each right now, so the difference is in front of him before he saves. */
+  var CONTAR_ABIERTO = false;   // 26 Sep (stage 3): Count is the small one now, open on a tap
   function pintarConteo(d) {
     var lista = d.contables || [];
-    $('conteo-card').hidden = !lista.length;
+    $('btnContar').hidden = !lista.length;
+    $('conteo-card').hidden = !lista.length || !CONTAR_ABIERTO;
     var antes = $('k-que').value;
     llenarSelect($('k-que'), lista.map(function (x) { return x.item; }));
     if (antes && lista.some(function (x) { return x.item === antes; })) $('k-que').value = antes;
@@ -2167,6 +2320,72 @@ function reglaRegistro_(d, L) {
       (x.agregado ? ' Contarlo solo corrige cuánto queda: sus compras ya están en los números.' : '');
   }
   $('k-que').addEventListener('change', function () { $('k-hecho').hidden = true; decirConteo(); });
+  $('btnContar').addEventListener('click', function () {
+    CONTAR_ABIERTO = !CONTAR_ABIERTO; $('btnContar').setAttribute('aria-expanded', String(CONTAR_ABIERTO));
+    $('conteo-card').hidden = !CONTAR_ABIERTO;
+    if (CONTAR_ABIERTO) $('conteo-card').scrollIntoView({ block: 'nearest' });
+  });
+  /* 26 Sep (cheviva-next-round stage 3, S13, S14): the jars of each product and every supply, with the sheet's own figures:
+     what there is, what goes out a week, how long it lasts, and the line to start a batch or to order. Each row opens on a
+     tap to what the figures come from. */
+  function porSemanaTexto(v) { v = Number(v) || 0; return cant(v >= 10 ? Math.round(v) : Math.round(v * 100) / 100); }
+  function duraTexto(dias) {
+    if (dias === null || dias === undefined) return '—';
+    if (!(dias > 0)) return 'nada';
+    if (dias >= 182) return 'meses';
+    if (dias >= 7) return '~' + Math.round(dias / 7) + ' sem.';
+    return '~' + Math.max(1, Math.floor(dias)) + (Math.floor(dias) === 1 ? ' día' : ' días');
+  }
+  function conUnidad(n, u) { return cant(n) + (u && u !== 'unidad' ? ' ' + u : ''); }
+  function filaStock(clave, nombre, hay, sem, dura, linea, partes, sinUso) {
+    var ab = !!ABIERTAS[clave] && partes && partes.length;
+    var nom = partes && partes.length ? '<button type="button" class="abre" data-abre="' + esc(clave) + '" aria-expanded="' + !!ab + '">' + nombre + '</button>' : nombre;
+    var h = '<tr class="con-partes"><td>' + nom + '</td><td class="n">' + hay + '</td>' +
+      (sinUso ? '<td colspan="3" class="n placeholder">' + esc(sinUso) + '</td>' : '<td class="n">' + sem + '</td><td class="n">' + esc(dura) + '</td><td class="n">' + linea + '</td>') + '</tr>';
+    if (partes && partes.length) h += '<tr class="parte" data-de="' + esc(clave) + '"' + (ab ? '' : ' hidden') + '><td colspan="5">' + partes.join(' ') + '</td></tr>';
+    return h;
+  }
+  function pintarExistencias(d) {
+    var ex = d.existencias || { frascos: [], insumos: [], semanas: 4 }, sem = ex.semanas || 4;
+    $('frascosStockTabla').innerHTML = '<tr><th></th><th class="n">Hay</th><th class="n">Semanal</th><th class="n">Dura</th><th class="n">Empezar</th></tr>' +
+      (ex.frascos || []).map(function (x) {
+        var sin = x.linea === null || x.linea === undefined;
+        var partes = sin ? null : ['<span>' + esc('Últimas ' + sem + ' semanas: ' + (x.regalo ? x.regalados + ' regalados.' : (x.vendidos + (x.regalados ? ' vendidos y ' + x.regalados + ' regalados.' : ' vendidos.')))) + '</span>',
+                                   '<span>' + esc('Un lote tarda ' + x.tarda + ' días + ' + x.margen + ' de margen.') + '</span>',
+                                   '<span>' + esc('Empezá uno cuando queden menos de ' + cant(x.linea) + '.') + '</span>'];
+        return filaStock('st-' + x.producto, esc(corto(x.producto)), cant(x.stock),
+          porSemanaTexto(x.porSemana), duraTexto(x.dias), sin ? '' : cant(x.linea), partes, sin ? 'sin ventas' : '');   // given away or sold: the row's parts say which
+      }).join('');
+    $('insumosTabla').innerHTML = '<tr><th></th><th class="n">Hay</th><th class="n">Semanal</th><th class="n">Dura</th><th class="n">Avisa</th></tr>' +
+      (ex.insumos || []).map(function (x) {
+        var sin = x.linea === null || x.linea === undefined;
+        var partes = sin ? null : ['<span>' + esc('Últimas ' + (x.semanas || sem) + ' semanas: ' + conUnidad(x.usado, x.unidad) + ' usados.') + '</span>',
+                                   '<span>' + esc('Entrega ' + x.entrega + ' días + ' + x.margen + ' de margen.') + '</span>',
+                                   '<span>' + esc('Avisa cuando quedan menos de ' + conUnidad(x.linea, x.unidad) + '.') + '</span>'];
+        return filaStock('si-' + x.item, esc(x.item), conUnidad(x.stock, x.unidad), sin ? '' : porSemanaTexto(x.porSemana) + (x.unidad && x.unidad !== 'unidad' ? ' ' + x.unidad : ''),
+          duraTexto(x.dias), sin ? '' : conUnidad(x.linea, x.unidad), partes, sin ? 'sin uso' : '');
+      }).join('');
+  }
+  /* 26 Sep (stage 3, S15): Broken or lost, the main entry — what, how many, broke or lost, a note; never more than there is */
+  var MOTIVO = 'Se rompió';
+  function pintarPerdida(d) {
+    var lista = d.perdibles || [], antes = $('pe-que').value;
+    llenarSelect($('pe-que'), lista.map(function (x) { return x.item; }));
+    if (antes && lista.some(function (x) { return x.item === antes; })) $('pe-que').value = antes;
+    decirPerdida();
+  }
+  function decirPerdida() {
+    var x = ((D && D.perdibles) || []).filter(function (c) { return c.item === $('pe-que').value; })[0];
+    $('pe-cuanto').textContent = 'Cuántos' + (x && x.unidad && x.unidad !== 'unidad' ? ' (' + x.unidad + ')' : '');
+  }
+  $('pe-que').addEventListener('change', decirPerdida);
+  $('pe-motivo').querySelectorAll('button').forEach(function (b) {
+    b.addEventListener('click', function () { MOTIVO = b.dataset.t; $('pe-motivo').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); }); });
+  });
+  $('pe-guardar').addEventListener('click', function () {
+    guardar($('pe-guardar'), 'guardarPerdida', { que: $('pe-que').value, cantidad: $('pe-cantidad').value, motivo: MOTIVO, nota: $('pe-nota').value, fecha: diaDe(Date.now()) },
+      function () { $('pe-cantidad').value = ''; $('pe-nota').value = ''; });
+  });
   /* Instagram next to WhatsApp (21 Sep, his point 9). The numbers come from the sheet, which reads Instagram at most once
      an hour; they always carry the time they were read, and a connection that was cut says so instead of showing old
      numbers as today's. A sheet with no Instagram key hands over nothing, and the card stays out of sight. */
@@ -2428,7 +2647,25 @@ function reglaRegistro_(d, L) {
     $('c-avisar').hidden = !(D && D.vigilados) || !(nueva || (it && it.unidades.length && ((D && D.vigilados) || []).indexOf(v) < 0));   // an older sheet: never asked
     $('c-avisar-cuanto').textContent = 'Cantidad' + (USO_AVISAR ? ' por ' + USO_AVISAR : '') + ($('c-unidad').value ? ' (' + $('c-unidad').value + ')' : '');
   }
-  $('c-que').addEventListener('change', function () { unidadesDe(); pintarAvisar(); });
+  $('c-que').addEventListener('change', function () { unidadesDe(); pintarAvisar(); pintarEnvio(); });
+  /* 26 Sep (cheviva-next-round stage 3, S23): what a shipping can name — the supplies from the settings, and "Ninguno, es un
+     gasto"; left empty, To review asks later */
+  function llenarInsumos(sel, conVacio, dia, cuenta) {
+    var L = listasDelTelefono() || {};
+    // 26 Sep (S23): only a supply with a purchase on or before that day, paid by the same person; otherwise only "Ninguno"
+    var antes = sel.value, lista = typeof reglaOpcionesDeEnvio_ === 'function' ? reglaOpcionesDeEnvio_(L, dia || L.hoy || '', cuenta || '') : [], ninguno = (D && D.ningunInsumo) || 'Ninguno';
+    sel.innerHTML = (conVacio === false ? '' : '<option value=""></option>') + lista.map(function (n) { return '<option value="' + esc(n) + '">' + esc(n) + '</option>'; }).join('') +
+      '<option value="' + esc(ninguno) + '">' + esc('Ninguno, es un gasto') + '</option>';
+    if (antes && [].some.call(sel.options, function (o) { return o.value === antes; })) sel.value = antes;
+    if (IDIOMA === 'en') traducirTodo(sel);
+  }
+  function esEnvio(nombre) { return !!D && !!D.itemEnvio && nombre === D.itemEnvio; }
+  function pintarEnvio() {
+    $('c-envio').hidden = !esEnvio($('c-que').value);
+    if (!$('c-envio').hidden) llenarInsumos($('c-insumo'), true, $('c-fecha').value, $('c-cuenta').value);
+  }
+  $('c-fecha').addEventListener('change', pintarEnvio);
+  $('c-cuenta').addEventListener('change', pintarEnvio);
   $('c-unidad').addEventListener('change', pintarAvisar);
   $('c-uso').querySelectorAll('button').forEach(function (bt) {
     bt.addEventListener('click', function () { USO_AVISAR = bt.dataset.t; $('c-uso').querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === bt); }); pintarAvisar(); });
@@ -2454,7 +2691,7 @@ function reglaRegistro_(d, L) {
      the sheet confirms. The sheet answers a repeat as already saved, so nothing is ever written twice. What the sheet
      refuses comes back on this phone's To review with Corregir and Borrar. A refused password never deletes what waits:
      it goes after the next sign-in. The numbers come with the app's next read, as always. */
-  var LETRA = { guardarVenta: 'V', guardarRegistro: 'V', guardarCompra: 'C', guardarLote: 'L', guardarFrascos: 'E', guardarConteo: 'K', guardarPago: 'P' };
+  var LETRA = { guardarVenta: 'V', guardarRegistro: 'V', guardarCompra: 'C', guardarLote: 'L', guardarFrascos: 'E', guardarConteo: 'K', guardarPago: 'P', guardarPerdida: 'R' };
   function nuevoCodigo(fn) {   // "V-7F3K9Q2M": a digit and a letter in turn, so no run of digits looks like a phone number
     var cifras = '23456789', letras = 'ABCDEFGHJKMNPQRSTVWXYZ', r = [], s = '', i;
     try { var b = new Uint8Array(8); window.crypto.getRandomValues(b); for (i = 0; i < 8; i++) r.push(b[i]); }
@@ -2479,10 +2716,15 @@ function reglaRegistro_(d, L) {
       .map(function (e) { return typeof reglaClaveLote_ === 'function' ? reglaClaveLote_(e.datos.lote) : String(e.datos.lote); });
     return { productos: D.productos, vendedores: D.vendedores, canales: D.canales, cuentas: D.cuentas, estados: D.estados, items: D.items,
              unidades: D.unidades, gruposItems: D.gruposItems, lotes: D.lotes, personas: D.personas, contables: D.contables,
-             consigna: (D.consigna || {}).gente || [], hoy: diaDe(Date.now()), lotesEnCola: enCola };
+             consigna: (D.consigna || {}).gente || [], hoy: diaDe(Date.now()), lotesEnCola: enCola,
+             // 26 Sep (stage 3, S15): what can break or be lost and what is there of it, less what this phone already saved as lost
+             perdibles: D.perdibles || [],
+             insumosEnvio: D.insumosEnvio || [], itemEnvio: D.itemEnvio || '', ningunInsumo: D.ningunInsumo || '',
+             comprasInsumos: D.comprasInsumos || [], dueno: D.dueno || ((D.cuenta || {}).dueno) || '',
+             perdidasEnCola: leerCola().filter(function (e) { return e.fn === 'guardarPerdida' && e.estado !== 'rechazada'; }).map(function (e) { return e.datos; }) };
   }
   var QUE_ES = { guardarVenta: { 'Compró': 'Venta', 'Regaló': 'Regalo', 'En consignación': 'Consignación', 'Volvió': 'Vuelta de consignación' },
-                 guardarRegistro: 'Contacto', guardarCompra: 'Compra', guardarLote: 'Lote', guardarFrascos: 'Frascos llenados', guardarConteo: 'Conteo', guardarPago: 'Pago' };
+                 guardarRegistro: 'Contacto', guardarCompra: 'Compra', guardarLote: 'Lote', guardarFrascos: 'Frascos llenados', guardarConteo: 'Conteo', guardarPago: 'Pago', guardarPerdida: 'Se rompió o se perdió' };
   function resumenDe(fn, x) {   // one line per entry, each piece on its own, so the English screen words each piece
     var que = fn === 'guardarVenta' ? (QUE_ES.guardarVenta[x.tipo] || 'Venta') : QUE_ES[fn] || '', partes = [que];
     var hora = new Date(), cuando = dos(hora.getHours()) + ':' + dos(hora.getMinutes());
@@ -2493,6 +2735,7 @@ function reglaRegistro_(d, L) {
     else if (fn === 'guardarCompra') { partes.push((x.nuevo ? x.nuevo.nombre : x.que) || ''); if (x.total) partes.push(gs(typeof reglaGuaranies_ === 'function' ? reglaGuaranies_(x.total) : x.total)); }
     else if (fn === 'guardarLote' || fn === 'guardarFrascos') partes.push(String(x.lote || ''));
     else if (fn === 'guardarConteo') { partes.push(x.que || ''); partes.push(String(x.contado || '')); }
+    else if (fn === 'guardarPerdida') { partes.push(x.que || ''); partes.push(String(x.cantidad || '')); }
     else if (fn === 'guardarPago') { partes.push((x.quien || '') + ' → ' + (x.a || '')); if (x.monto) partes.push(gs(typeof reglaGuaranies_ === 'function' ? reglaGuaranies_(x.monto) : x.monto)); }
     partes.push(cuando);
     return partes.filter(function (t) { return String(t).trim(); }).join(' · ');
@@ -2564,7 +2807,7 @@ function reglaRegistro_(d, L) {
       unidadesDe(); pon('c-unidad', x.unidad); pon('c-cantidad', x.cantidad); pon('c-total', x.total); pon('c-cuenta', x.cuenta); pon('c-nota', x.nota);
       USO_AVISAR = x.avisar && x.avisar.uso ? x.avisar.uso : '';
       $('c-uso').querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.t === USO_AVISAR); });
-      pon('c-avisar-cantidad', x.avisar ? x.avisar.cantidad : ''); pintarAvisar();
+      pon('c-avisar-cantidad', x.avisar ? x.avisar.cantidad : ''); pintarAvisar(); pintarEnvio(); pon('c-insumo', x.insumo);
     } else if (e.fn === 'guardarLote') {
       ir('lote'); pon('l-lote', x.lote); puesto['l-lote'] = ''; pon('l-fecha', x.fecha); pon('l-g0', x.gochugaru); pon('l-parte', x.parte); pon('l-nota', x.nota);
     } else if (e.fn === 'guardarFrascos') {
@@ -2574,7 +2817,10 @@ function reglaRegistro_(d, L) {
       ir('cuentas'); pon('cta-quien', x.quien); pintarDestino(D); pon('cta-a', x.a); quienTocado = true; pon('cta-monto', x.monto); montoTocado = true;
       pon('cta-fecha', x.fecha); pon('cta-nota', x.nota); pintarQueEs(D);
     } else if (e.fn === 'guardarConteo') {
-      ir('lote'); pon('k-que', x.que); decirConteo(); pon('k-cantidad', x.contado); pon('k-fecha', x.fecha); pon('k-nota', x.nota);
+      ir('lote'); CONTAR_ABIERTO = true; $('conteo-card').hidden = false; pon('k-que', x.que); decirConteo(); pon('k-cantidad', x.contado); pon('k-fecha', x.fecha); pon('k-nota', x.nota);
+    } else if (e.fn === 'guardarPerdida') {
+      ir('lote'); pon('pe-que', x.que); decirPerdida(); pon('pe-cantidad', x.cantidad); pon('pe-nota', x.nota);
+      MOTIVO = x.motivo || 'Se rompió'; $('pe-motivo').querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.t === MOTIVO); });
     }
     toast('Corregilo y guardalo de nuevo.');
   }
@@ -2587,8 +2833,9 @@ function reglaRegistro_(d, L) {
     var nueva = compraNueva();
     guardar($('c-guardar'), 'guardarCompra', { fecha: $('c-fecha').value, que: nueva ? '' : $('c-que').value, cantidad: $('c-cantidad').value, unidad: $('c-unidad').value, total: $('c-total').value, cuenta: $('c-cuenta').value, nota: $('c-nota').value,
       nuevo: nueva ? { nombre: $('c-nombre').value, grupo: $('c-que').value.replace(/^\+nuevo:/, '') } : null,
-      avisar: $('c-avisar').hidden ? null : { uso: USO_AVISAR, cantidad: $('c-avisar-cantidad').value } },
-      function () { $('c-cantidad').value = ''; $('c-total').value = ''; $('c-nota').value = ''; $('c-nombre').value = ''; $('c-avisar-cantidad').value = '';
+      avisar: $('c-avisar').hidden ? null : { uso: USO_AVISAR, cantidad: $('c-avisar-cantidad').value },
+      insumo: $('c-envio').hidden ? '' : $('c-insumo').value },
+      function () { $('c-cantidad').value = ''; $('c-total').value = ''; $('c-nota').value = ''; $('c-nombre').value = ''; $('c-avisar-cantidad').value = ''; $('c-insumo').value = '';
                     USO_AVISAR = ''; $('c-uso').querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); }); pintarAvisar(); });
   });
   $('l-guardar').addEventListener('click', function () {
@@ -2705,24 +2952,33 @@ function reglaRegistro_(d, L) {
       if (ultimaCuenta()) cuentaSel.value = ultimaCuenta();
       var etiqueta = document.createElement('label'); etiqueta.textContent = 'Cuenta';
       div.appendChild(etiqueta); div.appendChild(cuentaSel);
+      // 26 Sep (stage 3, S23): a receipt that holds only shipping asks which supply it brought (empty: To review asks later)
+      var insumoSel = null;
+      if (rec.lineas.length && rec.lineas.every(function (l) { return esEnvio(l.que); })) {
+        var diaRec = (function (t) { var m = String(t || '').match(/^(\d\d)\/(\d\d)\/(\d{4})$/); return m ? m[3] + '-' + m[2] + '-' + m[1] : ''; })(rec.fecha);
+        insumoSel = document.createElement('select'); insumoSel.className = 'insumo-recibo'; llenarInsumos(insumoSel, true, diaRec, cuentaSel.value);
+        cuentaSel.addEventListener('change', function () { llenarInsumos(insumoSel, true, diaRec, cuentaSel.value); });
+        var et2 = document.createElement('label'); et2.textContent = 'De qué insumo';
+        div.appendChild(et2); div.appendChild(insumoSel);
+      }
       var acciones = document.createElement('div'); acciones.className = 'dos';
       var si = document.createElement('button'); si.className = 'btn primario chico'; si.textContent = 'Aceptar';
       var no = document.createElement('button'); no.className = 'btn chico'; no.textContent = 'Más tarde';
-      si.onclick = function () { recordarCuenta(cuentaSel.value); aceptar(r.lectura, div, si, no, cuentaSel.value); };
+      si.onclick = function () { recordarCuenta(cuentaSel.value); aceptar(r.lectura, div, si, no, cuentaSel.value, insumoSel ? insumoSel.value : ''); };
       no.onclick = function () { acciones.remove(); div.insertAdjacentHTML('beforeend', '<p class="sub">Quedó en "Por revisar" en la planilla.</p>'); };
       acciones.appendChild(si); acciones.appendChild(no); div.appendChild(acciones);
     } else {
       div.insertAdjacentHTML('beforeend', '<p class="sub">Quedó en "Por revisar" sin tildar. Corregilo ahí, tildalo y usá Cheviva → Recibos → Aceptar los revisados.</p>');
     }
   }
-  function aceptar(lectura, div, si, no, cuenta) {
+  function aceptar(lectura, div, si, no, cuenta, insumo) {
     si.disabled = true; no.disabled = true; si.textContent = 'Pasando a Compras…';
     google.script.run.withSuccessHandler(function (r) {
       if (!r || !r.ok) { si.disabled = false; no.disabled = false; si.textContent = 'Aceptar'; div.insertAdjacentHTML('beforeend', '<p class="error">' + esc(r && r.mensaje ? r.mensaje : 'No se pudo aceptar.') + '</p>'); return; }
       si.parentNode.remove(); div.classList.add('listo');
       div.insertAdjacentHTML('beforeend', '<p class="ok">✓ Listo: ' + r.movidas + ' compra' + (r.movidas === 1 ? '' : 's') + ' por ' + gs(r.total) + (r.envio ? ' (el envío de ' + gs(r.envio) + ' se repartió entre los productos)' : '') + '.</p>');
       cargar();
-    }).withFailureHandler(function (e) { si.disabled = false; no.disabled = false; si.textContent = 'Aceptar'; div.insertAdjacentHTML('beforeend', '<p class="error">' + esc(e && e.message ? e.message : e) + '</p>'); }).aceptarLectura(lectura, cuenta || '');
+    }).withFailureHandler(function (e) { si.disabled = false; no.disabled = false; si.textContent = 'Aceptar'; div.insertAdjacentHTML('beforeend', '<p class="error">' + esc(e && e.message ? e.message : e) + '</p>'); }).aceptarLectura(lectura, cuenta || '', insumo || '');
   }
 })();
 </script>
