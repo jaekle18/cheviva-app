@@ -15,6 +15,15 @@
  */
 
 var INGLES = {
+  // 26 Sep (cheviva-next-round stage 4): the customers on Sale
+  'Clientes esta semana': 'Customers this week', 'Tiempos de respuesta': 'Answer times', 'Ofertas sin seguimiento': 'Offers with no follow-up',
+  'Anotar la venta': 'Record the sale', 'Agregar contacto': 'Add a contact', 'sin leer todavía': 'not read yet', 'revisar': 'check',
+  'esperando': 'waiting', 'contestado': 'answered', 'sin venta': 'no sale', 'Chats': 'Chats', 'Mediana': 'Median', 'La más larga': 'Longest',
+  'Nadie escribió esta semana.': 'Nobody wrote this week.', 'Ningún chat contestado esta semana.': 'No chat answered this week.', 'Ninguna.': 'None.',
+  'Semanas anteriores': 'Earlier weeks', 'Esta semana no hubo publicaciones.': 'No posts this week.',
+  'Ya compró': 'Already bought',
+  'Pagó compras': 'Paid for purchases', 'Cobró ventas': 'Collected sales', 'Le pagó a otros': 'Paid to others', 'Recibió de otros': 'Received from others',
+  'Sigue en el negocio': 'Still in the business', 'caja': 'cash',
   // the frame
   'Leyendo la planilla…': 'Reading the sheet…', 'Actualizar': 'Refresh', 'Para revisar': 'To review',
   'Leer los recibos que quedaron en la carpeta': 'Read the receipts left in the folder',
@@ -52,10 +61,8 @@ var INGLES = {
   'Costo por vasito de 100 ml': 'Cost per 100 ml cup', 'Margen por frasco, % del precio': 'Margin per jar, % of the price',
   // 25 Sep (cheviva-next-round stage 2): the five places, the six tiles, the month by function, margins, movements, accounts
   'Leer recibos pendientes': 'Read pending receipts', 'Márgenes': 'Margins', 'Movimientos': 'Movements', 'Anotar un pago': 'Record a payment',
-  'Adónde fue la plata': 'Where the money went', 'Cómo se calcula': 'How it is worked out', 'Cómo funciona': 'How it works', 'Para qué sirve': 'What it is for',
-  'Enlaces': 'Links', 'Anotar una compra': 'Record a purchase', 'Cómo se cuentan': 'How they are counted',
-  'Un gasto pasa al resultado cuando se usa: al vender o regalar un frasco, al pagar un viaje o la feria, y una parte del equipo cada mes. El resto está en cosas que el negocio todavía tiene.':
-    'An expense moves into net income when it is used: when a jar is sold or given away, when a trip or the market is paid for, and a share of the equipment every month. The rest is in things the business still has.',
+  'Adónde fue la plata': 'Where the money went',
+  'Enlaces': 'Links', 'Anotar una compra': 'Record a purchase',
   'ej.: efectivo de la feria': 'e.g. cash from the market', 'vacío = partes iguales': 'empty = equal shares', 'vacío = sin acuerdo': 'empty = not agreed',
   'Aceptar': 'Accept', 'Más tarde': 'Later', 'En stock': 'In stock', 'Margen/frasco': 'Margin/jar', 'Costo/frasco': 'Cost/jar', 'Clientes': 'Customers',
   'Inversión neta': 'Net investment', 'esperando respuesta': 'waiting for a reply', 'a precio de lista': 'at list price', 'Precio de lista': 'List price',
@@ -79,8 +86,6 @@ var INGLES = {
   'Muestras regaladas': 'Free samples', 'Gastos': 'Expenses', 'Equipo, uso del mes': 'Equipment, this month\'s share', 'Resultado': 'Result',
   'Caja del mes': 'Cash this month', 'Caja de la semana': 'Cash this week', 'Entró: ventas cobradas': 'In: sales collected', 'Salió: todas las compras': 'Out: all purchases',
   'Diferencia de caja': 'Cash difference',
-  'Cada compra cuenta el día que se pagó, aunque los frascos y los ingredientes sigan en el negocio. Por eso la caja no es el resultado.':
-    'Each purchase counts on the day it was paid, even while the jars and ingredients are still in the business. That is why cash is not the result.',
   'Regalos, al costo': 'Gifts, at cost', 'Gastos (viajes, feria, Canva…)': 'Expenses (trips, market, Canva…)', 'Resultado de la semana': 'Net income for the week',
   'Nada pendiente.': 'Nothing pending.',
   // Recibo
@@ -126,12 +131,9 @@ var INGLES = {
   // Venta
   'Qué vendiste o regalaste, cuándo, dónde y a quién. Nuestro WhatsApp:': 'What you sold or gave away, when, where and to whom. Our WhatsApp:',
   'Vendí': 'Sold', 'Regalé': 'Gave', 'Dejé': 'Left', 'Contacto': 'Contact',
-  'Frascos que dejás con alguien para que los venda. Siguen siendo del negocio hasta que los venda: no es una venta y no entra plata.':
-    'Jars you leave with someone for them to sell. They stay the business\'s until sold: it is not a sale and no money comes in.',
   'Cuántos': 'How many', 'Total cobrado, Gs': 'Total charged, Gs', 'se completa con el precio de lista': 'filled in with the list price',
   '¿A qué bolsillo fue la plata?': 'Which pocket did the money go to?', 'Se queda por frasco, Gs (opcional)': 'They keep per jar, Gs (optional)',
   'lo dejás en blanco si todavía no arreglaron': 'leave it blank if nothing is agreed yet',
-  'Si lo ponés, la app te propone sola cuánto cobrar cuando esa persona te pague.': 'If you fill it in, the app suggests how much to charge when that person pays you.',
   'Dónde': 'Where', 'Canal': 'Channel', 'A quién (opcional)': 'To whom (optional)', 'Teléfono (opcional)': 'Phone (optional)', 'Teléfono': 'Phone',
   'Guardar la venta': 'Save the sale', 'Guardar el regalo': 'Save the gift', 'Guardar lo que dejé': 'Save what I left', 'Guardar lo que volvió': 'Save what came back',
   'Frascos en manos de revendedores': 'Jars held by resellers', 'Últimos movimientos': 'Latest entries', 'Abrir el chat en WhatsApp': 'Open the chat in WhatsApp',
@@ -252,6 +254,21 @@ function haceIngles_(s) {
   return m ? m[1] + (m[2] === 'h' ? ' h' : ' days') + ' ago' : s;
 }
 var INGLES_REGLAS = [
+  // 26 Sep (stage 4): the customers' lines and answer times
+  [/^contestado en (\d+) h(?: (\d+) min)?$/, function (x, h, m) { return 'answered in ' + h + ' h' + (m ? ' ' + m + ' min' : ''); }],
+  [/^contestado en (\d+) min$/, function (x, m) { return 'answered in ' + m + ' min'; }],
+  [/^el negocio le debe ([\d.]+)$/, function (x, n) { return 'the business owes ' + n.replace(/\./g, ','); }],
+  [/^ya compró \(a mano, (\d\d\/\d\d)\)$/, function (x, d) { return 'already bought (by hand, ' + d + ')'; }],
+  [/^(\d+) ofertas? sin seguimiento$/, function (x, n) { return n + (n === '1' ? ' offer' : ' offers') + ' with no follow-up'; }],
+  [/^(\d+) (publicación anterior|publicaciones anteriores)$/, function (x, n) { return n + (n === '1' ? ' earlier post' : ' earlier posts'); }],
+  [/^venta del (\d\d\/\d\d)$/, function (x, d) { return 'sale of ' + d; }],
+  [/^Pasaron las (\d+) horas$/, function (x, h) { return 'Over ' + h + ' hours'; }],
+  [/^hace (\d+) días$/, function (x, n) { return n + ' days ago'; }],
+  [/^Mediana (.+)$/, function (x, a) { return 'Median ' + a; }],
+  [/^la más larga (.+)$/, function (x, a) { return 'longest ' + a; }],
+  [/^(\d+) pasaron las (\d+) horas$/, function (x, n, h) { return n + ' over ' + h + ' hours'; }],
+  [/^(\d+) chat\(s\) con mensajes nuevos sin leer por la IA hace más de (\d+) horas$/, function (x, n, h) { return n + ' chat(s) with new messages not read by the AI for more than ' + h + ' hours'; }],
+  [/^Los mensajes de Instagram no se pudieron leer (\d+) veces seguidas$/, function (x, n) { return 'Instagram messages could not be read ' + n + ' times in a row'; }],
   // 26 Sep (cheviva-next-round stage 3): the stock tables' durations and parts, Broken or lost, the line to start a batch
   [/^~(\d+) sem\.$/, function (x, n) { return '~' + n + ' wk'; }],
   [/^~(\d+) (día|días)$/, function (x, n) { return '~' + nPlural_(n, 'day', 'days'); }],
@@ -378,6 +395,7 @@ var INGLES_REGLAS = [
     return 'supply to reorder: ' + nombreInsumoIngles_(n) + ', ' + inglesDe_(q) + ' left (' + duracionInglesa_(d) + ') · ' +
       (p ? 'suggested order: ' + inglesDe_(p) + ', like the last purchase' + (donde ? ' at ' + donde : '') : 'no earlier purchase in the sheet'); }],
   [/^cliente esperando respuesta: (.+), escribió (hace .+)$/, function (x, a, h) { return 'customer waiting for a reply: ' + nombreIngles_(a) + ', wrote ' + haceIngles_(h); }],
+  [/^tienda esperando respuesta: (.+), escribió (hace .+)$/, function (x, a, h) { return 'shop waiting for a reply: ' + nombreIngles_(a) + ', wrote ' + haceIngles_(h); }],
   [/^frascos con un revendedor hace más de (\d+) días: (.+), (\d+) \((Gs.+) a precio de venta\)$/, function (x, n, q, f, g) {
     return 'jars with a reseller for more than ' + n + ' days: ' + inglesDe_(q) + ', ' + f + ' (' + g + ' at the sale price)'; }],
   // what the door answers after a save, or why it refused
@@ -815,6 +833,7 @@ function reglaRegistro_(d, L) {
     subirRecibo: function (c) { return { accion: 'subir', carga: c }; },
     aceptarLectura: function (l, c, i) { return { accion: 'aceptar', lectura: l, cuenta: c, insumo: i || '' }; },
     guardarInsumoEnvio: function (d) { return { accion: 'insumoEnvio', datos: d }; },
+    guardarYaCompro: function (d) { return { accion: 'yaCompro', datos: d }; },
     leerPendientes: function () { return { accion: 'leer' }; },
     empezarDeNuevo: function () { return { accion: 'empezarDeNuevo' }; }   // the demo's button (23 Sep); the live door refuses it
   };
@@ -932,6 +951,19 @@ function reglaRegistro_(d, L) {
   .btn { display: block; width: 100%; text-align: center; padding: 15px 12px; border-radius: 12px; font: 700 17px 'Archivo', sans-serif; border: 2px solid var(--seal); color: var(--seal); background: var(--white); margin: 14px 0 6px; cursor: pointer; -webkit-appearance: none; }
   .btn.primario { background: var(--seal); color: var(--white); }
   .btn.chico { font-size: 14px; padding: 10px; margin: 6px 0; }
+  /* 26 Sep (stage 4): a customer's line */
+  .cliente { display: block; padding: 10px 0; border-bottom: 1px solid var(--linea, #e6dfd3); }
+  .cliente .quien { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .cliente .quien small { white-space: nowrap; }
+  .cliente .que { margin: 4px 0; overflow-wrap: anywhere; }
+  .cliente .estado { display: block; }
+  .canal { font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 5px; border-radius: 4px; border: 1px solid currentColor; margin-right: 4px; }
+  .revisar, .esperando { color: #A3381F; }
+  h3.sub-h { margin-top: 16px; }
+  #clientes-card .btn.chico, #btnContacto { min-height: 44px; }
+  #tiemposTabla td { vertical-align: middle; }
+  .botones-cliente { margin-top: 6px; }
+  .botones-cliente .btn.chico { margin: 0; }
   .btn[disabled] { opacity: .45; }
   .dos { display: flex; gap: 10px; }
   .dos .btn { flex: 1; }
@@ -1080,12 +1112,12 @@ function reglaRegistro_(d, L) {
   table.partes-persona td.n { color: var(--ink); }
   .enlaces a.enlace-logo { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 0; padding: 6px 0; color: var(--ink); border-bottom: 1px solid var(--ph); }
   .enlace-logo svg { width: 22px; height: 22px; flex: none; }
-  details.explica { margin: 0 0 6px; }
-  details.explica summary { display: flex; align-items: center; min-height: 44px; list-style: none; color: var(--seal); font-weight: 600; font-size: 14px; cursor: pointer; }
-  details.explica summary::-webkit-details-marker { display: none; }
-  details.explica summary::after { content: ' ▾'; margin-left: 4px; font-size: 11px; }
-  details.explica[open] summary::after { content: ' ▴'; }
-  details.explica p { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+  details.mas { margin: 0 0 6px; }
+  details.mas summary { display: flex; align-items: center; min-height: 44px; list-style: none; color: var(--seal); font-weight: 600; font-size: 14px; cursor: pointer; }
+  details.mas summary::-webkit-details-marker { display: none; }
+  details.mas summary::after { content: ' ▾'; margin-left: 4px; font-size: 11px; }
+  details.mas[open] summary::after { content: ' ▴'; }
+  details.mas p { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
 </style>
 </head>
 <body class="sin-datos">
@@ -1136,11 +1168,6 @@ function reglaRegistro_(d, L) {
     <div class="tarjeta sin-datos-aviso"><span class="spinner"></span>Leyendo la planilla…</div>
     <div class="con-datos">
       <div class="leido"><span data-leido></span></div>
-      <div class="tarjeta" id="margenes-card">
-        <h3 id="margenesTitulo">Márgenes</h3>
-        <table id="margenesTabla" class="lineas"></table>
-      </div>
-
       <div class="tarjeta" id="movimientos-card">
         <h3>Movimientos</h3>
         <table id="movimientosTabla" class="lineas movs"></table>
@@ -1169,7 +1196,7 @@ function reglaRegistro_(d, L) {
       <div class="tarjeta">
         <h3>Adónde fue la plata</h3>
         <table id="balanceTabla" class="lineas"></table>
-        <details class="explica"><summary>Cómo se calcula</summary><p>Un gasto pasa al resultado cuando se usa: al vender o regalar un frasco, al pagar un viaje o la feria, y una parte del equipo cada mes. El resto está en cosas que el negocio todavía tiene.</p></details>
+
       </div>
 
       <div class="tarjeta">
@@ -1239,7 +1266,7 @@ function reglaRegistro_(d, L) {
     <h2>Lote</h2>
     <div class="tarjeta">
       <h3>Nuevo lote</h3>
-      <details class="explica"><summary>Cómo se calcula</summary><p>Todo lo comprado como ingrediente el día del lote entra en el lote. El gochugaru va por gramos porque se compra aparte.</p></details>
+
       <div class="fila2">
         <div><label>Lote</label><input id="l-lote" inputmode="numeric"></div>
         <div><label>Fecha de compra</label><input type="date" id="l-fecha"></div>
@@ -1260,7 +1287,7 @@ function reglaRegistro_(d, L) {
         <div><label>Blanco</label><input id="f-blanco" inputmode="numeric" placeholder="0"></div>
         <div><label>Vasitos</label><input id="f-vasitos" inputmode="numeric" placeholder="0"></div>
       </div>
-      <details class="explica"><summary>Cómo se cuentan</summary><p id="f-tamanos">Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.</p></details>
+
       <label>Nota</label><textarea id="f-nota"></textarea>
       <button class="btn primario" id="f-guardar">Guardar los frascos</button>
     </div>
@@ -1285,7 +1312,7 @@ function reglaRegistro_(d, L) {
     <!-- 21 Sep, his point 7: count the box, type the number once, and the sheet holds exactly that -->
     <div class="tarjeta" id="conteo-card" hidden>
       <h3>Contar lo que hay</h3>
-      <details class="explica"><summary>Cómo funciona</summary><p>Contá lo que hay de verdad y la planilla queda en ese número. La diferencia entra como gasto del mes.</p></details>
+
       <label>Qué</label><select id="k-que"></select>
       <label>Fecha</label><input type="date" id="k-fecha">
       <label id="k-cuanto">Cuántos hay</label><input id="k-cantidad" inputmode="decimal" placeholder="0">
@@ -1300,7 +1327,6 @@ function reglaRegistro_(d, L) {
   <section id="p-registro" class="pantalla" hidden>
     <h2>Venta</h2>
     <div class="seg tipo" id="v-tipo"><button type="button" data-t="Compró" class="on">Vendí</button><button type="button" data-t="Regaló">Regalé</button><button type="button" data-t="En consignación">Dejé</button><button type="button" data-t="Contacto">Contacto</button></div>
-    <p class="sub" id="v-explica" hidden>Frascos que dejás con alguien para que los venda. Siguen siendo del negocio hasta que los venda: no es una venta y no entra plata.</p>
     <div class="tarjeta" id="v-card">
       <label>Quién</label><div class="seg" id="v-quien"></div>
       <label>Fecha</label><input type="date" id="v-fecha">
@@ -1309,7 +1335,7 @@ function reglaRegistro_(d, L) {
         <p class="sub" id="v-cobrado-nota" hidden style="margin:6px 0 0"></p></div>
       <div id="v-cuenta-wrap"><label>¿A qué bolsillo fue la plata?</label><select id="v-cuenta"></select></div>
       <div id="v-queda-wrap" hidden><label>Se queda por frasco, Gs (opcional)</label><input id="v-queda" inputmode="numeric" placeholder="vacío = sin acuerdo">
-        <details class="explica"><summary>Para qué sirve</summary><p>Si lo ponés, la app te propone sola cuánto cobrar cuando esa persona te pague.</p></details></div>
+</div>
       <label>Dónde</label><input id="v-donde" list="lugares" placeholder="Feria de Karu"><datalist id="lugares"></datalist>
       <label>Canal</label><select id="v-canal"></select>
       <div class="fila2">
@@ -1318,6 +1344,25 @@ function reglaRegistro_(d, L) {
       </div>
       <label>Nota</label><textarea id="v-nota"></textarea>
       <button class="btn primario" id="v-guardar">Guardar la venta</button>
+    </div>
+    <!-- 26 Sep (stage 4): "Agregar contacto" replaces the Contact type; always here, with or without the customers' data -->
+    <button class="btn chico" id="btnContacto" type="button">Agregar contacto</button>
+    <!-- 26 Sep (cheviva-next-round stage 4, S16-S18): the customers, read by the AI; answer times; offers with no follow-up -->
+    <div class="tarjeta" id="clientes-card" hidden>
+      <h3>Clientes esta semana</h3>
+      <div id="clientesLineas"></div>
+      <h3 class="sub-h">Tiempos de respuesta</h3>
+      <table class="densa" id="tiemposTabla"></table>
+      <h3 class="sub-h">Ofertas sin seguimiento</h3>
+      <div id="ofertasLista"></div>
+      <div id="clientesAnteriores"></div>
+    </div>
+    <div class="tarjeta" id="ig-card">
+      <h3>Instagram</h3>
+      <p class="sub" id="igCuenta" style="margin:0 0 8px"></p>
+      <table id="igTabla" class="densa"></table>
+      <div id="igAnteriores"></div>
+      <small id="igEstado"></small>
     </div>
     <div class="tarjeta" id="consigna-card" hidden>
       <h3>Frascos en manos de revendedores</h3>
@@ -1338,7 +1383,6 @@ function reglaRegistro_(d, L) {
         <div><label>Producto</label><select id="r-producto"></select></div>
         <div><label>Cantidad</label><input id="r-cantidad" inputmode="numeric"></div>
       </div>
-      <label>Total cobrado, Gs</label><input id="r-cobrado" inputmode="numeric" placeholder="vacío = precio de lista">
       <label>Canal</label><select id="r-canal"></select>
       <label>Nota</label><textarea id="r-nota"></textarea>
       <button class="btn primario" id="r-guardar">Guardar el contacto</button>
@@ -1352,12 +1396,6 @@ function reglaRegistro_(d, L) {
       <h3>WhatsApp</h3>
       <div id="waMensajes"></div>
       <small id="waEstado"></small>
-    </div>
-    <div class="tarjeta" id="ig-card">
-      <h3>Instagram</h3>
-      <p class="sub" id="igCuenta" style="margin:0 0 8px"></p>
-      <table id="igTabla" class="densa"></table>
-      <small id="igEstado"></small>
     </div>
   </section>
 </main>
@@ -1376,7 +1414,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-demo-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-26-ronda-3';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-26-ronda-4';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1736,6 +1774,7 @@ function reglaRegistro_(d, L) {
     }).join('') : '<p class="sub" style="margin:0">Todavía no llegan mensajes: falta vincular el WhatsApp de la empresa.</p>';
     $('waEstado').textContent = d.whatsapp.ultimo ? 'Última lectura del WhatsApp: ' + d.whatsapp.ultimo + '.' : '';
     pintarInstagram(d.instagram);
+    pintarClientes(d);
     var p = d.pendientes, items = [];
     if (p.recibos) items.push([p.recibos, 'recibo(s) esperando en "Por revisar" (no cuadran o parecen repetidos)', { url: d.urls.planilla }]);
     if (p.problemas) items.push([p.problemas, 'recibo(s) con problema en la carpeta', { ir: 'recibo' }]);
@@ -1784,19 +1823,25 @@ function reglaRegistro_(d, L) {
     var gastado = tp ? [['<span>Costo de ventas</span>', tp.cmv], ['<span>Muestras regaladas, al costo</span>', tp.muestras]]
       .concat((tp.gastos || []).map(function (g) { return ['<span>' + esc(TERMINOS[g[0]] || g[0]) + '</span>', g[1]]; }))
       .concat([['<span>Depreciación del equipo</span>', tp.depreciacion]]) : [];
-    var vv = b.vaciosValor || {};
+    /* 26 Sep (stage 4, his addition): what the business has, as the Balance prints it (the door's b.impreso), so the empty jars
+       read one figure everywhere; a page talking to an older door rounds them itself, as before */
+    var bi = b.impreso || null;
+    var vv = bi ? bi.vacios : (b.vaciosValor || {});
     var vacios = [['<span>' + esc((b.vacios['350 ml'] || 0) + ' de 350 ml') + '</span>', vv['350 ml']], ['<span>' + esc((b.vacios['100 ml'] || 0) + ' de 100 ml') + '</span>', vv['100 ml']]];
-    var kimchi = [['<span>En frascos</span>', b.kimchiStock], ['<span>En lotes sin envasar</span>', b.enProceso]].concat(dn.enEspecie ? [['<span>Menos lo del lote 1 que no pasó por Compras</span>', -dn.enEspecie]] : []);
+    var kimchi = [['<span>En frascos</span>', bi ? bi.kimchiStock : b.kimchiStock], ['<span>En lotes sin envasar</span>', bi ? bi.enProceso : b.enProceso]].concat(dn.enEspecie ? [['<span>Menos lo del lote 1 que no pasó por Compras</span>', -dn.enEspecie]] : []);
     var sinLote = (b.sinLoteDetalle || []).map(function (x) { return ['<b class="dia">' + esc(String(x.fecha).slice(0, 5)) + '</b>', x.total]; });
-    var gochu = [['<span>Gochugaru</span>', b.gochuStockValor], ['<span>Etiquetas</span>', b.etiquetasStockValor]];
+    var gochu = [['<span>Gochugaru</span>', bi ? bi.gochu : b.gochuStockValor], ['<span>Etiquetas</span>', bi ? bi.etiquetas : b.etiquetasStockValor]];
     var equipo = b.equipoCosto !== undefined ? [['<span>Costó</span>', b.equipoCosto], ['<span>Ya usado (depreciación)</span>', -b.depAcum]] : [];
     var suma = [['<span>Ya es gasto</span>', dm.usado], ['<span>Frascos vacíos</span>', dm.vacios], ['<span>Kimchi hecho sin vender</span>', dm.kimchi]]
       .concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', dm.sinLote]] : []).concat([['<span>Gochugaru y etiquetas</span>', dm.gochuEtiquetas], ['<span>Equipo</span>', dm.equipoNeto]]);
     var enManos = gentes.filter(function (x) { return x.quien !== duenoC && Math.round(x.saldo || 0) < 0; })
-      .map(function (x) { return ['<span>Plata del negocio en manos de</span> <span>' + esc(x.quien) + '</span>', -x.saldo]; });
-    var activo = [['<span>Kimchi en frascos</span>', b.kimchiStock], ['<span>Kimchi en lotes sin envasar</span>', b.enProceso]].concat(vacios.map(function (x) { return ['<span>Frascos vacíos</span> · ' + x[0], x[1]]; }))
-      .concat([['<span>Gochugaru</span>', b.gochuStockValor], ['<span>Etiquetas</span>', b.etiquetasStockValor]]).concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', dn.sinLote]] : [])
-      .concat([['<span>Equipo</span>', dn.equipoNetoImpreso !== undefined ? dn.equipoNetoImpreso : dn.equipoNeto]]).concat(enManos);
+      .map(function (x) {
+        var impreso = bi ? (bi.enManos || []).filter(function (y) { return y.quien === x.quien; })[0] : null;
+        return ['<span>Plata del negocio en manos de</span> <span>' + esc(x.quien) + '</span>', impreso ? impreso.monto : -x.saldo];
+      });
+    var activo = [['<span>Kimchi en frascos</span>', kimchi[0][1]], ['<span>Kimchi en lotes sin envasar</span>', kimchi[1][1]]].concat(vacios.map(function (x) { return ['<span>Frascos vacíos</span> · ' + x[0], x[1]]; }))
+      .concat(gochu).concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', bi ? bi.sinLote : dn.sinLote]] : [])
+      .concat([['<span>Equipo</span>', bi ? bi.equipo : (dn.equipoNetoImpreso !== undefined ? dn.equipoNetoImpreso : dn.equipoNeto)]]).concat(enManos);
     var saldoPartes = function (x, signo) {   // a saldo is what was put in, less what reached them and what was paid back
       return [['<span>Puso de su plata</span>', signo * x.puso], ['<span>Plata del negocio que le llegó</span>', -signo * x.tiene], ['<span>Ya se le devolvió</span>', -signo * x.devuelto]];
     };
@@ -1805,7 +1850,7 @@ function reglaRegistro_(d, L) {
       linea('b-salio', '<span>Salió en compras</span>', gs(dm.salio), partes(pcs, dm.salio), 'total') +   // his point 2: no "desde el principio" in a heading
       linea('b-usado', '<span>Ya es gasto</span>', gs(dm.usado), partes(gastado, dm.usado)) +
       linea('b-vacios', esc('Frascos vacíos (' + (b.vacios['350 ml'] || 0) + ' de 350 ml, ' + (b.vacios['100 ml'] || 0) + ' de 100 ml)'), gs(dm.vacios), vv['350 ml'] !== undefined ? partes(vacios, dm.vacios) : null) +
-      linea('b-kimchi', 'Kimchi hecho sin vender, en frascos y en lotes' + (dn.enEspecie ? '<small>sin los ' + gs(dn.enEspecie) + ' de ingredientes del lote 1, que se pagaron antes de la planilla y no salieron por Compras</small>' : ''), gs(dm.kimchi), partes(kimchi, dm.kimchi)) +
+      linea('b-kimchi', 'Kimchi hecho sin vender, en frascos y en lotes', gs(dm.kimchi), partes(kimchi, dm.kimchi)) +   // 26 Sep (stage 4's second check): no sentence under it
       (dn.sinLote ? linea('b-sinlote', '<span>Ingredientes comprados sin lote</span>', gs(dm.sinLote), partes(sinLote, dm.sinLote)) : '') +
       linea('b-gochu', esc('Gochugaru (' + Math.round(b.gochuStockG || 0) + ' g) y etiquetas' + (b.etiquetasStock !== undefined ? ' (' + Math.round(b.etiquetasStock) + ')' : '') + ' en stock'), gs(dm.gochuEtiquetas), b.gochuStockValor !== undefined ? partes(gochu, dm.gochuEtiquetas) : null) +
       linea('b-equipo', '<span>Equipo, lo que le queda de vida</span>', gs(dm.equipoNeto), partes(equipo, dm.equipoNeto)) +
@@ -1931,8 +1976,7 @@ function reglaRegistro_(d, L) {
     llenarSelectMantener($('f-lote'), d.lotes.map(function (l) { return l.lote; }), d.lotes.length ? 'Elegí…' : 'No hay lotes');
     // the labels are no longer typed (21 Sep): the card says how many each jar takes, from Ajustes
     var ep = d.etiquetasPorFrasco;
-    $('f-tamanos').textContent = 'Picante y Blanco: frascos de 350 ml. Vasitos: 100 ml.' +
-      (ep ? ' Las etiquetas se descuentan solas: ' + (ep['350 ml'] || 0) + ' por frasco y ' + (ep['100 ml'] || 0) + ' por vasito.' : '');
+    // 26 Sep (change 8): the jar sizes' note went with its disclosure
     pintarConteo(d);
     pintarExistencias(d); pintarPerdida(d);
     var siguienteLote = String(d.lotes.reduce(function (m, l) { return Math.max(m, Number(l.lote) || 0); }, 0) + 1);
@@ -2002,9 +2046,13 @@ function reglaRegistro_(d, L) {
     var gi = (m.gastosItems || []).filter(function (g) { return g[1]; });
     var impreso = function (g) { return mo.gastos && mo.gastos[g[0]] !== undefined ? mo.gastos[g[0]] : Math.round(g[1]); };
     var venta = [['Muestras regaladas, al costo', mo.muestras, 'muestras']].concat(gi.filter(function (g) { return g[2] === 'venta'; }).map(function (g) { return [TERMINOS[g[0]] || g[0], impreso(g)]; }));
-    var admin = gi.filter(function (g) { return g[2] !== 'venta'; }).map(function (g) { return [TERMINOS[g[0]] || g[0], impreso(g)]; }).concat([['Depreciación del equipo', mo.depreciacion]]);
+    /* 26 Sep (change 3, his yes; IAS 2 §12 and §38): the equipment's depreciation is a production overhead, so it sits in cost of
+       sales, as its own part beside the jars, and leaves administrative costs */
+    var admin = gi.filter(function (g) { return g[2] !== 'venta'; }).map(function (g) { return [TERMINOS[g[0]] || g[0], impreso(g)]; });
     var suma = function (l) { return l.reduce(function (t, x) { return t + (Number(x[1]) || 0); }, 0); };
-    return { mo: mo, ventas: mo.ventas, cmv: mo.cmv, bruto: mo.ventas - mo.cmv, venta: venta.filter(function (x) { return x[1] || x[2] === 'muestras'; }), admin: admin,
+    var cmv = (Number(mo.cmv) || 0) + (Number(mo.depreciacion) || 0);
+    return { mo: mo, ventas: mo.ventas, cmv: cmv, cmvFrascos: mo.cmv, depreciacion: mo.depreciacion || 0, bruto: mo.ventas - cmv,
+             venta: venta.filter(function (x) { return x[1] || x[2] === 'muestras'; }), admin: admin.filter(function (x) { return x[1]; }),
              gVenta: suma(venta), gAdmin: suma(admin), resultado: mo.resultado };
   }
   /* The parts of the month's lines, the same on Home and in the margins (26 Sep, the checker's second round: the margins'
@@ -2017,10 +2065,11 @@ function reglaRegistro_(d, L) {
     var ventas = vend.map(function (x, i) { return ['<span>' + esc(x.quien) + '</span> · <span>' + esc(cuantos(x.unidades, 'frasco', 'frascos')) + '</span>', gs(vendR[i])]; });
     // the cost of sales by size: "15 frascos · Gs 12.256,3 c/u"
     var tamanos = Object.keys(cp).filter(function (k) { return vp[k]; });
-    var cmvR = cuadrar(tamanos.map(function (k) { return cp[k]; }), f.cmv);
+    var cmvR = cuadrar(tamanos.map(function (k) { return cp[k]; }), f.cmvFrascos !== undefined ? f.cmvFrascos : f.cmv);
     var cmv = tamanos.map(function (k, i) {
       return ['<span>' + esc(k === '100 ml' ? cuantos(vp[k], 'vasito', 'vasitos') : cuantos(vp[k], 'frasco', 'frascos')) + '</span> · <span>' + esc(unDecimal(cp[k] / vp[k]) + ' c/u') + '</span>', gs(-cmvR[i])];
     });
+    if (f.depreciacion) cmv.push(['<span>Depreciación del equipo</span>', gs(-f.depreciacion)]);   // 26 Sep (change 3): its own part
     var venta = f.venta.map(function (x) {
       var t = '<span>' + esc(x[0]) + '</span>';
       if (x[2] === 'muestras') {   // "21 vasitos · Gs 5.593 c/u"
@@ -2034,6 +2083,20 @@ function reglaRegistro_(d, L) {
     var resultado = [['<span>Margen bruto</span>', gs(f.bruto)], ['<span>Gastos de venta</span>', gs(-f.gVenta)], ['<span>Gastos de administración</span>', gs(-f.gAdmin)]];
     return { ventas: ventas, cmv: cmv, venta: venta, admin: admin, bruto: bruto, resultado: resultado, vp: vp };
   }
+  /* 26 Sep (change 10, his yes): each of the four lines with its share of sales, rounded so they read as a subtraction: the
+     gross margin and the result rounded as usual, the two costs sharing what lies between them by largest remainder (September:
+     66% - 43% - 6% = 17%); a month with no sale shows a dash */
+  function porcentajesDelMes(f) {
+    var v = Number(f.ventas) || 0;
+    if (!v) return { bruto: '—', venta: '—', admin: '—', resultado: '—' };
+    var redondo = function (x) { return (x < 0 ? -1 : 1) * Math.floor(Math.abs(x) + 0.5); };
+    var b = redondo(f.bruto / v * 100), r = redondo(f.resultado / v * 100);
+    var xs = [f.gVenta / v * 100, f.gAdmin / v * 100], ps = xs.map(Math.floor), k = (b - r) - (ps[0] + ps[1]);
+    var orden = [0, 1].sort(function (i, j) { return (xs[j] - ps[j]) - (xs[i] - ps[i]); });   // the largest remainder first
+    for (var i = 0; k > 0; i++, k--) ps[orden[i % 2]]++;
+    for (var j = 0; k < 0; j++, k++) ps[orden[1 - (j % 2)]]--;
+    return { bruto: b + '%', venta: ps[0] + '%', admin: ps[1] + '%', resultado: r + '%' };
+  }
   function pintarInicio(d, n, pp, pic, bla, vas, ultimoLote) {
     var m = d.mes, f = mesPorFuncion(d), mes3 = String(m.nombre || '').split(' ')[0];
     var P = partesDelMes(d, f), vp = P.vp, partesVentas = P.ventas, partesCmv = P.cmv, partesVenta = P.venta, partesAdmin = P.admin;
@@ -2043,7 +2106,8 @@ function reglaRegistro_(d, L) {
     // the plan's worked example for Home (26 Sep, the chat on its words): "on 1 Oct before any sale, Sales Gs 0 · 0 jars; Net
     // income shows its costs; every percentage and per-jar figure '—'" — the list-price margin included, and its cost with it
     var sinVentas = mesSinVentas(d), margenSi = costo && !sinVentas;
-    var esperan = ((d.avisos || {}).esperando || []).filter(function (x) { return !x.ejemplo; }).length;   // a labeled example of the demo is never counted
+    var esperan = ((d.avisos || {}).esperando || []).filter(function (x) { return !x.ejemplo && !x.grupo; }).length;   // customers only: a shop's group is not one (26 Sep)
+    var ofertasN = ((d.clientes || {}).ofertas || []).length;   // 26 Sep (stage 4): the open offers, dropping at once with "Ya compró"
     var c = d.cuenta || {}, dueno = c.dueno || '';
     var tile = function (clave, e, cifra, chico, partes, neg, irA) {
       var abierta = !!ABIERTAS[clave] && partes && partes.length;
@@ -2060,21 +2124,28 @@ function reglaRegistro_(d, L) {
            margenSi ? [['<span>Precio de lista</span>', gs(mf.precio)], ['<span>Costo/frasco</span>', gs(-costo)]] : null, margenSi && mf.margen < 0) +
       tile('k-stock', 'En stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>',
            [vas ? '<span>' + esc(vas + ' vasitos') + '</span>' : '', primeroEnAcabarse(d)].filter(Boolean).join(' · ')) +
-      tile('k-clientes', 'Clientes', String(esperan), '<span>esperando respuesta</span>', null, false, 'mensajes') +
+      tile('k-clientes', 'Clientes', String(esperan), '<span>esperando respuesta</span>' + (ofertasN ? ' · <span>' + esc(ofertasN + (ofertasN === 1 ? ' oferta sin seguimiento' : ' ofertas sin seguimiento')) + '</span>' : ''), null, false, 'mensajes') +
       tile('k-inversion', 'Inversión neta', gs(c.aporteDueno || 0), esc(dueno), null, false, 'cuentas');
     ajustarKpis();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarKpis);   // the web fonts are wider than the fallback
     // THIS MONTH, by function, each sum opening to its parts
     $('mesTitulo').textContent = 'Este mes: ' + m.nombre;
+    var pcs = porcentajesDelMes(f);
     $('mesTabla').innerHTML =
       linea('m-ventas', '<span>Ventas</span>', gs(f.ventas), partesVentas) +
       linea('m-cmv', '<span>Costo de ventas</span>', gs(-f.cmv), partesCmv) +
-      linea('m-bruto', '<span>Margen bruto</span> <small class="pc">' + esc(porc(f.bruto, f.ventas)) + '</small>', gs(f.bruto), P.bruto, 'sub') +
-      linea('m-venta', '<span>Gastos de venta</span>', gs(-f.gVenta), partesVenta) +
-      linea('m-admin', '<span>Gastos de administración</span>', gs(-f.gAdmin), partesAdmin) +
-      linea('m-resultado', '<span>Resultado del mes</span> <small class="pc">' + esc(porc(f.resultado, f.ventas)) + '</small>', gs(f.resultado), P.resultado, 'total');
-    // 16 Sep, his yes: next to the estimate, the cash that really came in and went out; why it differs sits behind the tap
-    $('mesCaja').innerHTML = cajaLinea('m-caja', 'Caja del mes', m.cobrado, m.compras || 0);
+      linea('m-bruto', '<span>Margen bruto</span> <small class="pc">' + esc(pcs.bruto) + '</small>', gs(f.bruto), null, 'sub') +
+      linea('m-venta', '<span>Gastos de venta</span> <small class="pc">' + esc(pcs.venta) + '</small>', gs(-f.gVenta), partesVenta) +
+      linea('m-admin', '<span>Gastos de administración</span> <small class="pc">' + esc(pcs.admin) + '</small>', gs(-f.gAdmin), partesAdmin) +
+      linea('m-resultado', '<span>Resultado del mes</span> <small class="pc">' + esc(pcs.resultado) + '</small>', gs(f.resultado), null, 'total');   // 26 Sep (change 3): totals of the lines above open nothing
+    /* 26 Sep (change 6, his yes): the cash that came in and went out, figures only, and what of the money out is still in the
+       business, line by line (the parts of "Adónde fue la plata"): no sentence */
+    var dmI = d.dineroMostrado || {};
+    var sigue = [['<span>Frascos vacíos</span>', dmI.vacios], ['<span>Kimchi hecho sin vender</span>', dmI.kimchi], ['<span>Gochugaru y etiquetas</span>', dmI.gochuEtiquetas],
+                 ['<span>Equipo</span>', dmI.equipoNeto], ['<span>Ingredientes comprados sin lote</span>', dmI.sinLote]].filter(function (x) { return Math.round(Number(x[1]) || 0); });
+    var sigueTotal = sigue.reduce(function (t, x) { return t + Math.round(Number(x[1]) || 0); }, 0);
+    $('mesCaja').innerHTML = cajaLinea('m-caja', 'Caja del mes', m.cobrado, m.compras || 0) +
+      (sigue.length ? linea('m-sigue', '<span>Sigue en el negocio</span>', gs(sigueTotal), sigue.map(function (x) { return [x[0], gs(x[1])]; })) : '');
     // THIS WEEK, open; the earlier weeks behind a tap each
     var sem = d.semanas || [], w = sem[0] || { ventas: 0, cmv: 0, muestras: 0, gastos: 0, resultado: 0, vendidos: 0, cobrado: 0, compras: 0, clave: '' };
     $('semanaTitulo').textContent = 'Esta semana: ' + rango(w.clave, w.texto);
@@ -2084,7 +2155,10 @@ function reglaRegistro_(d, L) {
     $('semanasAntes').innerHTML = sem.slice(1).map(function (x) {
       var wm = x.mostrado || x;
       if (semanaVacia(x)) return '<tr class="semana-vacia"><td colspan="2"><span>' + esc(rango(x.clave, x.texto)) + '</span> · <span class="placeholder">Nada comprado ni vendido.</span></td></tr>';
-      return linea('s-' + x.clave, '<span>' + esc(rango(x.clave, x.texto)) + '</span>', '<small>' + esc('resultado') + '</small> ' + gs(wm.resultado), semanaPartes(x));   // an earlier week's figure says what it is
+      // 26 Sep (change 7, his "then let's show both"): each earlier week shows its result and its cash, as this week does
+      var cajaW = Math.round(Number(x.cobrado) || 0) - Math.round(Number(x.compras) || 0);
+      return linea('s-' + x.clave, '<span>' + esc(rango(x.clave, x.texto)) + '</span>',
+        '<span class="nb"><small>' + esc('resultado') + '</small> ' + gs(wm.resultado) + '</span><br><span class="nb"><small>' + esc('caja') + '</small> ' + gs(cajaW) + '</span>', semanaPartes(x));
     }).join('');
   }
   var NADA_EN_LA_SEMANA = '<tr><td colspan="2" class="placeholder">Nada comprado ni vendido.</td></tr>';
@@ -2133,8 +2207,7 @@ function reglaRegistro_(d, L) {
   }
   function cajaLinea(clave, titulo, entro, salio) {
     return linea(clave, '<span>' + esc(titulo) + '</span>', gs(Math.round(entro) - Math.round(salio)),
-      [['<span>Entró: ventas cobradas</span>', gs(entro)], ['<span>Salió: todas las compras</span>', gs(-salio)],
-       ['<small class="nota-parte">Cada compra cuenta el día que se pagó, aunque los frascos y los ingredientes sigan en el negocio. Por eso la caja no es el resultado.</small>', null]]);
+      [['<span>Entró: ventas cobradas</span>', gs(entro)], ['<span>Salió: todas las compras</span>', gs(-salio)]]);
   }
   // "21–27 sep", or "29 sep – 5 oct" (the 19 shorter labels); the sheet's own words when the week has no key
   function rango(clave, texto) {
@@ -2152,17 +2225,7 @@ function reglaRegistro_(d, L) {
     formulario: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#7248B9" d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path fill="#B9A4DC" d="M15 2v5h5z"/><path fill="#fff" d="M8 11h1.5v1.5H8zm3 0h5v1.5h-5zm-3 3h1.5v1.5H8zm3 0h5v1.5h-5zm-3 3h1.5v1.5H8zm3 0h5v1.5h-5z"/></svg>'
   };
   function pintarNumeros(d) {
-    var f = mesPorFuncion(d), m = d.mes, n = Number(m.vendidos) || 0, P = partesDelMes(d, f);
-    // MÁRGENES (S8): the month, each as a share of the sales, and the gross margin per jar sold (never read as the list-price figure)
-    $('margenesTitulo').textContent = 'Márgenes: ' + m.nombre;
-    var cobradoProm = n ? f.ventas / n : 0;
-    $('margenesTabla').innerHTML =
-      linea('g-bruto', '<span>Margen bruto</span>', gs(f.bruto) + '<small>' + esc(porc(f.bruto, f.ventas)) + '</small>', P.bruto) +
-      linea('g-venta', '<span>Gastos de venta</span>', gs(-f.gVenta) + '<small>' + esc(porc(f.gVenta, f.ventas)) + '</small>', P.venta) +
-      linea('g-admin', '<span>Gastos de administración</span>', gs(-f.gAdmin) + '<small>' + esc(porc(f.gAdmin, f.ventas)) + '</small>', P.admin) +
-      linea('g-resultado', '<span>Resultado del mes</span>', gs(f.resultado) + '<small>' + esc(porc(f.resultado, f.ventas)) + '</small>', P.resultado, 'total') +
-      linea('g-frasco', '<span>Margen bruto por frasco vendido</span><small>' + (n ? '<span>precio promedio cobrado</span> <span class="nb">' + gs(cobradoProm) + '</span>' : '') + '</small>',
-            n ? gs(f.bruto / n) : '—');
+    // 26 Sep (change 10, his yes): no Márgenes card — the month on Home carries the four shares
     pintarMovimientos(d);
     // ENLACES (S12): each with its logo; a link with nothing behind it is not drawn
     var u = d.urls || {}, wa = d.whatsapp || {};
@@ -2294,8 +2357,7 @@ function reglaRegistro_(d, L) {
   if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', ajustarKpis);
   function caja(titulo, entro, salio) {
     return '<tr><th colspan="2">' + esc(titulo) + '</th></tr>' + fila('Entró: ventas cobradas', gs(entro)) + fila('Salió: todas las compras', gs(-salio)) +
-      fila('Diferencia de caja', gs(entro - salio), 'total') +
-      '<tr class="suave"><td colspan="2">Cada compra cuenta el día que se pagó, aunque los frascos y los ingredientes sigan en el negocio. Por eso la caja no es el resultado.</td></tr>';
+      fila('Diferencia de caja', gs(entro - salio), 'total');
   }
   function cuantos(n, uno, varios) { n = Number(n) || 0; return n + ' ' + (n === 1 ? uno : varios); }
   /* The count card (21 Sep, his point 7): the list of what can be counted comes from the sheet, and so does what the
@@ -2316,8 +2378,7 @@ function reglaRegistro_(d, L) {
     $('k-cuanto').textContent = 'Cuántos hay' + (u ? ' (' + u.trim() + ')' : '');
     $('k-dice').textContent = !x ? '' : 'Según la planilla hay ' + cant(x.stock) + u + '.' +
       (x.ultimo ? ' Último conteo: ' + x.ultimo.fecha + ', ' + cant(x.ultimo.contado) + u + '.' : ' Nunca se contó.') +
-      // 24 Sep (W16): an added supply was already an expense when it was bought, so its count moves no figure
-      (x.agregado ? ' Contarlo solo corrige cuánto queda: sus compras ya están en los números.' : '');
+      '';   // 26 Sep (change 8): no explanation after the figures
   }
   $('k-que').addEventListener('change', function () { $('k-hecho').hidden = true; decirConteo(); });
   $('btnContar').addEventListener('click', function () {
@@ -2350,20 +2411,14 @@ function reglaRegistro_(d, L) {
     $('frascosStockTabla').innerHTML = '<tr><th></th><th class="n">Hay</th><th class="n">Semanal</th><th class="n">Dura</th><th class="n">Empezar</th></tr>' +
       (ex.frascos || []).map(function (x) {
         var sin = x.linea === null || x.linea === undefined;
-        var partes = sin ? null : ['<span>' + esc('Últimas ' + sem + ' semanas: ' + (x.regalo ? x.regalados + ' regalados.' : (x.vendidos + (x.regalados ? ' vendidos y ' + x.regalados + ' regalados.' : ' vendidos.')))) + '</span>',
-                                   '<span>' + esc('Un lote tarda ' + x.tarda + ' días + ' + x.margen + ' de margen.') + '</span>',
-                                   '<span>' + esc('Empezá uno cuando queden menos de ' + cant(x.linea) + '.') + '</span>'];
         return filaStock('st-' + x.producto, esc(corto(x.producto)), cant(x.stock),
-          porSemanaTexto(x.porSemana), duraTexto(x.dias), sin ? '' : cant(x.linea), partes, sin ? 'sin ventas' : '');   // given away or sold: the row's parts say which
+          porSemanaTexto(x.porSemana), duraTexto(x.dias), sin ? '' : cant(x.linea), null, sin ? 'sin ventas' : '');   // 26 Sep (change 8): the row no longer opens   // given away or sold: the row's parts say which
       }).join('');
     $('insumosTabla').innerHTML = '<tr><th></th><th class="n">Hay</th><th class="n">Semanal</th><th class="n">Dura</th><th class="n">Avisa</th></tr>' +
       (ex.insumos || []).map(function (x) {
         var sin = x.linea === null || x.linea === undefined;
-        var partes = sin ? null : ['<span>' + esc('Últimas ' + (x.semanas || sem) + ' semanas: ' + conUnidad(x.usado, x.unidad) + ' usados.') + '</span>',
-                                   '<span>' + esc('Entrega ' + x.entrega + ' días + ' + x.margen + ' de margen.') + '</span>',
-                                   '<span>' + esc('Avisa cuando quedan menos de ' + conUnidad(x.linea, x.unidad) + '.') + '</span>'];
         return filaStock('si-' + x.item, esc(x.item), conUnidad(x.stock, x.unidad), sin ? '' : porSemanaTexto(x.porSemana) + (x.unidad && x.unidad !== 'unidad' ? ' ' + x.unidad : ''),
-          duraTexto(x.dias), sin ? '' : conUnidad(x.linea, x.unidad), partes, sin ? 'sin uso' : '');
+          duraTexto(x.dias), sin ? '' : conUnidad(x.linea, x.unidad), null, sin ? 'sin uso' : '');   // 26 Sep (change 8): the row no longer opens
       }).join('');
   }
   /* 26 Sep (stage 3, S15): Broken or lost, the main entry — what, how many, broke or lost, a note; never more than there is */
@@ -2389,23 +2444,114 @@ function reglaRegistro_(d, L) {
   /* Instagram next to WhatsApp (21 Sep, his point 9). The numbers come from the sheet, which reads Instagram at most once
      an hour; they always carry the time they were read, and a connection that was cut says so instead of showing old
      numbers as today's. A sheet with no Instagram key hands over nothing, and the card stays out of sight. */
+  /* 26 Sep (stage 4, S16-S18): one line per customer this week, answer times, offers with no follow-up, earlier weeks on a tap */
+  var LINEAS_CLIENTES = [], OFERTAS_CLIENTES = [];
+  function pintarClientes(d) {
+    var c = d.clientes;
+    $('clientes-card').hidden = !c;
+    if (!c) return;
+    var semanas = c.semanas || [], esta = semanas[0] || { lineas: [], tiempos: {} };
+    LINEAS_CLIENTES = esta.lineas || [];
+    var linea = function (l, i, conBoton) {
+      var que = l.sinLeer ? '<i>sin leer todavía</i>' : '<span translate="no">' + esc(l.queQuiere || '—') + '</span>' + (l.revisar ? ' <b class="revisar">revisar</b>' : '');
+      var estado = l.estado === 'esperando' ? '<b class="esperando">esperando</b>' : l.minutos ? '<span>contestado en ' + esc(l.minutosTexto || minutosTexto(l.minutos)) + '</span>' : '<span>contestado</span>';
+      var venta = l.venta ? '<span>venta del ' + esc(l.venta.fecha) + '</span>' : l.yaCompro ? '<span>ya compró (a mano, ' + esc(l.yaCompro) + ')</span>' : '<span>sin venta</span>';
+      return '<div class="cliente"><div class="quien"><b><span class="canal">' + esc(l.canal) + '</span>' + esc(l.nombre || '—') + '</b><small>' + esc(l.ultimo) + '</small></div>' +
+        '<div class="que">' + que + '</div><small class="estado">' + estado + ' · ' + venta + '</small>' +
+        (conBoton && !l.venta ? '<div class="fila2 botones-cliente"><button type="button" class="btn chico" data-anotar="' + i + '">Anotar la venta</button>' +
+          (!l.yaCompro ? '<button type="button" class="btn chico" data-yacompro="' + i + '">Ya compró</button>' : '') + '</div>' : '') + '</div>';
+    };
+    $('clientesLineas').innerHTML = LINEAS_CLIENTES.length ? LINEAS_CLIENTES.map(function (l, i) { return linea(l, i, true); }).join('')
+      : '<p class="sub" style="margin:0">Nadie escribió esta semana.</p>';
+    var t = esta.tiempos || {};
+    $('tiemposTabla').innerHTML = t.chats
+      ? '<tr><td>Chats</td><td class="n">' + t.chats + '</td></tr><tr><td>Mediana</td><td class="n">' + esc(t.mediana) + '</td></tr><tr><td>La más larga</td><td class="n">' + esc(t.maxima) + '</td></tr>' +
+        '<tr class="con-partes"><td><button type="button" class="abre" data-abre="c-limite" aria-expanded="' + !!ABIERTAS['c-limite'] + '">Pasaron las ' + t.limiteHoras + ' horas</button></td><td class="n">' + t.sobreLimite + '</td></tr>' +
+        (t.porChat || []).map(function (x) { return '<tr class="parte" data-de="c-limite"' + (ABIERTAS['c-limite'] ? '' : ' hidden') + '><td>' + esc(x.nombre || '—') + '</td><td class="n">' + esc(x.minutos) + '</td></tr>'; }).join('')
+      : '<tr><td class="placeholder">Ningún chat contestado esta semana.</td></tr>';
+    var ofertas = c.ofertas || [];
+    OFERTAS_CLIENTES = ofertas;
+    // an offer is at least 7 days old, so its customer is rarely among this week's lines: "Ya compró" sits on the offer too
+    $('ofertasLista').innerHTML = ofertas.length
+      ? '<table class="densa">' + ofertas.map(function (o, i) {
+          return '<tr><td>' + esc(o.nombre || '—') + '<small>' + esc((o.productos || []).map(function (x) { return x.cantidad + ' × ' + x.producto; }).join(', ')) + ' · <span>hace ' + o.dias + ' días</span></small>' +
+            '<button type="button" class="btn chico" data-yacompro-oferta="' + i + '">Ya compró</button></td><td class="n">' + gs(o.valor) + '</td></tr>';
+        }).join('') + (ofertas.length > 1 ? '<tr class="total"><td>Total</td><td class="n">' + gs(c.valorOfertas) + '</td></tr>' : '') + '</table>'
+      : '<p class="sub" style="margin:0">Ninguna.</p>';
+    var anteriores = semanas.slice(1);
+    $('clientesAnteriores').innerHTML = anteriores.length
+      ? '<details class="mas"><summary>Semanas anteriores</summary>' + anteriores.map(function (w) {
+          var tw = w.tiempos || {};
+          return '<h3 class="sub-h">' + esc(w.texto) + '</h3>' + (tw.chats ? '<p class="sub" style="margin:0"><span>Mediana ' + esc(tw.mediana) + '</span> · <span>la más larga ' + esc(tw.maxima) + '</span> · <span>' + tw.sobreLimite + ' pasaron las ' + tw.limiteHoras + ' horas</span></p>' : '') +
+            (w.lineas || []).map(function (l) { return linea(l, 0, false); }).join('');
+        }).join('') + '</details>'
+      : '';
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest('[data-yacompro], [data-yacompro-oferta]') : null;
+    if (!b || !D || !D.clientes) return;
+    var l = b.hasAttribute('data-yacompro') ? LINEAS_CLIENTES[Number(b.dataset.yacompro)] : OFERTAS_CLIENTES[Number(b.getAttribute('data-yacompro-oferta'))];
+    if (!l) return;
+    var c = D.clientes, antes = JSON.stringify(c), hoy = new Date();
+    l.yaCompro = ('0' + hoy.getDate()).slice(-2) + '/' + ('0' + (hoy.getMonth() + 1)).slice(-2);
+    (c.semanas || []).forEach(function (w) { (w.lineas || []).forEach(function (x) { if (x.chat === l.chat) x.yaCompro = l.yaCompro; }); });
+    c.ofertas = (c.ofertas || []).filter(function (o) { return o.chat !== l.chat; });
+    c.valorOfertas = c.ofertas.reduce(function (t, o) { return t + (o.valor || 0); }, 0);
+    pintar(D, null, true);   // Venta's offers and Home's tile drop at once
+    google.script.run.withSuccessHandler(function (r) {
+      if (r && r.ok) toast(r.mensaje || 'Listo.');
+      else { D.clientes = JSON.parse(antes); pintar(D, null, true); toast((r && (r.mensaje || r.error)) || 'No se pudo guardar.', true); }
+    }).withFailureHandler(function (e) { D.clientes = JSON.parse(antes); pintar(D, null, true); toast(e && e.message ? e.message : String(e), true); })
+      .guardarYaCompro({ chat: l.chat, canal: l.canal, nombre: l.nombre });
+  });
+  function minutosTexto(m) { return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : ''); }
+  // "Anotar la venta": the sale form filled with the product, the quantity, the name and the phone (S17)
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest('[data-anotar]') : null;
+    if (!b) return;
+    var l = LINEAS_CLIENTES[Number(b.dataset.anotar)];
+    if (!l || !D) return;
+    TIPO = 'Compró'; pintarTipo();
+    (D.productos || []).forEach(function (p, i) { var q = (l.productos || []).filter(function (x) { return x.producto === p; })[0]; if ($('v-q' + i)) $('v-q' + i).value = q ? q.cantidad : ''; });
+    $('v-nombre').value = l.nombre || ''; $('v-telefono').value = l.telefono || '';
+    var canal = $('v-canal'); if (canal && [].some.call(canal.options, function (o) { return o.value === l.canal; })) canal.value = l.canal;
+    if (typeof prellenarCobrado === 'function') prellenarCobrado();
+    var card = $('v-card'); if (card && card.scrollIntoView) card.scrollIntoView({ block: 'start' });
+  });
   function pintarInstagram(ig) {
     $('ig-card').hidden = !ig;
     if (!ig) return;
     var c = ig.cuenta || {}, posts = ig.posts || [];
     if (ig.cortada) {
       $('igCuenta').innerHTML = '<span class="error">La conexión con Instagram se cortó: Instagram ya no acepta la llave.</span>';
-      $('igTabla').innerHTML = '';
+      $('igTabla').innerHTML = ''; $('igAnteriores').innerHTML = '';
       $('igEstado').textContent = 'Hay que volver a conectarla en la página de Meta de la app' + (ig.fallo ? '. Se vio el ' + ig.fallo + '.' : '.');
       return;
     }
     if (ig.pendiente) {
       $('igCuenta').textContent = 'Todavía no se leyó Instagram. La planilla lo lee sola, una vez por hora.';
-      $('igTabla').innerHTML = ''; $('igEstado').textContent = ig.error ? 'La última vez no se pudo: ' + ig.error : '';
+      $('igTabla').innerHTML = ''; $('igAnteriores').innerHTML = ''; $('igEstado').textContent = ig.error ? 'La última vez no se pudo: ' + ig.error : '';
       return;
     }
     $('igCuenta').innerHTML = (c.usuario ? '<b>@' + esc(c.usuario) + '</b> · ' : '') + '<span class="nb">' + cuantos(c.seguidores, 'seguidor', 'seguidores') + '</span> · <span class="nb">' + cuantos(c.publicaciones, 'publicación', 'publicaciones') + '</span>';
     var algunaSumando = posts.some(function (p) { return p.sumando; });
+    /* 26 Sep (stage 4, his words of 25 Sep: "this week open and then expandable to see all of the rest"): this week's posts in the
+       table, every earlier one behind one tap; a door that hands no weeks shows them all, as before */
+    var porSemana = !!ig.semanaActual && posts.some(function (p) { return p.semana !== undefined; });
+    var anteriores = porSemana ? posts.filter(function (p) { return p.semana !== ig.semanaActual; }) : [];
+    if (porSemana) posts = posts.filter(function (p) { return p.semana === ig.semanaActual; });
+    var fila = function (p) {
+          var leyenda = IDIOMA === 'en' && p.textoIngles ? p.textoIngles : p.texto;
+          var nota = [p.tipo ? esc(p.tipo) : '', leyenda ? '<span translate="no">' + esc(leyenda) + '</span>' : ''].filter(Boolean).join(' · ') +
+            esc((p.comentarios ? ' · ' + cuantos(p.comentarios, 'comentario', 'comentarios') : '') + (p.sumando ? ' · todavía sumando' : ''));
+          var fecha = p.enlace ? '<a class="enlace" href="' + esc(p.enlace) + '" target="_blank" rel="noopener">' + esc(p.fecha) + '</a>' : esc(p.fecha);
+          var n = function (x) { return x === null || x === undefined ? '—' : num(x); };
+          return '<tr><td>' + fecha + '<small>' + nota + '</small>' + (IDIOMA === 'en' && p.textoIngles ? '<small class="auto">translated automatically</small>' : '') +
+                 '</td><td class="n">' + n(p.alcance) + '</td><td class="n">' + n(p.vistas) + '</td><td class="n">' + n(p.meGusta) + '</td></tr>';
+    };
+    var cabecera = '<tr><th>Publicación</th><th class="n">Alcance</th><th class="n">Vistas</th><th class="n envuelve">Me gusta</th></tr>';
+    $('igAnteriores').innerHTML = anteriores.length
+      ? '<details class="mas"><summary>' + esc(cuantos(anteriores.length, 'publicación anterior', 'publicaciones anteriores')) + '</summary><table class="densa">' + cabecera + anteriores.map(fila).join('') + '</table></details>' : '';
     $('igTabla').innerHTML = posts.length
       ? '<tr><th>Publicación</th><th class="n">Alcance</th><th class="n">Vistas</th><th class="n envuelve">Me gusta</th></tr>' +
         posts.map(function (p) {
@@ -2417,9 +2563,8 @@ function reglaRegistro_(d, L) {
           return '<tr><td>' + fecha + '<small>' + nota + '</small>' + (IDIOMA === 'en' && p.textoIngles ? '<small class="auto">translated automatically</small>' : '') +
                  '</td><td class="n">' + n(p.alcance) + '</td><td class="n">' + n(p.vistas) + '</td><td class="n">' + n(p.meGusta) + '</td></tr>';
         }).join('')
-      : '<tr><td class="placeholder">Todavía no hay publicaciones.</td></tr>';
-    $('igEstado').textContent = 'Leído de Instagram el ' + ig.leido + '.' +
-      (algunaSumando ? ' Instagram sigue sumando los números de una publicación durante 48 horas.' : '') +
+      : '<tr><td class="placeholder">' + (porSemana && anteriores.length ? 'Esta semana no hubo publicaciones.' : 'Todavía no hay publicaciones.') + '</td></tr>';
+    $('igEstado').textContent = 'Leído de Instagram el ' + ig.leido + '.' +   // 26 Sep (stage 4's second check): no explanation after it
       (ig.error ? ' La última lectura no se pudo: ' + ig.error : '');
   }
   function kpi(e, n, neg) { return '<div class="kpi' + (neg ? ' neg' : '') + '"><div class="e">' + esc(e) + '</div><div class="n">' + n + '</div></div>'; }
@@ -2449,38 +2594,32 @@ function reglaRegistro_(d, L) {
       var v = Math.round(x.saldo || 0);
       if (!v) return 'a mano';
       if (x.quien === dueno) return (v > 0 ? 'invirtió ' : 'retiró ') + num(Math.abs(v));
-      return v > 0 ? 'se le debe ' + num(v) : 'tiene ' + num(-v) + ' del negocio';
+      return v > 0 ? 'el negocio le debe ' + num(v) : 'tiene ' + num(-v) + ' del negocio';
     };
-    var FILAS_CUENTA = [['Puso de su plata', 'puso'], ['Plata del negocio que le llegó', 'tiene'], ['Ya se le devolvió', 'devuelto']];
+    // 26 Sep (change 2, his yes: "you get an account, the same as everyone else"): the same five rows for everyone
+    var FILAS_CUENTA = [['Pagó compras', 'compras'], ['Cobró ventas', 'cobrado'], ['Le pagó a otros', 'pagoAOtros'], ['Recibió de otros', 'recibioDeOtros']];
     var aviso = c.sinDestino ? '<p class="sub" style="margin:6px 0 0">' + esc(c.sinDestino + ' pago(s) sin "A quién" en la planilla: no cuentan hasta que lo pongas.') + '</p>' : '';
     /* 26 Sep (the checker's second round; his rule "everywhere"): each figure opens to its parts, per person, adding up to it
        as printed: what they put in (purchases by account, payments made), the business's money that reached them (sales
        collected, payments received or handed on) and what was paid back to them; the balance to those three */
     var dia = function (f) { return '<b class="dia">' + esc(String(f || '').slice(0, 5)) + '</b>'; };
     var partesDe = function (x) {
-      var dueno_ = x.quien === dueno, puso = [], tiene = [], devuelto = [];
-      (x.comprasPorCuenta || []).forEach(function (k) { puso.push(['<span>Compras</span> · <span>' + esc(k.cuenta || 'sin cuenta') + '</span> <span class="nb">(' + k.n + ')</span>', k.total]); });
-      (x.cobros || []).forEach(function (k) { tiene.push([dia(k.fecha) + ' <span>Venta cobrada</span>' + (k.que ? '<small translate="no">' + esc(k.que) + '</small>' : ''), k.total]); });
+      var compras = [], cobrado = [], pago = [], recibio = [];
+      (x.comprasPorCuenta || []).forEach(function (k) { compras.push(['<span>Compras</span> · <span>' + esc(k.cuenta || 'sin cuenta') + '</span> <span class="nb">(' + k.n + ')</span>', k.total]); });
+      (x.cobros || []).forEach(function (k) { cobrado.push([dia(k.fecha) + ' <span>Venta cobrada</span>' + (k.que ? '<small translate="no">' + esc(k.que) + '</small>' : ''), k.total]); });
       (x.pagos || []).forEach(function (e) {
-        var con = ' <span>' + esc(e.con || '') + '</span>';
-        if (e.clase === 'Inversión') puso.push([dia(e.fecha) + ' <span>Pagó a</span>' + con, e.total]);
-        else if (e.clase === 'Plata del negocio que le llegó') tiene.push([dia(e.fecha) + ' <span>Le pagó</span>' + con, e.total]);
-        else if (e.clase === 'Plata del negocio que entregó') tiene.push([dia(e.fecha) + ' <span>Entregó a</span>' + con, -e.total]);
-        else if (e.clase === 'Plata del negocio en su mano') tiene.push([dia(e.fecha) + ' <span>Recibió de</span>' + con, e.total]);
-        else if (e.clase === 'Reembolso') devuelto.push([dia(e.fecha) + ' <span>Le devolvió</span>' + con, e.total]);
-        else if (e.clase === 'Reembolso y plata del negocio') {
-          devuelto.push([dia(e.fecha) + ' <span>Le devolvió</span>' + con, e.devuelto || 0]);
-          tiene.push([dia(e.fecha) + ' <span>Recibió de</span>' + con, e.total - (e.devuelto || 0)]);
-        }
+        if (e.tipo === 'paga') pago.push([dia(e.fecha) + ' <span>A</span> <span>' + esc(e.con || '') + '</span>', e.total]);
+        else recibio.push([dia(e.fecha) + ' <span>De</span> <span>' + esc(e.con || '') + '</span>', e.total]);
       });
       var hecho = function (lista, total) {   // a part that takes away reads "menos …" with its figure, never a minus sign (S10)
         lista = lista.filter(function (y) { return Math.round(Number(y[1]) || 0) !== 0; });
         var r = cuadrar(lista.map(function (y) { return y[1]; }), total);
         return lista.map(function (y, i) { return r[i] < 0 ? ['<span>menos</span> ' + y[0], gs(-r[i])] : [y[0], gs(r[i])]; });
       };
-      var signo = x.quien !== dueno_ && Math.round(x.saldo || 0) < 0 ? -1 : 1;   // "tiene 90.000 del negocio": its parts add up to what the words say
-      return { puso: hecho(puso, x.puso), tiene: hecho(tiene, x.tiene), devuelto: hecho(devuelto, x.devuelto),
-               saldo: hecho([['<span>Puso de su plata</span>', signo * x.puso], ['<span>Plata del negocio que le llegó</span>', -signo * x.tiene], ['<span>Ya se le devolvió</span>', -signo * x.devuelto]], signo * Math.round(x.saldo || 0)) };
+      var signo = x.quien !== dueno && Math.round(x.saldo || 0) < 0 ? -1 : 1;   // "tiene 195.000 del negocio": its parts add up to what the words say
+      return { compras: hecho(compras, x.compras), cobrado: hecho(cobrado, x.cobrado), pagoAOtros: hecho(pago, x.pagoAOtros), recibioDeOtros: hecho(recibio, x.recibioDeOtros),
+               saldo: hecho([['<span>Pagó compras</span>', signo * (x.compras || 0)], ['<span>Le pagó a otros</span>', signo * (x.pagoAOtros || 0)],
+                             ['<span>Cobró ventas</span>', -signo * (x.cobrado || 0)], ['<span>Recibió de otros</span>', -signo * (x.recibioDeOtros || 0)]], signo * Math.round(x.saldo || 0)) };
     };
     var PARTES = todos.map(partesDe);
     var abreFila = function (clave, texto, n) {
@@ -2605,7 +2744,6 @@ function reglaRegistro_(d, L) {
     $('v-cobrado-wrap').hidden = TIPO !== 'Compró';
     $('v-cuenta-wrap').hidden = TIPO !== 'Compró';
     if (TIPO === 'Compró') bolsilloPorDefecto();
-    $('v-explica').hidden = TIPO !== 'En consignación';
     $('v-queda-wrap').hidden = TIPO !== 'En consignación';
     if (TIPO === 'En consignación' && !$('v-queda').value) $('v-queda').value = quedaDe($('v-nombre').value) || '';
     // for a hand-over the name is the whole point, so the label stops saying "optional"
@@ -2617,6 +2755,9 @@ function reglaRegistro_(d, L) {
     if (TIPO === 'Compró') prellenarCobrado();
   }
   $('v-tipo').querySelectorAll('button').forEach(function (bt) { bt.addEventListener('click', function () { TIPO = bt.dataset.t; pintarTipo(); }); });
+  // 26 Sep (stage 4): "Agregar contacto" opens today's contact form; it replaces the Contact type in the switch
+  (function () { var bc = $('v-tipo').querySelector('[data-t="Contacto"]'); if (bc) bc.hidden = true; })();
+  $('btnContacto').addEventListener('click', function () { TIPO = 'Contacto'; pintarTipo(); var c = $('r-card'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'start' }); });
   pintarTipo();
   $('v-guardar').addEventListener('click', function () {
     var cantidades = {}; (D ? D.productos : []).forEach(function (p, i) { cantidades[p] = $('v-q' + i).value; });
@@ -2800,7 +2941,7 @@ function reglaRegistro_(d, L) {
     } else if (e.fn === 'guardarRegistro') {
       ir('registro'); TIPO = 'Contacto'; pintarTipo();
       pon('r-nombre', x.nombre); pon('r-telefono', x.telefono); pon('r-estado', x.estado); pon('r-producto', x.producto); pon('r-cantidad', x.cantidad);
-      pon('r-cobrado', x.cobrado); pon('r-canal', x.canal); pon('r-nota', x.nota); chatTipeado();
+      pon('r-canal', x.canal); pon('r-nota', x.nota); chatTipeado();   // 26 Sep (change 9): no "Total cobrado" on a contact
     } else if (e.fn === 'guardarCompra') {
       ir('compra'); pon('c-fecha', x.fecha);
       if (x.nuevo) { $('c-que').value = '+nuevo:' + (x.nuevo.grupo || ''); pon('c-nombre', x.nuevo.nombre); } else pon('c-que', x.que);
@@ -2861,8 +3002,8 @@ function reglaRegistro_(d, L) {
       });
   });
   $('r-guardar').addEventListener('click', function () {
-    guardar($('r-guardar'), 'guardarRegistro', { nombre: $('r-nombre').value, telefono: $('r-telefono').value, estado: $('r-estado').value, producto: $('r-producto').value, cantidad: $('r-cantidad').value, cobrado: $('r-cobrado').value, canal: $('r-canal').value, nota: $('r-nota').value },
-      function () { $('r-nombre').value = ''; $('r-telefono').value = ''; $('r-cantidad').value = ''; $('r-cobrado').value = ''; $('r-nota').value = ''; chatTipeado(); });
+    guardar($('r-guardar'), 'guardarRegistro', { nombre: $('r-nombre').value, telefono: $('r-telefono').value, estado: $('r-estado').value, producto: $('r-producto').value, cantidad: $('r-cantidad').value, canal: $('r-canal').value, nota: $('r-nota').value },   // 26 Sep (change 9): a contact carries no amount
+      function () { $('r-nombre').value = ''; $('r-telefono').value = ''; $('r-cantidad').value = ''; $('r-nota').value = ''; chatTipeado(); });
   });
   $('btnLeer').addEventListener('click', function () {
     var b = $('btnLeer'); ocupado(b, true, 'Leyendo…');
