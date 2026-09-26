@@ -104,6 +104,13 @@ var INGLES = {
   'Frascos en manos de revendedores': 'Jars held by resellers', 'Últimos movimientos': 'Latest entries', 'Abrir el chat en WhatsApp': 'Open the chat in WhatsApp',
   'Qué pasó': 'What happened', 'Producto': 'Product', 'vacío = precio de lista': 'empty = list price', 'Guardar el contacto': 'Save the contact',
   'Últimos contactos': 'Latest contacts', 'Todavía no hay contactos.': 'No contacts yet.', 'Todavía no hay ventas ni regalos.': 'No sales or gifts yet.',
+  // 25 Sep (cheviva-next-round stage 1): what waits on the phone, what came back from the sheet, and each entry's kind
+  'entrada esperando para enviarse': 'entry waiting to be sent', 'entradas esperando para enviarse': 'entries waiting to be sent',
+  'Corregir': 'Fix', '¿Borrar esta entrada? No llegó a la planilla.': 'Delete this entry? It never reached the sheet.',
+  'Guardado en el teléfono: se envía cuando haya señal.': 'Saved on the phone: it goes when there is a signal.',
+  'Guardado. Se está enviando a la planilla.': 'Saved. It is being sent to the sheet.', 'Corregilo y guardalo de nuevo.': 'Fix it and save it again.',
+  'Regalo': 'Gift', 'Consignación': 'Consignment', 'Vuelta de consignación': 'Consignment return', 'Pago': 'Payment', 'Conteo': 'Count',
+  'la planilla no lo aceptó': 'the sheet did not accept it', 'Ya estaba en la planilla.': 'It was already in the sheet.',
   'Se queda con quien vendió': 'Stays with whoever sold', 'Volvieron': 'Came back', 'Borrar': 'Delete', 'Anulando…': 'Voiding…', 'Guardando…': 'Saving…',
   'Cambiá los números si no volvieron todos.': 'Change the numbers if not all of them came back.', '¿A quién se los dejaste? Poné el nombre.': 'Who did you leave them with? Enter the name.',
   'el revendedor': 'the reseller', 'Anulado.': 'Voided.', 'No se pudo guardar.': 'Could not save.',
@@ -142,7 +149,7 @@ var INGLES = {
   'Elegí el producto.': 'Choose the product.', '¿Cuántos frascos?': 'How many jars?', 'Elegí el canal de la lista.': 'Choose the channel from the list.',
   'Nadie se paga a sí mismo.': 'Nobody pays themselves.', 'Poné cuánto se pagó.': 'Enter how much was paid.',
   '¿Cuántos hay? Poné el número que contaste, 0 si no queda nada.': 'How many are there? Enter the number you counted, 0 if none is left.',
-  'Lo contado no puede ser negativo.': 'The count cannot be negative.', 'La fecha del conteo no puede ser después de hoy.': 'The count date cannot be after today.',
+  'Lo contado no puede ser negativo.': 'The count cannot be negative.', 'El monto no puede ser negativo.': 'The amount cannot be negative.', 'La fecha del conteo no puede ser después de hoy.': 'The count date cannot be after today.',
   '¿Venta, regalo o consignación?': 'Sale, gift or consignment?', 'Poné cuántos frascos o vasitos.': 'Enter how many jars or cups.',
   'No encontré esa línea (¿ya estaba anulada?).': 'That line was not found (was it already voided?).', 'acción desconocida': 'unknown action',
   'Esto solo existe en la demo.': 'This exists only in the demo.', 'Listo: vuelven los números reales de Cheviva de este momento.': 'Done: Cheviva\'s real numbers of this moment are back.',
@@ -311,6 +318,12 @@ var INGLES_REGLAS = [
   [/^Lote (.+) guardado: (Gs.+) comprados el (.+) \+ gochugaru = (Gs.+) de ingredientes\.( Ojo: no hay compras de ingredientes con esa fecha\.)?$/, function (x, l, a, f, b, o) {
     return 'Batch ' + l + ' saved: ' + a + ' bought on ' + f + ' + gochugaru = ' + b + ' of ingredients.' + (o ? ' Careful: there are no ingredient purchases on that date.' : ''); }],
   [/^No existe el lote (.+)\. Cargalo primero en "Nuevo lote"\.$/, function (x, l) { return 'Batch ' + l + ' does not exist. Enter it first under "New batch".'; }],
+  // 25 Sep (cheviva-next-round stage 1): the save only writes and confirms, and a refusal comes back on the phone
+  [/^No se pudo guardar: (.+)$/, function (x, m) { return 'Could not save: ' + inglesDe_(m); }],
+  [/^Lote (.+) guardado, el (.+)\.$/, function (x, l, f) { return 'Batch ' + l + ' saved, on ' + f + '.'; }],
+  [/^Lote ([^:]+): (\d.*), el (\d\d\/\d\d\/\d{4})\.$/, function (x, l, q, f) { return 'Batch ' + l + ': ' + q.split(' + ').map(inglesDe_).join(' + ') + ', on ' + f + '.'; }],
+  [/^La planilla decía (.+)\.$/, function (x, c) { return 'The sheet said ' + inglesDe_(c) + '.'; }],
+  [/^El lote (.+) ya está en este teléfono, esperando para enviarse\.$/, function (x, l) { return 'Batch ' + l + ' is already on this phone, waiting to be sent.'; }],
   [/^Lote (.+): (\d+) frascos de 350 ml y (\d+) vasitos hasta ahora(\. Costo por frasco de 350 ml: (Gs.+))?\.$/, function (x, l, a, b, y, g) {
     return 'Batch ' + l + ': ' + nPlural_(a, 'jar', 'jars') + ' of 350 ml and ' + nPlural_(b, 'cup', 'cups') + ' so far' + (g ? '. Cost per 350 ml jar: ' + g : '') + '.'; }],
   [/^No existe la pestaña "?([^"]+)"?\.( Corré "Instalar \/ actualizar el sistema" desde el menú Cheviva\.)?$/, function (x, t, c) {
@@ -441,6 +454,200 @@ function leyendasEnIngles_(ig) {
   });
 }
 function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) + '-' + s.length; }
+
+</script>
+<script>
+/**
+ * THE SHEET'S RULES, CHECKED ON THE PHONE FIRST (25 Sep 2026, cheviva-next-round stage 1; the plan's SAVING paragraph:
+ * "Before clearing, the phone checks the same rules the sheet does"). The phone clears a form the moment Save is tapped
+ * and sends the entry afterwards, so a rule the sheet would refuse is checked here first, with the sheet's own words
+ * (the English list already has them). The sheet still checks everything itself (10_web.js), and an entry it refuses
+ * after all comes back on the phone's To review (S22).
+ *
+ * Pure: no Google service, no page. tools/construir-app-web.py puts this file into the phone page, as it does the English
+ * list; in the sheet it only sits beside the code, and the suite (section 52) holds each rule against the sheet's own
+ * save on the same cases, so the two cannot drift apart unseen.
+ *
+ * L, the lists the phone read from the sheet: { productos, vendedores, canales, cuentas, estados, items: [{ nombre,
+ * unidades }], unidades, gruposItems, lotes: [{ lote, fecha }], personas, contables: [{ item }], consigna: [{ quien,
+ * productos }], hoy: 'yyyy-mm-dd', lotesEnCola: ['7'] (batches saved on this phone and still waiting to be sent) }.
+ */
+
+/** numero_ as the sheet reads a number: "1.234,5" is 1234.5. */
+function reglaNumero_(v) {
+  if (typeof v === 'number') return isNaN(v) ? 0 : v;
+  if (v === '' || v === null || v === undefined) return 0;
+  var n = parseFloat(String(v).replace(/\./g, '').replace(',', '.').replace(/[^0-9.\-]/g, ''));
+  return isNaN(n) ? 0 : n;
+}
+/** guaranies_ as the sheet reads money: a dot or a comma before exactly three digits marks thousands. */
+function reglaGuaranies_(v) {
+  if (typeof v === 'number') return isNaN(v) ? 0 : v;
+  return reglaNumero_(String(v === null || v === undefined ? '' : v).replace(/[.,](?=\d{3}(?!\d))/g, ''));
+}
+var REGLA_SIGNOS_MENOS_ = /[-‐-―−➖﹘﹣－]/;
+/** True when montoDeVenta_ would refuse the amount as below zero, however the minus is typed. */
+function reglaMontoNegativo_(v) {
+  if (typeof v === 'number') return v < 0;
+  var s = String(v === null || v === undefined ? '' : v), primer = s.search(/[0-9]/);
+  if (primer > 0 && REGLA_SIGNOS_MENOS_.test(s.slice(0, primer)) && reglaGuaranies_(s.slice(primer)) > 0) return true;
+  return reglaGuaranies_(v) < 0;
+}
+/** claveLote_: "7", "7,0" and 7 are the same batch. */
+function reglaClaveLote_(v) {
+  var s = String(v === null || v === undefined ? '' : v).trim();
+  if (!s) return '';
+  var n = Number(s.replace(',', '.'));
+  return isNaN(n) ? s : String(n);
+}
+/** The name as the list has it, any case; '' when it is not on the list. */
+function reglaEnLista_(lista, v) {
+  var t = String(v === null || v === undefined ? '' : v).trim().toLowerCase();
+  if (!t) return '';
+  for (var i = 0; i < (lista || []).length; i++) if (String(lista[i]).toLowerCase() === t) return lista[i];
+  return '';
+}
+
+/** '' when the sheet would take the entry; otherwise the sheet's own reason, word for word. */
+function reglaDeEntrada_(fn, d, L) {
+  d = d || {}; L = L || {};
+  switch (fn) {
+    case 'guardarVenta':    return reglaVenta_(d, L);
+    case 'guardarCompra':   return reglaCompra_(d, L);
+    case 'guardarLote':     return reglaLote_(d, L);
+    case 'guardarFrascos':  return reglaFrascos_(d, L);
+    case 'guardarPago':     return reglaPago_(d, L);
+    case 'guardarConteo':   return reglaConteo_(d, L);
+    case 'guardarRegistro': return reglaRegistro_(d, L);
+  }
+  return '';
+}
+
+function reglaVenta_(d, L) {
+  var tipo = String(d.tipo || '').trim();
+  if (['Compró', 'Regaló', 'En consignación', 'Volvió'].indexOf(tipo) < 0) return '¿Venta, regalo o consignación?';
+  var esConsigna = tipo === 'En consignación' || tipo === 'Volvió';
+  var lineas = (L.productos || []).filter(function (p) { return reglaNumero_(d.cantidades && d.cantidades[p]) > 0; });
+  if (!lineas.length) return 'Poné cuántos frascos o vasitos.';
+  var canal = String(d.canal || '').trim();
+  if (canal && (L.canales || []).indexOf(canal) < 0) return 'Elegí el canal de la lista.';
+  if (!reglaEnLista_(L.vendedores, d.quien)) {
+    return '¿Quién ' + (tipo === 'Compró' ? 'vendió' : (esConsigna ? 'lo llevó' : 'regaló')) + '? Elegí ' + (L.vendedores || []).join(' o ') + '.';
+  }
+  if (String(d.cuenta || '').trim() && !reglaEnLista_(L.cuentas, d.cuenta)) return 'Elegí la cuenta de la lista.';
+  var nombre = String(d.nombre || '').trim();
+  if (esConsigna && !nombre) return '¿A quién se los dejaste? Poné el nombre.';
+  if (tipo === 'Volvió') {
+    var g = (L.consigna || []).filter(function (x) { return x && !x.ejemplo && x.quien === nombre; })[0];
+    for (var i = 0; i < lineas.length; i++) {
+      var n = reglaNumero_(d.cantidades[lineas[i]]), abiertos = g && g.productos && g.productos[lineas[i]] ? g.productos[lineas[i]] : 0;
+      if (n > abiertos) return nombre + ' tiene ' + abiertos + ' × ' + lineas[i] + ' en consignación, no ' + n + '.';
+    }
+  }
+  if (tipo === 'Compró' && reglaMontoNegativo_(d.cobrado)) return 'El monto no puede ser negativo.';
+  return '';
+}
+
+function reglaCompra_(d, L) {
+  var items = L.items || [], nuevo = d.nuevo && typeof d.nuevo === 'object' ? d.nuevo : null;
+  var buscar = function (v) { var t = String(v || '').trim().replace(/\s+/g, ' ').toLowerCase(); return items.filter(function (i) { return String(i.nombre).toLowerCase() === t; })[0] || null; };
+  var unidad = String(d.unidad || '').trim().toLowerCase(), que, item;
+  if (nuevo) {
+    var escrito = String(nuevo.nombre || '').trim().replace(/\s+/g, ' ');
+    if (!escrito) return 'Falta el nombre de lo que compraste.';
+    item = buscar(escrito);                                                   // a name already on the list is that one
+    que = item ? item.nombre : escrito;
+    if (!item && (L.gruposItems || []).indexOf(String(nuevo.grupo || '')) < 0) return 'Elegí en qué grupo va.';
+  } else {
+    item = buscar(d.que);
+    if (!item) return 'Elegí qué compraste.';
+    que = item.nombre;
+  }
+  if ((L.unidades || []).indexOf(unidad) < 0) return 'Elegí la unidad.';
+  var cantidad = reglaNumero_(d.cantidad), total = reglaGuaranies_(d.total);
+  if (String(d.cuenta || '').trim() && !reglaEnLista_(L.cuentas, d.cuenta)) return 'Elegí la cuenta de la lista.';
+  if (!(cantidad > 0)) return 'La cantidad tiene que ser mayor que cero.';
+  if (!(total > 0)) return 'El total tiene que ser mayor que cero.';
+  if (item && item.unidades && item.unidades.length && item.unidades.indexOf(unidad) < 0) {
+    return '"' + que + '" no se compra en "' + unidad + '". Puede ser: ' + item.unidades.join(', ') + '.';
+  }
+  var av = d.avisar && typeof d.avisar === 'object' ? d.avisar : null;
+  var usoAv = av && (av.uso === 'frasco' || av.uso === 'lote') ? av.uso : '';
+  var textoAv = av ? String(av.cantidad === undefined || av.cantidad === null ? '' : av.cantidad).trim() : '';
+  if (usoAv && !textoAv) return 'Falta la cantidad que usa cada ' + usoAv + ' (o no elijas por frasco ni por lote).';
+  if (textoAv) {
+    if (!usoAv) return 'Elegí si se usa por frasco o por lote.';
+    var m = textoAv.match(/^(\d+(?:[.,]\d+)?)\s*([^\d\s].*)?$/);            // cantidadDeCelda_: a plain number, no unit
+    if (!m || m[2] || !(Number(m[1].replace(',', '.')) > 0)) return 'La cantidad que usa cada ' + usoAv + ' tiene que ser un número mayor que cero.';
+  }
+  return '';
+}
+
+function reglaLote_(d, L) {
+  var lote = reglaClaveLote_(d.lote);
+  if (!lote || isNaN(Number(lote))) return 'Poné el número del lote.';
+  var ya = (L.lotes || []).filter(function (l) { return reglaClaveLote_(l.lote) === lote; })[0];
+  if (ya) return 'El lote ' + lote + ' ya existe (' + ya.fecha + '). Si querés cargar frascos, usá "Frascos llenados".';
+  if ((L.lotesEnCola || []).indexOf(lote) >= 0) return 'El lote ' + lote + ' ya está en este teléfono, esperando para enviarse.';
+  var parte = reglaNumero_(d.parte);
+  if (parte < 0 || parte > 100) return 'La parte del día va de 1 a 100.';
+  return '';
+}
+
+function reglaFrascos_(d, L) {
+  var lote = reglaClaveLote_(d.lote);
+  if (!lote) return 'Elegí el lote.';
+  var conocido = (L.lotes || []).some(function (l) { return reglaClaveLote_(l.lote) === lote; }) || (L.lotesEnCola || []).indexOf(lote) >= 0;
+  if (!conocido) return 'No existe el lote ' + lote + '. Cargalo primero en "Nuevo lote".';
+  if (d.cantidades) {
+    var hay = false, k;
+    for (k in d.cantidades) {
+      if (!Object.prototype.hasOwnProperty.call(d.cantidades, k)) continue;
+      var n = reglaNumero_(d.cantidades[k]);
+      if (n < 0) return 'Los frascos no pueden ser negativos.';
+      if (n > 0) hay = true;
+    }
+    if (!hay) return '¿Cuántos frascos salieron?';
+  }
+  return '';
+}
+
+function reglaPago_(d, L) {
+  var gente = L.personas || [];
+  var quien = reglaEnLista_(gente, d.quien);
+  if (!quien) return '¿Quién pagó? Elegí ' + gente.join(', ') + '.';
+  var a = reglaEnLista_(gente, d.a);
+  if (!a && gente.length === 2) a = gente[0] === quien ? gente[1] : gente[0];
+  if (!a) return '¿A quién le pagó? Elegí ' + gente.filter(function (n) { return n !== quien; }).join(', ') + '.';
+  if (a === quien) return 'Nadie se paga a sí mismo.';
+  if (!(Math.abs(reglaGuaranies_(d.monto)) > 0)) return 'Poné cuánto se pagó.';
+  return '';
+}
+
+function reglaConteo_(d, L) {
+  var contables = (L.contables || []).map(function (x) { return x.item; });
+  var item = reglaEnLista_(contables, d.que);
+  if (!item) return 'Elegí qué contaste: ' + contables.join(', ') + '.';
+  var texto = String(d.contado === undefined || d.contado === null ? '' : d.contado).trim();
+  if (!/\d/.test(texto)) return '¿Cuántos hay? Poné el número que contaste, 0 si no queda nada.';
+  if (reglaNumero_(texto) < 0) return 'Lo contado no puede ser negativo.';
+  var f = String(d.fecha || '').trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(f) && L.hoy && f > L.hoy) return 'La fecha del conteo no puede ser después de hoy.';
+  return '';
+}
+
+function reglaRegistro_(d, L) {
+  if (!String(d.nombre || '').trim()) return 'Poné el nombre.';
+  var estado = String(d.estado || '').trim();
+  if ((L.estados || []).indexOf(estado) < 0) return 'Elegí qué pasó.';
+  var producto = String(d.producto || '').trim();
+  if (producto && producto !== '—' && (L.productos || []).indexOf(producto) < 0) return 'Elegí el producto.';
+  if (reglaMontoNegativo_(d.cobrado)) return 'El monto no puede ser negativo.';
+  if ((estado === 'Compró' || estado === 'Regaló') && !(reglaNumero_(d.cantidad) > 0)) return '¿Cuántos frascos?';
+  var canal = String(d.canal || '').trim();
+  if (canal && (L.canales || []).indexOf(canal) < 0) return 'Elegí el canal de la lista.';
+  return '';
+}
 
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -687,6 +894,11 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
   .idiomas button, .demo-tira .idiomas button { font: 600 12px/1 'Archivo', sans-serif; border: 0; border-radius: 0; background: var(--paper); color: var(--ink); padding: 7px 9px; margin: 0; width: auto; max-width: none; }
   .idiomas button.on, .demo-tira .idiomas button.on { background: var(--seal); color: var(--white); }
   td small.auto { font-style: italic; }
+  /* 25 Sep (cheviva-next-round stage 1, S3, S22): what waits on this phone, and what the sheet refused, on To review */
+  .pendiente .cola-que { display: block; color: var(--muted); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+  .pendiente.rechazada .num { font-size: 16px; }
+  .pendiente .botones-cola { display: flex; gap: 8px; margin-top: 6px; }
+  .pendiente .botones-cola button { min-height: 44px; }
 </style>
 </head>
 <body class="sin-datos">
@@ -978,7 +1190,9 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var D = null;   // what the sheet says
-  var VERSION_PAGINA = '2026-09-25-noche';   // must match what the sheet hands over; see below
+  // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
+  var COLA = 'cheviva-demo-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
+  var VERSION_PAGINA = '2026-09-25-ronda-1';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -994,20 +1208,24 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
   document.documentElement.lang = IDIOMA;
   function enIngles(s) { return IDIOMA === 'en' && TRADUCE ? alIngles_(s) : s; }
   var HECHOS = typeof WeakMap === 'function' ? new WeakMap() : null;   // each piece of text is put into English once (25 Sep)
+  /* 25 Sep (cheviva-next-round stage 1, S4): each piece's own Spanish is kept beside its English, so ES comes back at a tap */
+  var ORIGINAL = typeof WeakMap === 'function' ? new WeakMap() : null;
   function traducirTexto(n) {
     var p = n.parentNode, v = n.nodeValue;
     if (!p || p.nodeName === 'SCRIPT' || p.nodeName === 'STYLE' || !v || !v.trim()) return;
     if (p.closest && p.closest('[translate="no"]')) return;               // a customer's words, a translated caption, a receipt's own words
     if (HECHOS && HECHOS.get(n) === v) return;                           // already English: its numbers are never formatted twice
     var e = alInglesPantalla_(v);
-    if (e !== v) n.nodeValue = e;
+    if (e !== v) { if (ORIGINAL) ORIGINAL.set(n, v); n.nodeValue = e; }
     if (HECHOS) HECHOS.set(n, n.nodeValue);
   }
   function traducirAtributos(el) {
     ['placeholder', 'label'].forEach(function (a) {
       if (!el.hasAttribute || !el.hasAttribute(a)) return;
-      var v = el.getAttribute(a), e = alIngles_(v);
-      if (e !== v) el.setAttribute(a, e);
+      var v = el.getAttribute(a);
+      if (el.getAttribute('data-en-' + a) === v) return;                  // already English
+      var e = alIngles_(v);
+      if (e !== v) { el.setAttribute('data-es-' + a, v); el.setAttribute('data-en-' + a, e); el.setAttribute(a, e); }
     });
   }
   function traducirTodo(raiz) {
@@ -1019,37 +1237,67 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     traducirAtributos(raiz);
     if (raiz.querySelectorAll) raiz.querySelectorAll('[placeholder],optgroup[label]').forEach(traducirAtributos);
   }
-  if (IDIOMA === 'en' && TRADUCE) {
-    traducirTodo(document.body);
-    new MutationObserver(function (cambios) {
-      cambios.forEach(function (m) {
-        if (m.type === 'characterData') traducirTexto(m.target);
-        else if (m.type === 'attributes') traducirAtributos(m.target);
-        else m.addedNodes.forEach(function (x) { traducirTodo(x); });
+  /* Back to Spanish: every piece still showing the English this page gave it gets its own Spanish back */
+  function volverAlEspanol(raiz) {
+    var w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT, null), n;
+    while ((n = w.nextNode())) {
+      if (ORIGINAL && ORIGINAL.has(n) && HECHOS && HECHOS.get(n) === n.nodeValue) n.nodeValue = ORIGINAL.get(n);
+      if (HECHOS) HECHOS['delete'](n);
+      if (ORIGINAL) ORIGINAL['delete'](n);
+    }
+    raiz.querySelectorAll('[data-es-placeholder],[data-es-label]').forEach(function (el) {
+      ['placeholder', 'label'].forEach(function (a) {
+        var o = el.getAttribute('data-es-' + a);
+        if (o === null) return;
+        if (el.getAttribute(a) === el.getAttribute('data-en-' + a)) el.setAttribute(a, o);
+        el.removeAttribute('data-es-' + a); el.removeAttribute('data-en-' + a);
       });
-    }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'label'] });
-    var alertaPropia = window.alert.bind(window), preguntaPropia = window.confirm.bind(window);
-    window.alert = function (m) { return alertaPropia(alInglesPantalla_(String(m))); };
-    window.confirm = function (m) { return preguntaPropia(alInglesPantalla_(String(m))); };
+    });
+  }
+  var OBSERVADOR = null;
+  function observar(si) {
+    if (!TRADUCE || typeof MutationObserver !== 'function') return;
+    if (si && !OBSERVADOR) {
+      OBSERVADOR = new MutationObserver(function (cambios) {
+        cambios.forEach(function (m) {
+          if (m.type === 'characterData') traducirTexto(m.target);
+          else if (m.type === 'attributes') traducirAtributos(m.target);
+          else m.addedNodes.forEach(function (x) { traducirTodo(x); });
+        });
+      });
+      OBSERVADOR.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['placeholder', 'label'] });
+    } else if (!si && OBSERVADOR) { OBSERVADOR.disconnect(); OBSERVADOR = null; }
+  }
+  if (IDIOMA === 'en' && TRADUCE) { traducirTodo(document.body); observar(true); }
+  var alertaPropia = window.alert.bind(window), preguntaPropia = window.confirm.bind(window);
+  window.alert = function (m) { return alertaPropia(IDIOMA === 'en' && TRADUCE ? alInglesPantalla_(String(m)) : m); };
+  window.confirm = function (m) { return preguntaPropia(IDIOMA === 'en' && TRADUCE ? alInglesPantalla_(String(m)) : m); };
+  /* ES | EN at once (25 Sep, cheviva-next-round stage 1, S4; W3C: values locale-neutral, display strings around them): the
+     same screen redrawn in the other language from what the phone keeps. Nothing is read again and every figure stays. */
+  function marcarIdioma() { document.querySelectorAll('.idiomas button[data-l]').forEach(function (b) { b.classList.toggle('on', b.dataset.l === IDIOMA); }); }
+  function cambiarA(l) {
+    if (!TRADUCE || l === IDIOMA || !/^(es|en)$/.test(l)) return;
+    IDIOMA = l; window.CHEVIVA_IDIOMA = l; document.documentElement.lang = l;
+    marcarIdioma();
+    if (l === 'en') { traducirTodo(document.body); observar(true); }
+    else { observar(false); volverAlEspanol(document.body); }
+    if (D) pintar(D, null, true);
+    ajustarKpis();
   }
   function elegirIdioma(l) {
     try { localStorage.setItem(IDIOMA_ELEGIDO, l); } catch (e) {}
-    if (l !== IDIOMA) location.reload();
+    cambiarA(l);
   }
   document.querySelectorAll('.idiomas button[data-l]').forEach(function (b) {
     b.classList.toggle('on', b.dataset.l === IDIOMA);
     b.addEventListener('click', function () { elegirIdioma(b.dataset.l); });
   });
-  /* The demo's "Idioma al abrir", as the sheet says it: kept for the next opening; a phone that never chose follows it now */
+  /* The demo's "Idioma al abrir", as the sheet says it: kept for the next opening; a phone that never chose follows it now,
+     in place (25 Sep: no reload) */
   function idiomaDeLaDemo(demo) {
     if (!TRADUCE || !demo || !demo.es || !/^(es|en)$/.test(demo.idioma || '')) return;
     try { localStorage.setItem(IDIOMA_DE_LA_DEMO, demo.idioma); } catch (e) {}
-    var par = 'idioma>' + demo.idioma, ya = false;
-    try { ya = sessionStorage.getItem('cheviva-demo-idioma-recarga') === par; } catch (e) { ya = true; }
-    if (!guardado(IDIOMA_ELEGIDO) && demo.idioma !== IDIOMA && !ya) {
-      try { sessionStorage.setItem('cheviva-demo-idioma-recarga', par); } catch (e) {}
-      location.reload();
-    }
+    if (!guardado(IDIOMA_ELEGIDO) && demo.idioma !== IDIOMA) cambiarA(demo.idioma);
   }
 
   /* ---------- helpers ---------- */
@@ -1132,14 +1380,15 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
   function leerGuardados() {
     var g = null;
     try { g = JSON.parse(localStorage.getItem(GUARDADOS) || 'null'); } catch (e) { g = null; }
-    // numbers kept in the other language are not drawn (24 Sep): the door wrote some of their words in it
-    if (g && g.datos && g.datos.version === VERSION_PAGINA && Number(g.leido) > 0 && (g.idioma || 'es') === IDIOMA) return g;
+    // 25 Sep (stage 1): the sheet answers in Spanish and the phone words it, so kept numbers are Spanish in both languages;
+    // numbers an older page kept in English are never drawn
+    if (g && g.datos && g.datos.version === VERSION_PAGINA && Number(g.leido) > 0 && (g.idioma || 'es') === 'es') return g;
     try { localStorage.removeItem(GUARDADOS); } catch (e) {}
     return null;
   }
   function guardarLeidos(d) {
     try {
-      if (d && d.version === VERSION_PAGINA) localStorage.setItem(GUARDADOS, JSON.stringify({ leido: LEIDO, datos: d, idioma: IDIOMA }));
+      if (d && d.version === VERSION_PAGINA) localStorage.setItem(GUARDADOS, JSON.stringify({ leido: LEIDO, datos: d, idioma: 'es' }));
       else localStorage.removeItem(GUARDADOS);
     } catch (e) {}   // a phone that keeps nothing (private browsing, a full memory) still works: it waits, as before
   }
@@ -1214,7 +1463,7 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
   window.addEventListener('focus', function () { refrescarSiHaceFalta(20); });
   window.addEventListener('pageshow', function () { refrescarSiHaceFalta(20); });
   setInterval(function () { refrescarSiHaceFalta(55); }, 60000);
-  $('btnActualizar').addEventListener('click', function (ev) { ev.preventDefault(); cargar(); });
+  $('btnActualizar').addEventListener('click', function (ev) { ev.preventDefault(); cargar(); enviarCola(); });
   function waUrl(t) {
     var d = String(t || '').replace(/\D/g, '');
     if (!d) return '';
@@ -1223,12 +1472,13 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
   }
   /* Draws what the sheet said. leidoAntes = the time of numbers kept on the phone, drawn before the sheet answers.
      Returns false when it reloads the page instead of drawing. */
-  function pintar(d, leidoAntes) {
+  function pintar(d, leidoAntes, redibujo) {
     // the page and the sheet must agree; an old page reading new data printed Gs 0 on real figures (20 Sep).
     // ONE reload per pair of versions (21 Sep): the guard used to compare what it stored with the page's own version,
     // so a page still served old after its reload reloaded again every time the sheet answered, and never drew.
     // Kept numbers never get here with another version (leerGuardados), so only the sheet's answer can reload.
-    if (!leidoAntes) {
+    // redibujo (25 Sep, S4): the same numbers drawn again in the other language; their time and state stay as they are
+    if (!leidoAntes && !redibujo) {
       var par = VERSION_PAGINA + '>' + d.version, yaRecargo = false;
       try { yaRecargo = sessionStorage.getItem('cheviva-demo-recarga') === par; } catch (e) { yaRecargo = true; }
       if (d.version && d.version !== VERSION_PAGINA && !yaRecargo) {
@@ -1238,13 +1488,14 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     }
     var antes = D;   // what is on screen now: nothing typed or picked since may be undone by drawing again
     D = d;
-    if (leidoAntes) { LEIDO = leidoAntes; DE_LA_MEMORIA = true; }
+    if (redibujo) {}
+    else if (leidoAntes) { LEIDO = leidoAntes; DE_LA_MEMORIA = true; }
     else { LEIDO = ultimaLectura = Date.now(); DE_LA_MEMORIA = false; FALLO = ''; }
     document.body.classList.remove('sin-datos');
     decirLeido();
     pintarDemo(d.demo);
     // numbers kept from yesterday must not put yesterday into a form: then today comes from the phone
-    var hoy = leidoAntes ? diaDe(Date.now()) : d.hoy;
+    var hoy = leidoAntes || (redibujo && DE_LA_MEMORIA) ? diaDe(Date.now()) : d.hoy;
     $('hoy').textContent = hoy.split('-').reverse().join('/');
     // a date the page filled in follows the day; a date he changed stays
     ['c-fecha', 'l-fecha', 'f-fecha', 'v-fecha', 'cta-fecha', 'k-fecha'].forEach(function (id) {
@@ -1329,20 +1580,8 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     (av.consignas || []).forEach(function (x) { items.push([1, x.texto, { ir: 'registro', consigna: true }, x.ejemplo]); });   // the Venta screen
     // 25 Sep (cheviva-demo stage 5, S13): the watchman's lines about the reader and the demo, in the live app only
     (av.vigilancia || []).forEach(function (x) { items.push([1, x.texto, x.ir ? { ir: x.ir } : (x.planilla ? { url: d.urls.planilla } : {})]); });
-    $('pendientes').innerHTML = items.length ? items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>'; }).join('')
-                                            : '<p class="sub" style="margin:0">Nada pendiente.</p>';
-    $('pendientes').querySelectorAll('.pendiente[data-i]').forEach(function (el) {
-      el.addEventListener('click', function () {
-        var a = items[Number(el.dataset.i)][2] || {};
-        if (a.ir) {
-          ir(a.ir);
-          if (a.lote && $('f-lote')) $('f-lote').value = a.lote;
-          if (a.que && $('c-que')) { $('c-que').value = a.que; unidadesDe(true); }
-          if (a.consigna && $('consigna-card') && !$('consigna-card').hidden) $('consigna-card').scrollIntoView({ block: 'start' });
-        }
-        else if (a.url) window.open(a.url, '_blank');
-      });
-    });
+    ITEMS_HOJA = items;
+    pintarPendientes();
     $('btnLeer').hidden = !p.problemas;
     // 16 Sep, his ask: the filling date and the ingredients are columns, not text under the batch number
     $('lotesTabla').innerHTML = '<tr><th>Lote</th><th>Envasado</th><th class="n">Ingred.</th><th class="n">Frascos</th></tr>' +
@@ -1480,8 +1719,46 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     $('cargando').hidden = true; $('inicio').hidden = false;
     // in English: every word drawn above at once, before the tiles are fitted to their width (24 Sep)
     if (IDIOMA === 'en') { traducirTodo(document.body); ajustarKpis(); }
-    if (!leidoAntes) idiomaDeLaDemo(d.demo);
+    if (!leidoAntes && !redibujo) idiomaDeLaDemo(d.demo);
     return true;
+  }
+  /* To review: first what waits on this phone or came back from the sheet (25 Sep, stage 1: S3, S22), then the sheet's own
+     lines. Drawn again whenever the queue moves, without waiting for a read. */
+  var ITEMS_HOJA = [];
+  function pintarPendientes() {
+    var items = ITEMS_HOJA, cola = leerCola(), esperan = cola.filter(function (e) { return e.estado !== 'rechazada'; }),
+        rechazadas = cola.filter(function (e) { return e.estado === 'rechazada'; });
+    var html = rechazadas.map(function (e) {
+      return '<div class="pendiente rechazada"><span class="num">!</span><span><span>' + esc('No se pudo guardar: ' + (e.motivo || 'la planilla no lo aceptó')) + '</span>' +
+             '<small class="cola-que">' + esc(e.resumen || '') + '</small><span class="botones-cola"><button type="button" class="wa" data-corregir="' + esc(e.codigo) + '">Corregir</button>' +
+             '<button type="button" class="wa" data-borrar="' + esc(e.codigo) + '">Borrar</button></span></span></div>';
+    }).join('');
+    if (esperan.length) html += '<div class="pendiente cola" data-cola="enviar"><span class="num">' + esperan.length + '</span><span><span>' +
+      esc(esperan.length === 1 ? 'entrada esperando para enviarse' : 'entradas esperando para enviarse') + '</span>' +
+      esperan.map(function (e) { return '<small class="cola-que">' + esc(e.resumen || '') + '</small>'; }).join('') + '</span></div>';
+    html += items.map(function (x, i) { return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>'; }).join('');
+    $('pendientes').innerHTML = html || '<p class="sub" style="margin:0">Nada pendiente.</p>';
+    $('pendientes').querySelectorAll('.pendiente[data-i]').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var a = items[Number(el.dataset.i)][2] || {};
+        if (a.ir) {
+          ir(a.ir);
+          if (a.lote && $('f-lote')) $('f-lote').value = a.lote;
+          if (a.que && $('c-que')) { $('c-que').value = a.que; unidadesDe(true); }
+          if (a.consigna && $('consigna-card') && !$('consigna-card').hidden) $('consigna-card').scrollIntoView({ block: 'start' });
+        }
+        else if (a.url) window.open(a.url, '_blank');
+      });
+    });
+    $('pendientes').querySelectorAll('[data-cola="enviar"]').forEach(function (el) { el.addEventListener('click', function () { enviarCola(); }); });
+    $('pendientes').querySelectorAll('button[data-corregir]').forEach(function (b) { b.addEventListener('click', function () { corregir(b.getAttribute('data-corregir')); }); });
+    $('pendientes').querySelectorAll('button[data-borrar]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        if (!confirm('¿Borrar esta entrada? No llegó a la planilla.')) return;
+        quitarDeCola(b.getAttribute('data-borrar')); pintarPendientes();
+      });
+    });
+    if (IDIOMA === 'en') traducirTodo($('pendientes'));
   }
   // 16 Sep: "sigue en el negocio Gs 1.435.868" ran out of its tile. Every amount is one unbreakable piece now, so a
   // tile's big number shrinks until it fits (never below 13 px), and the small line under it wraps.
@@ -1766,16 +2043,144 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
     }
   }
   cargar();
+  setTimeout(function () { pintarPendientes(); enviarCola(); }, 0);   // what waited on this phone goes the moment it opens (S3)
 
-  /* ---------- the four entries ---------- */
-  function guardar(boton, fn, datos, despues) {
-    var texto = boton.textContent; ocupado(boton, true, 'Guardando…');
-    google.script.run.withSuccessHandler(function (r) {
-      ocupado(boton, false, texto);
-      if (!r || !r.ok) { toast(r && r.mensaje ? r.mensaje : 'No se pudo guardar.', true); return; }
-      toast(r.mensaje); if (despues) despues(r); cargar();
-    }).withFailureHandler(function (e) { ocupado(boton, false, texto); toast(e && e.message ? e.message : String(e), true); })[fn](datos);
+  /* ---------- the entries: saved without waiting (25 Sep 2026, cheviva-next-round stage 1: S1, S2, S3, S22) ----------
+     The book: Stripe's idempotent requests (each request carries its own key and a repeat is recognized); and since iPhone
+     Safari has no Background Sync (caniuse), an entry that did not get out goes the next time the app opens, never while it
+     is closed. Save checks the sheet's own rules first (19_reglas.js), keeps the entry on this phone with its own code and
+     clears the form at once; the phone sends it now, again on opening, when the signal comes back and every minute, until
+     the sheet confirms. The sheet answers a repeat as already saved, so nothing is ever written twice. What the sheet
+     refuses comes back on this phone's To review with Corregir and Borrar. A refused password never deletes what waits:
+     it goes after the next sign-in. The numbers come with the app's next read, as always. */
+  var LETRA = { guardarVenta: 'V', guardarRegistro: 'V', guardarCompra: 'C', guardarLote: 'L', guardarFrascos: 'E', guardarConteo: 'K', guardarPago: 'P' };
+  function nuevoCodigo(fn) {   // "V-7F3K9Q2M": a digit and a letter in turn, so no run of digits looks like a phone number
+    var cifras = '23456789', letras = 'ABCDEFGHJKMNPQRSTVWXYZ', r = [], s = '', i;
+    try { var b = new Uint8Array(8); window.crypto.getRandomValues(b); for (i = 0; i < 8; i++) r.push(b[i]); }
+    catch (e) { for (i = 0; i < 8; i++) r.push(Math.floor(Math.random() * 256)); }
+    for (i = 0; i < 8; i++) s += i % 2 ? letras.charAt(r[i] % letras.length) : cifras.charAt(r[i] % cifras.length);
+    return (LETRA[fn] || 'X') + '-' + s;
   }
+  function leerCola() {
+    if (COLA_EN_MEMORIA) return COLA_EN_MEMORIA.slice();
+    try { var c = JSON.parse(localStorage.getItem(COLA) || '[]'); return Array.isArray(c) ? c : []; } catch (e) { return []; }
+  }
+  function escribirCola(c) {
+    if (COLA_EN_MEMORIA) { COLA_EN_MEMORIA = c.slice(); return; }
+    try { localStorage.setItem(COLA, JSON.stringify(c)); }
+    catch (e) { COLA_EN_MEMORIA = c.slice(); }   // a phone that keeps nothing (private browsing, a full memory): it waits while the app is open
+  }
+  function cambiarEnCola(codigo, cambio) { escribirCola(leerCola().map(function (e) { if (e.codigo === codigo) cambio(e); return e; })); }
+  function quitarDeCola(codigo) { escribirCola(leerCola().filter(function (e) { return e.codigo !== codigo; })); }
+  function listasDelTelefono() {
+    if (!D) return null;
+    var enCola = leerCola().filter(function (e) { return e.fn === 'guardarLote' && e.estado !== 'rechazada'; })
+      .map(function (e) { return typeof reglaClaveLote_ === 'function' ? reglaClaveLote_(e.datos.lote) : String(e.datos.lote); });
+    return { productos: D.productos, vendedores: D.vendedores, canales: D.canales, cuentas: D.cuentas, estados: D.estados, items: D.items,
+             unidades: D.unidades, gruposItems: D.gruposItems, lotes: D.lotes, personas: D.personas, contables: D.contables,
+             consigna: (D.consigna || {}).gente || [], hoy: diaDe(Date.now()), lotesEnCola: enCola };
+  }
+  var QUE_ES = { guardarVenta: { 'Compró': 'Venta', 'Regaló': 'Regalo', 'En consignación': 'Consignación', 'Volvió': 'Vuelta de consignación' },
+                 guardarRegistro: 'Contacto', guardarCompra: 'Compra', guardarLote: 'Lote', guardarFrascos: 'Frascos llenados', guardarConteo: 'Conteo', guardarPago: 'Pago' };
+  function resumenDe(fn, x) {   // one line per entry, each piece on its own, so the English screen words each piece
+    var que = fn === 'guardarVenta' ? (QUE_ES.guardarVenta[x.tipo] || 'Venta') : QUE_ES[fn] || '', partes = [que];
+    var hora = new Date(), cuando = dos(hora.getHours()) + ':' + dos(hora.getMinutes());
+    if (fn === 'guardarVenta') {
+      Object.keys(x.cantidades || {}).forEach(function (p) { var n = Number(String(x.cantidades[p]).replace(',', '.')) || 0; if (n > 0) partes.push(n + ' × ' + p); });
+      if (x.cobrado) partes.push(gs(typeof reglaGuaranies_ === 'function' ? reglaGuaranies_(x.cobrado) : x.cobrado));
+    } else if (fn === 'guardarRegistro') partes.push(x.nombre || '');
+    else if (fn === 'guardarCompra') { partes.push((x.nuevo ? x.nuevo.nombre : x.que) || ''); if (x.total) partes.push(gs(typeof reglaGuaranies_ === 'function' ? reglaGuaranies_(x.total) : x.total)); }
+    else if (fn === 'guardarLote' || fn === 'guardarFrascos') partes.push(String(x.lote || ''));
+    else if (fn === 'guardarConteo') { partes.push(x.que || ''); partes.push(String(x.contado || '')); }
+    else if (fn === 'guardarPago') { partes.push((x.quien || '') + ' → ' + (x.a || '')); if (x.monto) partes.push(gs(typeof reglaGuaranies_ === 'function' ? reglaGuaranies_(x.monto) : x.monto)); }
+    partes.push(cuando);
+    return partes.filter(function (t) { return String(t).trim(); }).join(' · ');
+  }
+  function guardar(boton, fn, datos, despues) {
+    var L = listasDelTelefono();
+    var motivo = L && typeof reglaDeEntrada_ === 'function' ? reglaDeEntrada_(fn, datos, L) : '';
+    if (motivo) { toast(motivo, true); return; }                      // refused here, before anything is kept: the form stays to fix
+    var e = { codigo: nuevoCodigo(fn), fn: fn, datos: datos, creado: Date.now(), resumen: resumenDe(fn, datos), estado: 'esperando', intentos: 0 };
+    e.datos.codigo = e.codigo;
+    var c = leerCola(); c.push(e); escribirCola(c);
+    if (despues) despues({ ok: true, local: true, datos: datos });    // the form is free again at once
+    toast(navigator.onLine === false ? 'Guardado en el teléfono: se envía cuando haya señal.' : 'Guardado. Se está enviando a la planilla.');
+    pintarPendientes();
+    enviarCola();
+  }
+  function clave() { try { return localStorage.getItem('cheviva-demo-codigo') || ''; } catch (e) { return ''; } }
+  /* One entry at a time, oldest first (a batch before its jars). An answer that never comes frees the queue after 100 s:
+     sending again is safe, the sheet answers a repeat as already saved. */
+  function enviarCola() {
+    if (ENVIANDO) return;
+    var e = leerCola().filter(function (x) { return x.estado !== 'rechazada'; })[0];
+    if (!e || !clave()) return;                                      // nothing waits, or signed out: it goes after the next sign-in
+    ENVIANDO = true;
+    var listo = false, reloj = setTimeout(function () { if (!listo) { listo = true; ENVIANDO = false; } }, 100000);
+    var fin = function () { listo = true; ENVIANDO = false; clearTimeout(reloj); };
+    cambiarEnCola(e.codigo, function (x) { x.intentos = (x.intentos || 0) + 1; x.ultimoIntento = Date.now(); });
+    google.script.run.withSuccessHandler(function (r) {
+      if (listo) return; fin();
+      if (r && r.ok) { quitarDeCola(e.codigo); CONFIRMADAS++; if (r.mensaje && !r.yaEstaba) toast(r.mensaje); }
+      else if (!(r && r.ocupado)) {                                   // the sheet's own reason; a busy sheet is only tried again
+        cambiarEnCola(e.codigo, function (x) { x.estado = 'rechazada'; x.motivo = (r && r.mensaje) || 'la planilla no lo aceptó'; });
+      }
+      despuesDeEnviar();
+    }).withFailureHandler(function (err) {
+      if (listo) return; fin();
+      var m = err && err.message ? String(err.message) : String(err || '');
+      // no signal or a cut answer: it goes again; the door's own error three times: it comes back to be looked at
+      if (!/^No hay conexión con la planilla/.test(m)) {
+        cambiarEnCola(e.codigo, function (x) { x.fallos = (x.fallos || 0) + 1; if (x.fallos >= 3) { x.estado = 'rechazada'; x.motivo = m; } });
+      }
+      pintarPendientes();
+    })[e.fn](e.datos);
+  }
+  function despuesDeEnviar() {
+    pintarPendientes();
+    if (leerCola().some(function (x) { return x.estado !== 'rechazada'; })) { enviarCola(); return; }
+    if (CONFIRMADAS) { CONFIRMADAS = 0; cargar(); }                   // the numbers come with the app's next read
+  }
+  /* Corregir: the entry goes back into its own form, as it was typed, and leaves the queue; saving it again makes it new */
+  function corregir(codigo) {
+    var e = leerCola().filter(function (x) { return x.codigo === codigo; })[0];
+    if (!e) return;
+    quitarDeCola(codigo); pintarPendientes();
+    var x = e.datos || {}, pon = function (id, v) { if ($(id)) $(id).value = v === undefined || v === null ? '' : String(v); };
+    if (e.fn === 'guardarVenta') {
+      ir('registro'); TIPO = x.tipo || 'Compró'; pintarTipo();
+      if (x.quien) { QUIEN = x.quien; $('v-quien').querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.t === QUIEN); }); }
+      pon('v-fecha', x.fecha); (D ? D.productos : []).forEach(function (p, i) { pon('v-q' + i, (x.cantidades || {})[p]); });
+      pon('v-cobrado', x.cobrado); cobradoTocado = !!String(x.cobrado || ''); pon('v-cuenta', x.cuenta); pon('v-donde', x.donde); pon('v-canal', x.canal);
+      pon('v-nombre', x.nombre); pon('v-telefono', x.telefono); pon('v-nota', x.nota); pon('v-queda', x.queda);
+    } else if (e.fn === 'guardarRegistro') {
+      ir('registro'); TIPO = 'Contacto'; pintarTipo();
+      pon('r-nombre', x.nombre); pon('r-telefono', x.telefono); pon('r-estado', x.estado); pon('r-producto', x.producto); pon('r-cantidad', x.cantidad);
+      pon('r-cobrado', x.cobrado); pon('r-canal', x.canal); pon('r-nota', x.nota); chatTipeado();
+    } else if (e.fn === 'guardarCompra') {
+      ir('compra'); pon('c-fecha', x.fecha);
+      if (x.nuevo) { $('c-que').value = '+nuevo:' + (x.nuevo.grupo || ''); pon('c-nombre', x.nuevo.nombre); } else pon('c-que', x.que);
+      unidadesDe(); pon('c-unidad', x.unidad); pon('c-cantidad', x.cantidad); pon('c-total', x.total); pon('c-cuenta', x.cuenta); pon('c-nota', x.nota);
+      USO_AVISAR = x.avisar && x.avisar.uso ? x.avisar.uso : '';
+      $('c-uso').querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.t === USO_AVISAR); });
+      pon('c-avisar-cantidad', x.avisar ? x.avisar.cantidad : ''); pintarAvisar();
+    } else if (e.fn === 'guardarLote') {
+      ir('lote'); pon('l-lote', x.lote); puesto['l-lote'] = ''; pon('l-fecha', x.fecha); pon('l-g0', x.gochugaru); pon('l-parte', x.parte); pon('l-nota', x.nota);
+    } else if (e.fn === 'guardarFrascos') {
+      ir('lote'); var q = x.cantidades || {};
+      pon('f-lote', x.lote); pon('f-fecha', x.fecha); pon('f-picante', q['Kimchi Picante']); pon('f-blanco', q['Kimchi Blanco']); pon('f-vasitos', q['Vasito 100 ml']); pon('f-nota', x.nota);
+    } else if (e.fn === 'guardarPago') {
+      ir('cuentas'); pon('cta-quien', x.quien); pintarDestino(D); pon('cta-a', x.a); quienTocado = true; pon('cta-monto', x.monto); montoTocado = true;
+      pon('cta-fecha', x.fecha); pon('cta-nota', x.nota); pintarQueEs(D);
+    } else if (e.fn === 'guardarConteo') {
+      ir('lote'); pon('k-que', x.que); decirConteo(); pon('k-cantidad', x.contado); pon('k-fecha', x.fecha); pon('k-nota', x.nota);
+    }
+    toast('Corregilo y guardalo de nuevo.');
+  }
+  // what waits goes now, again on opening, when the signal comes back, when the app comes to the front, and every minute
+  window.addEventListener('online', function () { enviarCola(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) enviarCola(); });
+  setInterval(enviarCola, 60000);
   $('c-guardar').addEventListener('click', function () {
     recordarCuenta($('c-cuenta').value);
     var nueva = compraNueva();
@@ -1798,7 +2203,14 @@ function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = 
   // what the count did stays on the card, in words, until he picks something else: a toast is gone in a few seconds
   $('k-guardar').addEventListener('click', function () {
     guardar($('k-guardar'), 'guardarConteo', { que: $('k-que').value, contado: $('k-cantidad').value, fecha: $('k-fecha').value, nota: $('k-nota').value },
-      function (r) { $('k-cantidad').value = ''; $('k-nota').value = ''; $('k-hecho').textContent = r.mensaje || ''; $('k-hecho').hidden = !r.mensaje; });
+      function (r) {
+        var x = ((D && D.contables) || []).filter(function (c) { return c.item === r.datos.que; })[0];
+        var u = x && x.unidad && x.unidad !== 'unidad' ? ' ' + x.unidad : '', n = typeof reglaNumero_ === 'function' ? reglaNumero_(r.datos.contado) : Number(r.datos.contado) || 0;
+        // one piece per sentence (25 Sep): the English screen words each on its own
+        $('k-hecho').innerHTML = '<span>' + esc('Anotado: ' + r.datos.que + ', ' + cant(n) + u + '.') + '</span>' +
+          (x ? ' <span>' + esc('La planilla decía ' + cant(x.stock) + u + '.') + '</span>' : '');
+        $('k-hecho').hidden = false; $('k-cantidad').value = ''; $('k-nota').value = '';
+      });
   });
   $('r-guardar').addEventListener('click', function () {
     guardar($('r-guardar'), 'guardarRegistro', { nombre: $('r-nombre').value, telefono: $('r-telefono').value, estado: $('r-estado').value, producto: $('r-producto').value, cantidad: $('r-cantidad').value, cobrado: $('r-cobrado').value, canal: $('r-canal').value, nota: $('r-nota').value },
