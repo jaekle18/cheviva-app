@@ -972,7 +972,11 @@ function reglaRegistro_(d, L) {
   /* 26 Sep (stage 4): a customer's line */
   .cliente { display: block; padding: 10px 0; border-bottom: 1px solid var(--linea, #e6dfd3); }
   .cliente .quien { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-  .cliente .quien small { white-space: nowrap; }
+  .cliente .quien small { white-space: nowrap; flex: 0 0 auto; }
+  /* 27 Sep (stage 6, S9: a real 19-letter Instagram handle pushed the line's time 13 px off a 320 px screen): a long name breaks
+     inside its own box, wherever a customer's name is printed, and never widens the screen */
+  .cliente .quien b, #tiemposTabla td:first-child, #ofertasLista td:first-child, #pendientes .pendiente, #clientesAnteriores .cliente { min-width: 0; overflow-wrap: anywhere; }
+  #semanasAntes tr.caja-antes > td:first-child { padding-left: 12px; }
   .cliente .que { margin: 4px 0; overflow-wrap: anywhere; }
   .cliente .estado { display: block; }
   .canal { font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 5px; border-radius: 4px; border: 1px solid currentColor; margin-right: 4px; }
@@ -1431,7 +1435,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-26-ronda-6';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-27-ronda-7';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1858,8 +1862,11 @@ function reglaRegistro_(d, L) {
     var activo = [['<span>Kimchi en frascos</span>', kimchi[0][1]], ['<span>Kimchi en lotes sin envasar</span>', kimchi[1][1]]].concat(vacios.map(function (x) { return ['<span>Frascos vacíos</span> · ' + x[0], x[1]]; }))
       .concat(gochu).concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', bi ? bi.sinLote : dn.sinLote]] : [])
       .concat([['<span>Equipo</span>', bi ? bi.equipo : (dn.equipoNetoImpreso !== undefined ? dn.equipoNetoImpreso : dn.equipoNeto)]]).concat(enManos);
-    var saldoPartes = function (x, signo) {   // a saldo is what was put in, less what reached them and what was paid back
-      return [['<span>Puso de su plata</span>', signo * x.puso], ['<span>Plata del negocio que le llegó</span>', -signo * x.tiene], ['<span>Ya se le devolvió</span>', -signo * x.devuelto]];
+    /* 27 Sep (stage 6, change 2): a saldo opens to the four rows of Cuentas above it, the same words and figures (it used to open to
+       the old "Puso / Plata del negocio que le llegó / Ya se le devolvió", which meant a different sum for each person) */
+    var saldoPartes = function (x, signo) {
+      return [['<span>Pagó compras</span>', signo * (x.compras || 0)], ['<span>Cobró ventas</span>', -signo * (x.cobrado || 0)],
+              ['<span>Le pagó a otros</span>', signo * (x.pagoAOtros || 0)], ['<span>Recibió de otros</span>', -signo * (x.recibioDeOtros || 0)]];
     };
     var delDueno = gentes.filter(function (x) { return x.quien === duenoC; })[0];
     $('balanceTabla').innerHTML =
@@ -2172,10 +2179,10 @@ function reglaRegistro_(d, L) {
     $('semanasAntes').innerHTML = sem.slice(1).map(function (x) {
       var wm = x.mostrado || x;
       if (semanaVacia(x)) return '<tr class="semana-vacia"><td colspan="2"><span>' + esc(rango(x.clave, x.texto)) + '</span> · <span class="placeholder">Nada comprado ni vendido.</span></td></tr>';
-      // 26 Sep (change 7, his "then let's show both"): each earlier week shows its result and its cash, as this week does
-      var cajaW = Math.round(Number(x.cobrado) || 0) - Math.round(Number(x.compras) || 0);
-      return linea('s-' + x.clave, '<span>' + esc(rango(x.clave, x.texto)) + '</span>',
-        '<span class="nb"><small>' + esc('resultado') + '</small> ' + gs(wm.resultado) + '</span><br><span class="nb"><small>' + esc('caja') + '</small> ' + gs(cajaW) + '</span>', semanaPartes(x));
+      /* 26 Sep (change 7, his "then let's show both"): each earlier week shows its result and its cash, as this week does.
+         27 Sep (stage 6, S7): each is its own line with its own parts — the result opens to its four parts, the cash to Entró and Salió */
+      return linea('s-' + x.clave, '<span>' + esc(rango(x.clave, x.texto)) + '</span> <small>' + esc('resultado') + '</small>', gs(wm.resultado), semanaPartes(x)) +
+        cajaLinea('s-' + x.clave + '-caja', 'caja', x.cobrado || 0, x.compras || 0, 'caja-antes');
     }).join('');
   }
   var NADA_EN_LA_SEMANA = '<tr><td colspan="2" class="placeholder">Nada comprado ni vendido.</td></tr>';
@@ -2219,12 +2226,12 @@ function reglaRegistro_(d, L) {
     return linea(clave + '-ventas', '<span>Ventas</span> · <span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span>', gs(wm.ventas), partesV) +
       linea(clave + '-cmv', '<span>Costo de ventas</span>', gs(-wm.cmv), partesC) +
       linea(clave + '-gastos', '<span>Gastos</span>', gs(-gastos), [['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]]) +
-      linea(clave + '-resultado', '<span>Resultado de la semana</span>', gs(wm.resultado),
-            [['<span>Ventas</span>', gs(wm.ventas)], ['<span>Costo de ventas</span>', gs(-wm.cmv)], ['<span>Gastos</span>', gs(-gastos)]], 'total');
+      // 27 Sep (stage 6, S7 as amended): its parts are the three lines right above it, so it opens nothing
+      linea(clave + '-resultado', '<span>Resultado de la semana</span>', gs(wm.resultado), null, 'total');
   }
-  function cajaLinea(clave, titulo, entro, salio) {
+  function cajaLinea(clave, titulo, entro, salio, cls) {
     return linea(clave, '<span>' + esc(titulo) + '</span>', gs(Math.round(entro) - Math.round(salio)),
-      [['<span>Entró: ventas cobradas</span>', gs(entro)], ['<span>Salió: todas las compras</span>', gs(-salio)]]);
+      [['<span>Entró: ventas cobradas</span>', gs(entro)], ['<span>Salió: todas las compras</span>', gs(-salio)]], cls);
   }
   // "21–27 sep", or "29 sep – 5 oct" (the 19 shorter labels); the sheet's own words when the week has no key
   function rango(clave, texto) {
