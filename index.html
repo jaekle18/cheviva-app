@@ -40,7 +40,7 @@ var INGLES = {
   'Empezar de nuevo': 'Start over', 'Copiando…': 'Copying…', 'EJEMPLO': 'EXAMPLE',
   // Cuentas
   'Quién le debe a quién': 'Who owes whom', 'Quién paga': 'Who pays', 'A quién': 'To whom', 'Qué es': 'What it is',
-  'Monto, Gs': 'Amount, Gs', 'Fecha': 'Date', 'Nota (opcional)': 'Note (optional)', 'por ejemplo: efectivo de la feria': 'for example: cash from the market',
+  'Monto, Gs': 'Amount, Gs', 'Fecha': 'Date', 'Nota (opcional)': 'Note (optional)',
   'Anotar el pago': 'Record the payment', 'Anotar un pago entre nosotros': 'Record a payment between us', 'Compras por cuenta': 'Purchases by account',
   'Sin cuenta todavía': 'No account yet', 'Todavía no hay compras.': 'No purchases yet.', 'Todavía no hay nadie en las cuentas.': 'Nobody in the accounts yet.',
   'Puso de su plata': 'Put in', 'Saldo': 'Balance', 'Puso': 'Put in', 'Tiene': 'Holds', 'Quién': 'Who',
@@ -66,7 +66,7 @@ var INGLES = {
   'Leer recibos pendientes': 'Read pending receipts', 'Márgenes': 'Margins', 'Movimientos': 'Movements', 'Anotar un pago': 'Record a payment',
   'Adónde fue la plata': 'Where the money went',
   'Enlaces': 'Links', 'Anotar una compra': 'Record a purchase',
-  'ej.: efectivo de la feria': 'e.g. cash from the market', 'vacío = partes iguales': 'empty = equal shares', 'vacío = sin acuerdo': 'empty = not agreed',
+  'vacío = partes iguales': 'empty = equal shares', 'vacío = sin acuerdo': 'empty = not agreed',
   'Aceptar': 'Accept', 'Más tarde': 'Later', 'En stock': 'In stock', 'Margen/frasco': 'Margin/jar', 'Costo/frasco': 'Cost/jar', 'Clientes': 'Customers',
   'Inversión neta': 'Net investment', 'esperando respuesta': 'waiting for a reply', 'a precio de lista': 'at list price', 'Precio de lista': 'List price',
   'Costo de ventas': 'Cost of goods sold', 'Margen bruto': 'Gross margin', 'Gastos de venta': 'Selling costs', 'Gastos de administración': 'Administrative costs',
@@ -87,7 +87,7 @@ var INGLES = {
   'Plata que salió': 'Money out', 'Frascos en stock': 'Jars in stock', 'picante': 'spicy', 'blanco': 'white', 'Costo por frasco': 'Cost per jar',
   'promedio de los lotes': 'average of the batches', 'Margen por frasco': 'Margin per jar', 'Costo de lo vendido': 'Cost of what was sold',
   'Muestras regaladas': 'Free samples', 'Gastos': 'Expenses', 'Equipo, uso del mes': 'Equipment, this month\'s share', 'Resultado': 'Result',
-  'Caja del mes': 'Cash this month', 'Caja de la semana': 'Cash this week', 'Entró: ventas cobradas': 'In: sales collected', 'Salió: todas las compras': 'Out: all purchases',
+  'Caja del mes': 'Cash this month', 'Caja de la semana': 'Cash this week', 'Entró': 'In', 'Salió': 'Out',
   'Diferencia de caja': 'Cash difference',
   'Regalos': 'Gifts', 'Gastos (viajes, feria, Canva…)': 'Expenses (trips, market, Canva…)', 'Resultado de la semana': 'Net income for the week',
   'Nada pendiente.': 'Nothing pending.',
@@ -1243,7 +1243,7 @@ function reglaRegistro_(d, L) {
           <div><label>Monto, Gs</label><input id="cta-monto" inputmode="numeric" placeholder="0"></div>
           <div><label>Fecha</label><input type="date" id="cta-fecha"></div>
         </div>
-        <label>Nota (opcional)</label><input id="cta-nota" placeholder="ej.: efectivo de la feria">
+        <label>Nota (opcional)</label><input id="cta-nota">
         <button class="btn primario" id="cta-guardar">Anotar el pago</button>
         <h3 class="sub3">Compras por cuenta</h3>
         <table id="cuentasTabla" class="lineas"></table>
@@ -1469,7 +1469,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-27-harina-1';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-27-harina-3';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -2302,7 +2302,7 @@ function reglaRegistro_(d, L) {
   }
   function cajaLinea(clave, titulo, entro, salio, cls) {
     return linea(clave, '<span>' + esc(titulo) + '</span>', gs(Math.round(entro) - Math.round(salio)),
-      [['<span>Entró: ventas cobradas</span>', gs(entro)], ['<span>Salió: todas las compras</span>', gs(-salio)]], cls);
+      [['<span>Entró</span>', gs(entro)], ['<span>Salió</span>', gs(-salio)]], cls);
   }
   // "21–27 sep", or "29 sep – 5 oct" (the 19 shorter labels); the sheet's own words when the week has no key
   function rango(clave, texto) {
@@ -2460,7 +2460,7 @@ function reglaRegistro_(d, L) {
   window.addEventListener('resize', ajustarKpis);
   if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', ajustarKpis);
   function caja(titulo, entro, salio) {
-    return '<tr><th colspan="2">' + esc(titulo) + '</th></tr>' + fila('Entró: ventas cobradas', gs(entro)) + fila('Salió: todas las compras', gs(-salio)) +
+    return '<tr><th colspan="2">' + esc(titulo) + '</th></tr>' + fila('Entró', gs(entro)) + fila('Salió', gs(-salio)) +
       fila('Diferencia de caja', gs(entro - salio), 'total');
   }
   function cuantos(n, uno, varios) { n = Number(n) || 0; return n + ' ' + (n === 1 ? uno : varios); }
