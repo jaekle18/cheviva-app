@@ -92,7 +92,6 @@ var INGLES = {
   'Subir un recibo': 'Upload a receipt',
   'Sacale una foto al recibo, o elegí una foto o un PDF. Se lee en el momento y te muestro lo que leyó.': 'Take a photo of the receipt, or choose a photo or a PDF. It is read right away and you see what was read.',
   'Sacar foto': 'Take a photo', 'Elegir foto o PDF': 'Choose a photo or PDF', 'Subiendo…': 'Uploading…',
-  'Falta conectar el lector: en la planilla, menú Cheviva → Conectar el lector de recibos.': 'The receipt reader is not connected yet: see the Cheviva menu in the sheet.',
   'Preparando la foto…': 'Preparing the photo…', 'Leyendo el recibo… (unos segundos)': 'Reading the receipt… (a few seconds)', 'No llegó respuesta.': 'No answer came back.',
   '✓ Las líneas suman lo mismo que el total.': '✓ The lines add up to the total.', 'Aceptar → Compras': 'Accept → Purchases', 'Lo reviso después': 'I\'ll check it later',
   'Quedó en "Por revisar" en la planilla.': 'It stayed in the sheet\'s "Por revisar" tab.',
@@ -189,11 +188,11 @@ var INGLES = {
   'No encontré esa línea (¿ya estaba anulada?).': 'That line was not found (was it already voided?).', 'acción desconocida': 'unknown action',
   'Esto solo existe en la demo.': 'This exists only in the demo.', 'Listo: vuelven los números reales de Cheviva de este momento.': 'Done: Cheviva\'s real numbers of this moment are back.',
   'Con la contraseña de socio se leen solo los recibos que subís.': 'With a partner password only the receipts you upload are read.',
-  'Falta conectar el lector en la planilla.': 'The receipt reader is not connected in the sheet yet.', 'No sé qué lectura aceptar.': 'It is not clear which reading to accept.',
+  'El lector de recibos no está conectado.': 'The receipt reader is not connected.', 'No sé qué lectura aceptar.': 'It is not clear which reading to accept.',
+  'OpenRouter no acepta la clave del lector (401).': 'OpenRouter does not accept the reader\'s key (401).',
   'La foto llegó dañada. Probá de nuevo.': 'The photo arrived damaged. Try again.', 'No llegó ninguna foto.': 'No photo arrived.',
   'El archivo es muy grande (más de 25 MB).': 'The file is too big (over 25 MB).',
   'Esas líneas ya no están en "Por revisar" (¿ya se aceptaron?).': 'Those lines are no longer in "Por revisar" (were they already accepted?).',
-  'Falta conectar el lector: en la planilla, Cheviva → Conectar el lector de recibos.': 'The receipt reader is not connected yet: see the Cheviva menu in the sheet.',
   'No se leyó ninguna línea del recibo. Si la foto está borrosa, sacá otra; si no, avisale a Claude.': 'No line of the receipt was read. If the photo is blurry, take another; if not, tell Claude.',
   'Google Drive no encontró texto en el PDF. Si el escaneo salió muy claro o muy oscuro, escanealo de nuevo.': 'Google Drive found no text in the PDF. If the scan came out too light or too dark, scan it again.',
   'El lector no devolvió los datos en el formato pedido.': 'The reader did not return the data in the format asked for.'
@@ -399,7 +398,7 @@ var INGLES_REGLAS = [
   [/^Cantidad( por (frasco|lote))?( \((.+)\))?$/, function (x, y, u, z, un) { return 'Quantity' + (u ? ' per ' + (u === 'frasco' ? 'jar' : 'batch') : '') + (un ? ' (' + inglesDe_(un) + ')' : ''); }],
   [/^([\d.,]+) (kg|g|litro|ml|unidad|unidades)$/, function (x, n, u) { return n + ' ' + (u === 'litro' ? 'liter' : u === 'unidad' || u === 'unidades' ? 'units' : u); }],
   [/^Recibos de prueba: te quedan (\d+) de (\d+)$/, function (x, a, b) { return 'Trial receipts: ' + a + ' of ' + b + ' left'; }],
-  [/^Ya usaste tus (\d+) recibos de prueba\. Todo lo demás de la demo sigue abierto\.$/, function (x, n) { return 'You have used your ' + n + ' trial receipts. Everything else in the demo stays open.'; }],
+  [/^Ya usaste tus (\d+) recibos de prueba\.$/, function (x, n) { return 'You have used your ' + n + ' trial receipts.'; }],
   // Para revisar
   [/^recibo\(s\) esperando en "Por revisar" \(no cuadran o parecen repetidos\)$/, 'receipt(s) waiting in the sheet\'s "Por revisar" tab (they do not add up or look repeated)'],
   [/^recibo\(s\) con problema en la carpeta$/, 'receipt(s) with a problem in the folder'],
@@ -1251,7 +1250,6 @@ function reglaRegistro_(d, L) {
       <div class="dos"><label class="btn primario">Sacar foto<input type="file" id="camara" accept="image/*" capture="environment"></label>
       <label class="btn">Elegir foto o PDF<input type="file" id="archivo" accept="image/*,application/pdf" multiple></label></div>
       <p class="sub" id="socioRecibos" hidden></p>
-      <p class="error" id="faltaLector" hidden>Falta conectar el lector: en la planilla, menú Cheviva → Conectar el lector de recibos.</p>
       <div id="progreso" hidden><div class="tarjeta"><span class="spinner"></span><span id="progresoTexto">Subiendo…</span></div></div>
       <div id="resultados"></div>
     </div>
@@ -1433,7 +1431,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-26-ronda-5';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-26-ronda-6';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1759,11 +1757,10 @@ function reglaRegistro_(d, L) {
     var pp = d.porProducto || {}, pic = pp['Kimchi Picante'] ? pp['Kimchi Picante'].stock : 0, bla = pp['Kimchi Blanco'] ? pp['Kimchi Blanco'].stock : 0, vas = pp['Vasito 100 ml'] ? pp['Vasito 100 ml'].stock : 0;
     var ultimoLote = (d.lotes || []).filter(function (l) { return l.costoFrasco; })[0];   // newest batch with 350 ml jars: each batch costs a bit different
     pintarInicio(d, n, pp, pic, bla, vas, ultimoLote);
-    $('faltaLector').hidden = d.hayClave !== false;
     // 24 Sep (S14): a partner of the demo sees how many of the 3 test receipts are left; at 0 the upload is off
     var so = d.socio, sinRecibos = !!(so && so.quedan <= 0);
     $('socioRecibos').hidden = !so;
-    if (so) $('socioRecibos').textContent = sinRecibos ? 'Ya usaste tus ' + so.limite + ' recibos de prueba. Todo lo demás de la demo sigue abierto.'
+    if (so) $('socioRecibos').textContent = sinRecibos ? 'Ya usaste tus ' + so.limite + ' recibos de prueba.'
                                                        : 'Recibos de prueba: te quedan ' + so.quedan + ' de ' + so.limite;
     ['camara', 'archivo'].forEach(function (id) { $(id).disabled = sinRecibos; $(id).parentNode.classList.toggle('apagado', sinRecibos); });
     pintarNumeros(d);
@@ -1943,12 +1940,13 @@ function reglaRegistro_(d, L) {
       $('v-cantidades').innerHTML = d.productos.map(function (p, i) { return '<div><label>' + esc(corto(p)) + '</label><input id="v-q' + i + '" inputmode="numeric" placeholder="0"></div>'; }).join('');
       d.productos.forEach(function (p, i) { if (cantidadesAntes[p]) $('v-q' + i).value = cantidadesAntes[p]; $('v-q' + i).addEventListener('input', prellenarCobrado); });
     }
-    var canalAntes = $('v-canal').value || ultimo('cheviva-canal');
+    // 26 Sep (stage 6): a sale filled from a chat or put back by Corregir keeps its own place and channel, even empty, until it is saved
+    var canalAntes = VENTA_DADA ? $('v-canal').value : ($('v-canal').value || ultimo('cheviva-canal'));
     llenarSelect($('v-canal'), d.canales, 'Sin especificar');
     pintarTipo();
     if (canalAntes && d.canales.indexOf(canalAntes) >= 0) $('v-canal').value = canalAntes;
     $('lugares').innerHTML = (d.lugares || []).map(function (x) { return '<option value="' + esc(x) + '">'; }).join('');
-    if (!$('v-donde').value && d.lugares && d.lugares.length) $('v-donde').value = d.lugares[0];
+    if (!VENTA_DADA && !$('v-donde').value && d.lugares && d.lugares.length) $('v-donde').value = d.lugares[0];
     var quienAntes = QUIEN || ultimo('cheviva-quien');
     $('v-quien').innerHTML = d.vendedores.map(function (v) { return '<button type="button" data-t="' + esc(v) + '"' + (v === quienAntes ? ' class="on"' : '') + '>' + esc(v) + '</button>'; }).join('');
     QUIEN = d.vendedores.indexOf(quienAntes) >= 0 ? quienAntes : '';
@@ -2465,6 +2463,7 @@ function reglaRegistro_(d, L) {
      numbers as today's. A sheet with no Instagram key hands over nothing, and the card stays out of sight. */
   /* 26 Sep (stage 4, S16-S18): one line per customer this week, answer times, offers with no follow-up, earlier weeks on a tap */
   var LINEAS_CLIENTES = [], OFERTAS_CLIENTES = [];
+  var VENTA_DADA = false;   // 26 Sep (stage 6): the sale form holds a chat's sale or a corrected one: the draw keeps its place and channel
   function pintarClientes(d) {
     var c = d.clientes;
     $('clientes-card').hidden = !c;
@@ -2533,7 +2532,14 @@ function reglaRegistro_(d, L) {
     TIPO = 'Compró'; pintarTipo();
     (D.productos || []).forEach(function (p, i) { var q = (l.productos || []).filter(function (x) { return x.producto === p; })[0]; if ($('v-q' + i)) $('v-q' + i).value = q ? q.cantidad : ''; });
     $('v-nombre').value = l.nombre || ''; $('v-telefono').value = l.telefono || '';
-    var canal = $('v-canal'); if (canal && [].some.call(canal.options, function (o) { return o.value === l.canal; })) canal.value = l.canal;
+    // 26 Sep (stage 6): a sale from a chat carries nothing of the last entry: no market's place, no note, no typed amount, no
+    // other day, pocket or channel; each goes back to the form's own default, and the draw leaves the place and channel so
+    VENTA_DADA = true;
+    var canal = $('v-canal'); if (canal) canal.value = [].some.call(canal.options, function (o) { return o.value === l.canal; }) ? l.canal : '';
+    $('v-donde').value = ''; $('v-nota').value = ''; $('v-queda').value = '';
+    var hoyChat = diaDe(Date.now()); $('v-fecha').value = hoyChat; puesto['v-fecha'] = hoyChat;
+    $('v-cuenta').value = ''; bolsilloPorDefecto();
+    cobradoTocado = false;
     if (typeof prellenarCobrado === 'function') prellenarCobrado();
     var card = $('v-card'); if (card && card.scrollIntoView) card.scrollIntoView({ block: 'start' });
   });
@@ -2787,7 +2793,7 @@ function reglaRegistro_(d, L) {
       cuenta: TIPO === 'Compró' ? $('v-cuenta').value : '',
       donde: $('v-donde').value, canal: $('v-canal').value, nombre: $('v-nombre').value, telefono: $('v-telefono').value, nota: $('v-nota').value,
       queda: TIPO === 'En consignación' ? $('v-queda').value : '' },
-      function () { (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = ''; }); $('v-cobrado').value = ''; cobradoTocado = false; $('v-nombre').value = ''; $('v-telefono').value = ''; $('v-nota').value = ''; $('v-queda').value = ''; $('v-cobrado-nota').hidden = true; });
+      function () { VENTA_DADA = false; (D ? D.productos : []).forEach(function (p, i) { $('v-q' + i).value = ''; }); $('v-cobrado').value = ''; cobradoTocado = false; $('v-nombre').value = ''; $('v-telefono').value = ''; $('v-nota').value = ''; $('v-queda').value = ''; $('v-cobrado-nota').hidden = true; });
   });
   function chatTipeado() { var u = waUrl($('r-telefono').value); $('r-wa').href = u || '#'; $('r-wa').hidden = !u; }   // shown only with a number to open (24 Sep)
   $('r-telefono').addEventListener('input', chatTipeado);
@@ -2955,7 +2961,7 @@ function reglaRegistro_(d, L) {
       ir('registro'); TIPO = x.tipo || 'Compró'; pintarTipo();
       if (x.quien) { QUIEN = x.quien; $('v-quien').querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.t === QUIEN); }); }
       pon('v-fecha', x.fecha); (D ? D.productos : []).forEach(function (p, i) { pon('v-q' + i, (x.cantidades || {})[p]); });
-      pon('v-cobrado', x.cobrado); cobradoTocado = !!String(x.cobrado || ''); pon('v-cuenta', x.cuenta); pon('v-donde', x.donde); pon('v-canal', x.canal);
+      pon('v-cobrado', x.cobrado); cobradoTocado = !!String(x.cobrado || ''); pon('v-cuenta', x.cuenta); pon('v-donde', x.donde); pon('v-canal', x.canal); VENTA_DADA = true;
       pon('v-nombre', x.nombre); pon('v-telefono', x.telefono); pon('v-nota', x.nota); pon('v-queda', x.queda);
     } else if (e.fn === 'guardarRegistro') {
       ir('registro'); TIPO = 'Contacto'; pintarTipo();
