@@ -23,6 +23,11 @@ var INGLES = {
   'Semanas anteriores': 'Earlier weeks', 'Esta semana no hubo publicaciones.': 'No posts this week.',
   'Ya compró': 'Already bought',
   'Pagó compras': 'Paid for purchases', 'Cobró ventas': 'Collected sales', 'Le pagó a otros': 'Paid to others', 'Recibió de otros': 'Received from others',
+  // 27 Sep (stage 7, his yes to S10 as amended): the running statement and the official names of the balances
+  'Movimiento': 'Entry', 'Pagó compra': 'Paid for a purchase', 'Cobró venta': 'Collected a sale', 'Le pagó a': 'Paid', 'Recibió de': 'Received from',
+  'Cuenta por cobrar a': 'Receivable from', 'Cuenta por pagar a': 'Payable to', 'Aportaciones netas': 'Net contributions', 'Retiros netos': 'Net withdrawals',
+  'por cobrar': 'receivable', 'por pagar': 'payable', 'retiros netos': 'net withdrawals',
+  'Fecha del recibo en el futuro: revisala': 'Receipt dated in the future: check it',
   'Sigue en el negocio': 'Still in the business', 'caja': 'cash',
   // the frame
   'Leyendo la planilla…': 'Reading the sheet…', 'Actualizar': 'Refresh', 'Para revisar': 'To review',
@@ -320,6 +325,21 @@ var INGLES_REGLAS = [
   [/^Márgenes: (.+)$/, function (x, a) { return 'Margins: ' + (fechaInglesa_(a) || a); }],
   [/^(\d+) de (\d+ ml)$/, function (x, n, t) { return n + ' of ' + t; }],   // 26 Sep: "132 de 350 ml", a part of the empty jars
   [/^invirtió (.+)$/, function (x, a) { return 'invested ' + a; }],
+  // 27 Sep (stage 7, his yes to S10 as amended): each balance in its official name
+  [/^aportaciones netas (.+)$/, function (x, a) { return 'net contributions ' + a; }],
+  [/^retiros netos (.+)$/, function (x, a) { return 'net withdrawals ' + a; }],
+  [/^cuenta por pagar (.+)$/, function (x, a) { return 'payable ' + a; }],
+  [/^cuenta por cobrar (.+)$/, function (x, a) { return 'receivable ' + a; }],
+  [/^Aportaciones netas de (.+)$/, function (x, a) { return a + '\'s net contributions'; }],
+  [/^Retiros netos de (.+)$/, function (x, a) { return a + '\'s net withdrawals'; }],
+  [/^Cuenta por pagar a (.+)$/, function (x, a) { return 'Payable to ' + a; }],
+  [/^Cuenta por cobrar a (.+)$/, function (x, a) { return 'Receivable from ' + a; }],
+  // 27 Sep (stage 7, his yes): the reasons a receipt waits for a look
+  [/^Fecha del recibo de hace (\d+) días: revisala$/, function (x, n) { return 'Receipt dated ' + n + ' days ago: check it'; }],
+  [/^Las líneas suman (Gs .+) y el recibo dice (Gs .+)$/, function (x, a, b) { return 'The lines add up to ' + a + ' and the receipt says ' + b; }],
+  [/^(.+): (Gs [\d.]+) (el|la) (\S+), la última vez (Gs [\d.]+) \(([+−]\d+%)\)$/, function (x, i, a, art, u, b, p) {
+    return inglesDe_(i) + ': ' + a + ' per ' + ({ kg: 'kg', litro: 'liter', unidad: 'unit' }[u] || u) + ', last time ' + b + ' (' + p + ')'; }],
+  [/^Ingredientes del lote (\S+), estimado$/, function (x, n) { return 'Batch ' + n + ' ingredients, estimated'; }],
   [/^retiró (.+)$/, function (x, a) { return 'took out ' + a; }],
   [/^se le debe (.+)$/, function (x, a) { return 'is owed ' + a; }],
   [/^tiene (.+) del negocio$/, function (x, a) { return 'holds ' + a + ' of the business\'s money'; }],
@@ -946,7 +966,7 @@ function reglaRegistro_(d, L) {
   .kpi .n small.linea { display: block; line-height: 1.35; margin-top: 4px; white-space: normal; }
   .contacto .quien small, .pendiente span, td small { overflow-wrap: anywhere; }   /* a long link or a run-on word wraps instead of running out */
   .nb { white-space: nowrap; overflow-wrap: normal; }   /* a money figure wraps BEFORE it, never inside it */
-  .kpi .e { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .kpi .e { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
   .kpi.neg .n { color: var(--seal); }
   table { width: 100%; border-collapse: collapse; font-size: 15px; }
   td, th { padding: 6px 4px; border-bottom: 1px solid var(--ph); vertical-align: top; text-align: left; }
@@ -1125,6 +1145,7 @@ function reglaRegistro_(d, L) {
   table.personas tr.rotulo td { font-size: 12px; color: var(--muted); padding: 8px 4px 0; border-bottom: 0; }
   table.personas { font-size: clamp(12px, 3.8vw, 15px); }   /* three people's figures side by side still fit 320 px */
   table.personas tr.total td, table.persona tr.total td { white-space: normal; font-weight: 700; }
+  @media (max-width: 374px) { table.personas tr.total td { font-size: 11px; } }   /* 27 Sep (stage 7): "net contributions" and eight digits, three people, fit 320 px */
   table.persona { margin-bottom: 12px; }
   table.personas tr.rotulo.con-partes td { padding: 0 4px; }
   table.personas tr.rotulo button.abre { min-height: 44px; font-size: 12px; color: var(--muted); }
@@ -1132,6 +1153,10 @@ function reglaRegistro_(d, L) {
   table.partes-persona th { text-transform: none; font: 600 12px 'Archivo', sans-serif; color: var(--ink); letter-spacing: 0; }
   table.partes-persona td { color: var(--muted); padding: 4px 2px; }
   table.partes-persona td.n { color: var(--ink); }
+  table.extracto tr.cab td { font-size: 11px; color: var(--muted); padding-top: 2px; }   /* 27 Sep (stage 7): the running statement */
+  table.extracto td small { display: block; font-size: 12px; }
+  table.extracto td.n { white-space: nowrap; vertical-align: top; }
+  table.extracto td.n small { display: block; font-size: 11px; }   /* the balance's words under its figure: "por cobrar" */
   .enlaces a.enlace-logo { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 0; padding: 6px 0; color: var(--ink); border-bottom: 1px solid var(--ph); }
   .enlace-logo svg { width: 22px; height: 22px; flex: none; }
   details.mas { margin: 0 0 6px; }
@@ -1435,7 +1460,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-demo-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-27-ronda-8';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-27-ronda-9';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1796,7 +1821,12 @@ function reglaRegistro_(d, L) {
     pintarInstagram(d.instagram);
     pintarClientes(d);
     var p = d.pendientes, items = [];
-    if (p.recibos) items.push([p.recibos, 'recibo(s) esperando en "Por revisar" (no cuadran o parecen repetidos)', { url: d.urls.planilla }]);
+    /* 27 Sep (stage 7, his yes of 11:1x ET): every receipt is checked before it enters the books; each reason one waits for is its
+       own line, figures only, until someone accepts it ("Fecha del recibo en el futuro: revisala", a date over 60 days old, lines
+       that do not add up to the total, a price more than 50% from the last one paid); the rest waiting keep the one line */
+    var motivos = p.motivos || [], conMotivo = p.conMotivo || 0;
+    motivos.forEach(function (t) { items.push([1, t, { url: d.urls.planilla }]); });
+    if (p.recibos - conMotivo > 0) items.push([p.recibos - conMotivo, 'recibo(s) esperando en "Por revisar" (no cuadran o parecen repetidos)', { url: d.urls.planilla }]);
     if (p.problemas) items.push([p.problemas, 'recibo(s) con problema en la carpeta', { ir: 'recibo' }]);
     if (p.lotesSinFrascos.length) items.push([p.lotesSinFrascos.length, 'lote(s) sin frascos cargados: ' + p.lotesSinFrascos.join(', '), { ir: 'lote', lote: p.lotesSinFrascos[0] }]);
     if (p.sinLote) items.push([p.sinLote, 'carga(s) de frascos con un lote que no existe', { url: d.urls.planilla }]);
@@ -1857,7 +1887,7 @@ function reglaRegistro_(d, L) {
     var enManos = gentes.filter(function (x) { return x.quien !== duenoC && Math.round(x.saldo || 0) < 0; })
       .map(function (x) {
         var impreso = bi ? (bi.enManos || []).filter(function (y) { return y.quien === x.quien; })[0] : null;
-        return ['<span>Plata del negocio en manos de</span> <span>' + esc(x.quien) + '</span>', impreso ? impreso.monto : -x.saldo];
+        return ['<span>Cuenta por cobrar a</span> <span>' + esc(x.quien) + '</span>', impreso ? impreso.monto : -x.saldo];   // 27 Sep (stage 7): its official name
       });
     var activo = [['<span>Kimchi en frascos</span>', kimchi[0][1]], ['<span>Kimchi en lotes sin envasar</span>', kimchi[1][1]]].concat(vacios.map(function (x) { return ['<span>Frascos vacíos</span> · ' + x[0], x[1]]; }))
       .concat(gochu).concat(dn.sinLote ? [['<span>Ingredientes comprados sin lote</span>', bi ? bi.sinLote : dn.sinLote]] : [])
@@ -1881,12 +1911,14 @@ function reglaRegistro_(d, L) {
       linea('b-activo', '<span>Lo que el negocio tiene hoy (activo)</span>', gs(b.activo), b.vaciosValor ? partes(activo, b.activo) : null, 'suave') +
       // the same words as the Balance (22 Sep, the accounting view): the owner's saldo is his investment, anyone else's
       // is what the business owes them or the business's money in their hands, and the words follow the sign
-      linea('b-inversion', 'Inversión neta de ' + esc(duenoC), gs(b.aporteDueno || 0), delDueno ? partes(saldoPartes(delDueno, 1), b.aporteDueno || 0) : null, 'suave') +
+      // 27 Sep (stage 7, his yes to S10 as amended): the official names, never a minus
+      linea('b-inversion', ((b.aporteDueno || 0) < 0 ? 'Retiros netos de ' : 'Aportaciones netas de ') + esc(duenoC), gs(Math.abs(b.aporteDueno || 0)),
+            delDueno ? partes(saldoPartes(delDueno, (b.aporteDueno || 0) < 0 ? -1 : 1), Math.abs(b.aporteDueno || 0)) : null, 'suave') +
       // 20 Sep: a line STAYS at zero. Being square is exactly what success looks like here, and a line that
       // disappears then reads as something broken. The words flip instead of printing a minus.
       (cu.gente || []).map(function (x) {
         var t = gentes.filter(function (y) { return y.quien === x.quien; })[0], signo = x.saldo >= 0 ? 1 : -1;
-        return linea('b-p-' + x.quien, x.saldo >= 0 ? 'El negocio le debe a ' + esc(x.quien) : esc(x.quien) + ' tiene plata del negocio',
+        return linea('b-p-' + x.quien, (x.saldo >= 0 ? 'Cuenta por pagar a ' : 'Cuenta por cobrar a ') + esc(x.quien),
                      gs(Math.abs(x.saldo || 0)), t ? partes(saldoPartes(t, signo), Math.abs(x.saldo || 0)) : null, 'suave');
       }).join('');
     // the per-jar block: the sheet hands over the very rows Resultado prints (21 Sep), so the phone cannot disagree
@@ -2149,7 +2181,7 @@ function reglaRegistro_(d, L) {
       tile('k-stock', 'En stock', '<span class="grupo"><span class="par">' + pic + ' <small>picante</small></span><span class="sep"> · </span><span class="par">' + bla + ' <small>blanco</small></span></span>',
            [vas ? '<span>' + esc(vas + ' vasitos') + '</span>' : '', primeroEnAcabarse(d)].filter(Boolean).join(' · ')) +
       tile('k-clientes', 'Clientes', String(esperan), '<span>esperando respuesta</span>' + (ofertasN ? ' · <span>' + esc(ofertasN + (ofertasN === 1 ? ' oferta sin seguimiento' : ' ofertas sin seguimiento')) + '</span>' : ''), null, false, 'mensajes') +
-      tile('k-inversion', 'Inversión neta', gs(c.aporteDueno || 0), esc(dueno), null, false, 'cuentas');
+      tile('k-inversion', (c.aporteDueno || 0) < 0 ? 'Retiros netos' : 'Aportaciones netas', gs(Math.abs(c.aporteDueno || 0)), esc(dueno), null, false, 'cuentas');   // 27 Sep (stage 7): the owner's balance by its official name, never a minus
     ajustarKpis();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustarKpis);   // the web fonts are wider than the fallback
     // THIS MONTH, by function, each sum opening to its parts
@@ -2196,10 +2228,22 @@ function reglaRegistro_(d, L) {
   function semanaVacia(w) {   // nothing sold, given, bought or spent that week
     return !w || !['ventas', 'cobrado', 'vendidos', 'cmv', 'muestras', 'gastos', 'compras'].some(function (k) { return Math.round(Number(w[k]) || 0); });
   }
+  /* 27 Sep (stage 7, his look): a week's costs by kind, as the month's — selling costs (the samples at cost and each selling
+     expense) and administrative costs (each of the rest), every part as the sheet printed it, so the two add up to the week's
+     costs as printed. A reading from before the kinds (no gastosItems) keeps its one line. */
+  function gastosDeLaSemana(wm) {
+    if (!wm.gastosItems && Math.round(wm.gastos || 0)) return null;
+    var venta = [['Muestras regaladas, al costo', wm.muestras || 0]], admin = [];
+    (wm.gastosItems || []).forEach(function (g) { (g[2] === 'venta' ? venta : admin).push([TERMINOS[g[0]] || g[0], g[1]]); });
+    var suma = function (l) { return l.reduce(function (t, x) { return t + (Number(x[1]) || 0); }, 0); };
+    var partes = function (l) { var p = l.filter(function (x) { return Math.round(x[1]); }).map(function (x) { return ['<span>' + esc(x[0]) + '</span>', gs(-x[1])]; }); return p.length ? p : null; };
+    return { venta: suma(venta), admin: suma(admin), partesVenta: partes(venta), partesAdmin: partes(admin) };
+  }
   function semanaPartes(w) {
-    var wm = w.mostrado || w;
-    return [['<span>' + esc('Ventas') + '</span> · <span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span>', gs(wm.ventas)], ['<span>Costo de ventas</span>', gs(-wm.cmv)],
-            ['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]];
+    var wm = w.mostrado || w, g = gastosDeLaSemana(wm);
+    return [['<span>' + esc('Ventas') + '</span> · <span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span>', gs(wm.ventas)], ['<span>Costo de ventas</span>', gs(-wm.cmv)]]
+      .concat(g ? [['<span>Gastos de venta</span>', gs(-g.venta)], ['<span>Gastos de administración</span>', gs(-g.admin)]]
+                : [['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]]);
   }
   /* the week's sales, one line per sale (the same sales of a day, person, place and price together, as in Movimientos),
      adding up to the week's sales as printed; a reseller's commission, booked as a sale at list price, is its own part */
@@ -2227,9 +2271,11 @@ function reglaRegistro_(d, L) {
     var partesC = (w.vendidos && cmvF ? [['<span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span> · <span>' + esc(unDecimal(w.cmv / w.vendidos) + ' c/u') + '</span>', gs(-cmvF)]] : [])
       .concat(depW ? [['<span>Depreciación del equipo</span>', gs(-depW)]] : []);
     if (!partesC.length) partesC = null;
+    var g = gastosDeLaSemana(wm);   // 27 Sep (stage 7, his look): the costs by kind, as the month's
     return linea(clave + '-ventas', '<span>Ventas</span> · <span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span>', gs(wm.ventas), partesV) +
       linea(clave + '-cmv', '<span>Costo de ventas</span>', gs(-wm.cmv), partesC) +
-      linea(clave + '-gastos', '<span>Gastos</span>', gs(-gastos), [['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]]) +
+      (g ? linea(clave + '-venta', '<span>Gastos de venta</span>', gs(-g.venta), g.partesVenta) + linea(clave + '-admin', '<span>Gastos de administración</span>', gs(-g.admin), g.partesAdmin)
+         : linea(clave + '-gastos', '<span>Gastos</span>', gs(-gastos), [['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]])) +
       // 27 Sep (stage 6, S7 as amended): its parts are the three lines right above it, so it opens nothing
       linea(clave + '-resultado', '<span>Resultado de la semana</span>', gs(wm.resultado), null, 'total');
   }
@@ -2278,6 +2324,9 @@ function reglaRegistro_(d, L) {
     });
     if (semanas.indexOf(estaSemana) < 0 && estaSemana) semanas.unshift(estaSemana);
     semanas.sort(function (a, b) { return a < b ? 1 : a > b ? -1 : 0; });
+    /* 27 Sep (stage 7, the check's first round: a purchase typed with the year 2028 opened a 2028 week and 60 empty weeks, and
+       September fell off the list): whatever the dates, the list starts at the current week and never shows a week after it */
+    if (estaSemana) semanas = semanas.filter(function (k) { return k <= estaSemana; });
     // 26 Sep (the checker, S11 "a week with nothing"): every week from the first one with an entry up to this one, none left out
     var todas = [], lunes = function (k, dias) { var p = k.split('-'), t = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2]) + dias * 86400000); return t.toISOString().slice(0, 10); };
     if (semanas.length) for (var k = semanas[0]; k >= semanas[semanas.length - 1] && todas.length < 60; k = lunes(k, -7)) todas.push(k);
@@ -2373,6 +2422,12 @@ function reglaRegistro_(d, L) {
     return [].some.call(r.getClientRects(), function (x) { return x.width && x.right > borde; });
   }
   function ajustarKpis() {
+    // 27 Sep (stage 7): a tile's name stays on one line, a little smaller when it has to ("Aportaciones netas" at 320 px)
+    document.querySelectorAll('.kpi .e').forEach(function (el) {
+      el.style.fontSize = ''; el.style.letterSpacing = '';
+      var tam = parseFloat(getComputedStyle(el).fontSize);
+      while (el.scrollWidth > el.clientWidth + 0.5 && tam > 8.5) { tam -= 0.5; el.style.fontSize = tam + 'px'; el.style.letterSpacing = '0.02em'; }
+    });
     document.querySelectorAll('.kpi .n').forEach(function (el) {
       el.style.fontSize = ''; el.classList.remove('ajustado', 'partido');
       var tam = parseFloat(getComputedStyle(el).fontSize);
@@ -2629,8 +2684,9 @@ function reglaRegistro_(d, L) {
     var saldoEnPalabras = function (x) {
       var v = Math.round(x.saldo || 0);
       if (!v) return 'a mano';
-      if (x.quien === dueno) return (v > 0 ? 'invirtió ' : 'retiró ') + num(Math.abs(v));
-      return v > 0 ? 'el negocio le debe ' + num(v) : 'tiene ' + num(-v) + ' del negocio';
+      // 27 Sep (stage 7, his yes to S10 as amended): the official names, never a minus
+      if (x.quien === dueno) return (v > 0 ? 'aportaciones netas ' : 'retiros netos ') + num(Math.abs(v));
+      return v > 0 ? 'cuenta por pagar ' + num(v) : 'cuenta por cobrar ' + num(-v);
     };
     // 26 Sep (change 2, his yes: "you get an account, the same as everyone else"): the same five rows for everyone
     var FILAS_CUENTA = [['Pagó compras', 'compras'], ['Cobró ventas', 'cobrado'], ['Le pagó a otros', 'pagoAOtros'], ['Recibió de otros', 'recibioDeOtros']];
@@ -2642,6 +2698,7 @@ function reglaRegistro_(d, L) {
     var partesDe = function (x) {
       var compras = [], cobrado = [], pago = [], recibio = [];
       (x.comprasPorCuenta || []).forEach(function (k) { compras.push(['<span>Compras</span> · <span>' + esc(k.cuenta || 'sin cuenta') + '</span> <span class="nb">(' + k.n + ')</span>', k.total]); });
+      (x.especie || []).forEach(function (e) { compras.push([dia(e.fecha) + ' <span>' + esc(e.que) + '</span>', e.total]); });   // 27 Sep (stage 7): batch 1's ingredients, the owner's
       (x.cobros || []).forEach(function (k) { cobrado.push([dia(k.fecha) + ' <span>Venta cobrada</span>' + (k.que ? '<small translate="no">' + esc(k.que) + '</small>' : ''), k.total]); });
       (x.pagos || []).forEach(function (e) {
         if (e.tipo === 'paga') pago.push([dia(e.fecha) + ' <span>A</span> <span>' + esc(e.con || '') + '</span>', e.total]);
@@ -2657,7 +2714,37 @@ function reglaRegistro_(d, L) {
                saldo: hecho([['<span>Pagó compras</span>', signo * (x.compras || 0)], ['<span>Le pagó a otros</span>', signo * (x.pagoAOtros || 0)],
                              ['<span>Cobró ventas</span>', -signo * (x.cobrado || 0)], ['<span>Recibió de otros</span>', -signo * (x.recibioDeOtros || 0)]], signo * Math.round(x.saldo || 0)) };
     };
-    var PARTES = todos.map(partesDe);
+    /* 27 Sep (stage 7, his yes to S10 as amended: "never group, never ranges"): a balance opens to the person's running statement —
+       every purchase, sale collected and payment on its own line and its own day, in date order, with the balance after it, the
+       last one the balance above. 27 Sep (the check's first round): each balance after a line in words, never "menos" and never a
+       minus — anyone else's "X por pagar" (the business owes them), "X por cobrar" (they hold its money) or "a mano"; the owner's
+       his contributions (the figure) or "retiros netos" once he took out more than he put in. Each movement's own words (Pagó,
+       Cobró, Le pagó a, Recibió de) say which way it went, so its amount carries no sign. */
+    var PALABRA_EXTRACTO = { 'Pagó compras': 'Pagó compra', 'Cobró ventas': 'Cobró venta' };
+    var extractoDe = function (x) {
+      var l = x.extracto;
+      if (!l || !l.length) return null;
+      var esDueno = x.quien === dueno;
+      var saldoEn = function (s) {
+        s = Math.round(s || 0);
+        if (!s) return '<span>a mano</span>';
+        var palabra = esDueno ? (s < 0 ? 'retiros netos' : '') : (s > 0 ? 'por pagar' : 'por cobrar');
+        return '<span class="nb">' + num(Math.abs(s)) + '</span>' + (palabra ? '<small>' + palabra + '</small>' : '');
+      };
+      return l.map(function (m) {
+        var v = Math.round(m.delta);
+        var que = m.fue === 'Le pagó a otros' || m.fue === 'Recibió de otros'
+          ? '<span>' + (m.fue === 'Le pagó a otros' ? 'Le pagó a' : 'Recibió de') + '</span> <span>' + esc(m.con || '') + '</span>' + (m.nota ? '<small translate="no">' + esc(m.nota) + '</small>' : '')
+          : '<span>' + esc(PALABRA_EXTRACTO[m.fue] || m.fue) + '</span>' + (m.que ? (m.fue === 'Cobró ventas' ? '<small translate="no">' : '<small>') + esc(m.que) + '</small>' : '');   // a customer's name stays as written
+        return [dia(m.fecha) + ' ' + que, '<span class="nb">' + num(Math.abs(v)) + '</span>', saldoEn(m.saldo)];
+      });
+    };
+    var tablaExtracto = function (x, l) {
+      return '<table class="partes-persona extracto"><tr><th colspan="3">' + esc(x.quien) + '</th></tr>' +
+        '<tr class="cab"><td>Movimiento</td><td class="n">Gs</td><td class="n">Saldo</td></tr>' +
+        l.map(function (y) { return '<tr><td>' + y[0] + '</td><td class="n">' + y[1] + '</td><td class="n">' + y[2] + '</td></tr>'; }).join('') + '</table>';
+    };
+    var PARTES = todos.map(function (x) { var p = partesDe(x); p.extracto = extractoDe(x); return p; });
     var abreFila = function (clave, texto, n) {
       var ab = !!ABIERTAS[clave];
       return '<tr class="rotulo con-partes"><td colspan="' + n + '"><button type="button" class="abre" data-abre="' + clave + '" aria-expanded="' + ab + '">' + esc(texto) + '</button></td></tr>';
@@ -2665,6 +2752,7 @@ function reglaRegistro_(d, L) {
     var partesFila = function (clave, k, n) {   // one small table per person under the figures, in the table's own order
       return '<tr class="parte" data-de="' + clave + '"' + (ABIERTAS[clave] ? '' : ' hidden') + '><td colspan="' + n + '">' + todos.map(function (x, i) {
         var l = PARTES[i][k];
+        if (k === 'saldo' && PARTES[i].extracto) return tablaExtracto(x, PARTES[i].extracto);   // 27 Sep (stage 7): the running statement
         return '<table class="partes-persona"><tr><th colspan="2">' + esc(x.quien) + '</th></tr>' +
           (l.length ? l.map(function (y) { return '<tr><td>' + y[0] + '</td><td class="n">' + y[1] + '</td></tr>'; }).join('') : '<tr><td colspan="2" class="placeholder">' + esc('nada') + '</td></tr>') + '</table>';
       }).join('') + '</td></tr>';
@@ -2681,7 +2769,7 @@ function reglaRegistro_(d, L) {
       $('cuentaTabla').innerHTML = todos.map(function (x, i) {
         return '<table class="persona lineas"><tr><th colspan="2">' + esc(x.quien) + '</th></tr>' +
           FILAS_CUENTA.map(function (r) { return linea('cu-' + r[1] + '-' + x.quien, esc(r[0]), num(Math.round(x[r[1]] || 0)), PARTES[i][r[1]].length ? PARTES[i][r[1]] : null); }).join('') +
-          linea('cu-saldo-' + x.quien, esc('Saldo'), esc(saldoEnPalabras(x)), PARTES[i].saldo, 'total') + '</table>';
+          linea('cu-saldo-' + x.quien, esc('Saldo'), esc(saldoEnPalabras(x)), PARTES[i].extracto ? [[tablaExtracto(x, PARTES[i].extracto), null]] : PARTES[i].saldo, 'total') + '</table>';
       }).join('') + aviso;
     }
     // the form is filled in with the payment that settles the first open balance; anyone can be picked instead
