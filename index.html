@@ -254,6 +254,25 @@ function haceIngles_(s) {
   return m ? m[1] + (m[2] === 'h' ? ' h' : ' days') + ' ago' : s;
 }
 var INGLES_REGLAS = [
+  // 26 Sep (cheviva-next-round stage 5, S20): the evening email's checks as To review lines (their short texts)
+  [/^El resumen de los lunes no sale hace (\d+) días$/, function (x, n) { return 'The Monday summary has not gone out for ' + n + ' days'; }],
+  [/^El WhatsApp de Cheviva ya no está vinculado al lector desde el (\d\d\/\d\d \d\d:\d\d)$/, function (x, d) { return 'Cheviva\'s WhatsApp is no longer linked to the reader since ' + d; }],
+  [/^El lector de WhatsApp no se reporta hace (\d+) horas \(desde el (\d\d\/\d\d \d\d:\d\d)\)$/, function (x, n, d) { return 'The WhatsApp reader has not checked in for ' + n + ' hours (since ' + d + ')'; }],
+  [/^GitHub no acepta el pedido de lectura de WhatsApp de cada hora: (.+)$/, function (x, m) { return 'GitHub does not accept the hourly WhatsApp reading request: ' + m; }],
+  [/^La planilla no pide la lectura de WhatsApp hace (\d+) horas$/, function (x, n) { return 'The sheet has not asked for the WhatsApp reading for ' + n + ' hours'; }],
+  [/^La llave de Instagram no se pudo renovar: (.+)$/, function (x, m) { return 'The Instagram key could not be renewed: ' + m; }],
+  [/^La llave de Instagram no se renueva hace (\d+) días$/, function (x, n) { return 'The Instagram key has not been renewed for ' + n + ' days'; }],
+  [/^La llave de Instagram vence en (-?\d+) día\(s\) \((\d\d\/\d\d)\)$/, function (x, n, d) { return 'The Instagram key expires in ' + n + (n === '1' ? ' day' : ' days') + ' (' + d + ')'; }],
+  [/^Hace (\d+) días que no se anota nada$/, function (x, n) { return 'Nothing has been recorded for ' + n + ' days'; }],
+  [/^Hoy fue feria y no hay ninguna venta anotada$/, function () { return 'Today was a market day and no sale has been recorded'; }],
+  [/^Quedan ([\d.,]+) frascos y en las últimas ferias se vendieron ([\d.,]+) por feria$/, function (x, n, m) { return n + (n === '1' ? ' jar' : ' jars') + ' left, and the last markets sold ' + m + ' per market'; }],
+  [/^Los números dicen que se vendieron ([\d.,]+) frascos más de los que se envasaron$/, function (x, n) { return 'The numbers say ' + n + (n === '1' ? ' more jar was' : ' more jars were') + ' sold than filled'; }],
+  [/^El precio de (.+) cambió (-?\d+)%: ahora (Gs [\d.,]+) por (.+)$/, function (x, i, n, g, u) { return 'The price of ' + inglesDe_(i) + ' changed ' + n + '%: now ' + g + ' per ' + inglesDe_(u); }],
+  [/^(\d+) precios se movieron más de (\d+)%, el mayor (.+)$/, function (x, n, pc, i) { return n + ' prices moved more than ' + pc + '%, the largest ' + inglesDe_(i); }],
+  [/^Un frasco cuesta (Gs [\d.,]+) y se vende a (Gs [\d.,]+)$/, function (x, a, b) { return 'A jar costs ' + a + ' and sells for ' + b; }],
+  [/^Los libros no cierran: la comprobación del Balance da (.+) en vez de 0$/, function (x, g) { return 'The books do not balance: the Balance\'s check gives ' + g + ' instead of 0'; }],
+  [/^Las cuentas de cada uno no suman lo que se puso: difieren en (Gs [\d.,]+)$/, function (x, g) { return 'Each person\'s account does not add up to what was put in: off by ' + g; }],
+  [/^(\d+) pago\(s\) entre ustedes no dicen a quién fueron$/, function (x, n) { return n + (n === '1' ? ' payment' : ' payments') + ' between you do not say whom it went to'.replace('it went', n === '1' ? 'it went' : 'they went'); }],
   // 26 Sep (stage 4): the customers' lines and answer times
   [/^contestado en (\d+) h(?: (\d+) min)?$/, function (x, h, m) { return 'answered in ' + h + ' h' + (m ? ' ' + m + ' min' : ''); }],
   [/^contestado en (\d+) min$/, function (x, m) { return 'answered in ' + m + ' min'; }],
@@ -1414,7 +1433,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-26-ronda-4';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-26-ronda-5';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
