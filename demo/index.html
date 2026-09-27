@@ -1435,7 +1435,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-demo-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-27-ronda-7';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-27-ronda-8';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -2222,7 +2222,11 @@ function reglaRegistro_(d, L) {
     if (partesV.length && Math.abs(Math.round(wm.ventas) - suma) >= 1) partesV.push(['<span>Comisión de revendedores</span>', Math.round(wm.ventas) - suma]);
     var rv = cuadrar(partesV.map(function (x) { return x[1]; }), wm.ventas);
     partesV = partesV.map(function (x, i) { return [x[0], gs(rv[i])]; });
-    var partesC = w.vendidos && wm.cmv ? [['<span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span> · <span>' + esc(unDecimal(w.cmv / w.vendidos) + ' c/u') + '</span>', gs(-wm.cmv)]] : null;
+    // 27 Sep (stage 6): the week's cost of sales opens to its jars and its share of the equipment's depreciation, as the month's
+    var cmvF = wm.cmvFrascos !== undefined ? wm.cmvFrascos : wm.cmv, depW = wm.depreciacion || 0;
+    var partesC = (w.vendidos && cmvF ? [['<span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span> · <span>' + esc(unDecimal(w.cmv / w.vendidos) + ' c/u') + '</span>', gs(-cmvF)]] : [])
+      .concat(depW ? [['<span>Depreciación del equipo</span>', gs(-depW)]] : []);
+    if (!partesC.length) partesC = null;
     return linea(clave + '-ventas', '<span>Ventas</span> · <span>' + esc(cuantos(w.vendidos, 'frasco', 'frascos')) + '</span>', gs(wm.ventas), partesV) +
       linea(clave + '-cmv', '<span>Costo de ventas</span>', gs(-wm.cmv), partesC) +
       linea(clave + '-gastos', '<span>Gastos</span>', gs(-gastos), [['<span>Muestras regaladas, al costo</span>', gs(-wm.muestras)], ['<span>Otros gastos</span>', gs(-wm.gastos)]]) +
