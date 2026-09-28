@@ -1510,7 +1510,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-demo-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-28-costo-lote-1';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-28-costo-lote-2';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -2181,9 +2181,9 @@ function reglaRegistro_(d, L) {
     var unidadDe = function (u, q) { return u === 'unidad' && q !== 1 ? 'unidades' : u; };
     var cifra = function (f) {
       if (!f) return '—';
-      var k = f[0], q = f[4], u = f[5] || '';
+      var k = f[0], q = f[4], u = f[5] || '';   // a purchase line whose quantity was not typed comes with none (28 Sep)
       // a quantity keeps its unit on its line (a no-break space), which also keeps it apart from the stock tables' English rule
-      var bajo = k === 'g' ? num(q) + '\u00A0' + u + ' a ' + gsGramo(f[6]) : k === 'f' || k === 't' ? num(q) + ' a ' + gs(f[6]) : k === 'e' ? '' : cant(q) + (u ? '\u00A0' + unidadDe(u, q) : '');
+      var bajo = k === 'g' ? num(q) + '\u00A0' + u + ' a ' + gsGramo(f[6]) : k === 'f' || k === 't' ? num(q) + ' a ' + gs(f[6]) : k === 'e' || q === undefined || q === '' ? '' : cant(q) + (u ? '\u00A0' + unidadDe(u, q) : '');
       return gs(f[3]) + (bajo ? '<small>' + esc(bajo) + '</small>' : '');
     };
     var nombre = function (f, de) {
