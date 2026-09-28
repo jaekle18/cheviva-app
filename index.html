@@ -22,6 +22,9 @@ var INGLES = {
   'Nadie escribió esta semana.': 'Nobody wrote this week.', 'Ningún chat contestado esta semana.': 'No chat answered this week.', 'Ninguna.': 'None.',
   'Semanas anteriores': 'Earlier weeks', 'Esta semana no hubo publicaciones.': 'No posts this week.',
   'Ya compró': 'Already bought',
+  // 28 Sep (the yCloud build, stage 3): the customer line's marks and who the contact is ('Tienda' and 'Otro' are listed already)
+  'Pedido': 'Order', 'Proveedor': 'Supplier', 'Organizador': 'Organizer', 'No es del negocio': 'Not business-related',
+  'Mandó solo fotos, audios o stickers': 'Sent only photos, audios or stickers',
   'Pagó compras': 'Paid for purchases', 'Cobró ventas': 'Collected sales', 'Le pagó a otros': 'Paid to others', 'Recibió de otros': 'Received from others',
   // 27 Sep (stage 7, his yes to S10 as amended): the running statement and the official names of the balances
   'Movimiento': 'Entry', 'Pagó compra': 'Paid for a purchase', 'Cobró venta': 'Collected a sale', 'Le pagó a': 'Paid', 'Recibió de': 'Received from',
@@ -261,6 +264,12 @@ var INGLES_REGLAS = [
   [/^El WhatsApp de Cheviva ya no está vinculado al lector desde el (\d\d\/\d\d \d\d:\d\d)$/, function (x, d) { return 'Cheviva\'s WhatsApp is no longer linked to the reader since ' + d; }],
   [/^El lector de WhatsApp no se reporta hace (\d+) horas \(desde el (\d\d\/\d\d \d\d:\d\d)\)$/, function (x, n, d) { return 'The WhatsApp reader has not checked in for ' + n + ' hours (since ' + d + ')'; }],
   [/^GitHub no acepta el pedido de lectura de WhatsApp de cada hora: (.+)$/, function (x, m) { return 'GitHub does not accept the hourly WhatsApp reading request: ' + m; }],
+  [/^WhatsApp: (\d+) mensajes? de yCloud sin pasar a la planilla \(desde (\d\d\/\d\d \d\d:\d\d)\)$/, function (x, n, d) { return 'WhatsApp: ' + n + ' yCloud ' + (n === '1' ? 'message' : 'messages') + ' not yet in the sheet (since ' + d + ')'; }],   // 27 Sep (the yCloud build)
+  // 28 Sep (the yCloud build, stage 2, S6): the watchman's look at yCloud, in the plan's own English
+  [/^WhatsApp no llega: el número (.+?) figura como ([A-Z_]+) en yCloud \(visto (\d\d\/\d\d \d\d:\d\d)\)$/, function (x, n, e, d) { return 'WhatsApp not arriving: number ' + n + ' shows as ' + e + ' in yCloud (seen ' + d + ')'; }],
+  [/^WhatsApp no llega: yCloud rechaza la llave del sistema \(visto (\d\d\/\d\d \d\d:\d\d)\)$/, function (x, d) { return 'WhatsApp not arriving: yCloud refuses the system\'s key (seen ' + d + ')'; }],
+  [/^WhatsApp no llega: yCloud dejó de enviar a la planilla \(visto (\d\d\/\d\d \d\d:\d\d)\)$/, function (x, d) { return 'WhatsApp not arriving: yCloud stopped sending to the sheet (seen ' + d + ')'; }],
+  [/^WhatsApp: yCloud no responde \(visto (\d\d\/\d\d \d\d:\d\d)\)$/, function (x, d) { return 'WhatsApp: yCloud is not answering (seen ' + d + ')'; }],
   [/^La planilla no pide la lectura de WhatsApp hace (\d+) horas$/, function (x, n) { return 'The sheet has not asked for the WhatsApp reading for ' + n + ' hours'; }],
   [/^La llave de Instagram no se pudo renovar: (.+)$/, function (x, m) { return 'The Instagram key could not be renewed: ' + m; }],
   [/^La llave de Instagram no se renueva hace (\d+) días$/, function (x, n) { return 'The Instagram key has not been renewed for ' + n + ' days'; }],
@@ -439,6 +448,9 @@ var INGLES_REGLAS = [
       (p ? 'suggested order: ' + inglesDe_(p) + ', like the last purchase' + (donde ? ' at ' + donde : '') : 'no earlier purchase in the sheet'); }],
   [/^cliente esperando respuesta: (.+), escribió (hace .+)$/, function (x, a, h) { return 'customer waiting for a reply: ' + nombreIngles_(a) + ', wrote ' + haceIngles_(h); }],
   [/^tienda esperando respuesta: (.+), escribió (hace .+)$/, function (x, a, h) { return 'shop waiting for a reply: ' + nombreIngles_(a) + ', wrote ' + haceIngles_(h); }],
+  // 28 Sep (the yCloud build, stage 3): the waiting line names who the contact is
+  [/^(proveedor|organizador|otro) esperando respuesta: (.+), escribió (hace .+)$/, function (x, q, a, h) { return ({ proveedor: 'supplier', organizador: 'organizer', otro: 'other' })[q] + ' waiting for a reply: ' + nombreIngles_(a) + ', wrote ' + haceIngles_(h); }],
+  [/^Oferta de (.+)$/, function (x, n) { return n + '\'s offer'; }],
   [/^frascos con un revendedor hace más de (\d+) días: (.+), (\d+) \((Gs.+) a precio de venta\)$/, function (x, n, q, f, g) {
     return 'jars with a reseller for more than ' + n + ' days: ' + inglesDe_(q) + ', ' + f + ' (' + g + ' at the sale price)'; }],
   // what the door answers after a save, or why it refused
@@ -1010,6 +1022,10 @@ function reglaRegistro_(d, L) {
   .cliente .estado { display: block; }
   .canal { font-size: 11px; font-weight: 700; letter-spacing: .02em; padding: 1px 5px; border-radius: 4px; border: 1px solid currentColor; margin-right: 4px; }
   .revisar, .esperando { color: #A3381F; }
+  /* 28 Sep (the yCloud build, stage 3): the customer line's mark (an order, the business's offer, who the contact is) */
+  .cliente .marca { display: inline-block; font-weight: 700; font-size: 12px; line-height: 1.4; border-radius: 6px; padding: 0 6px; color: #fff; background: #99271F; }
+  .cliente .marca.of { background: #8A6D1F; } .cliente .marca.tipo { background: #4B5563; }
+  .cliente .detalle { display: block; color: #6F6759; }
   h3.sub-h { margin-top: 16px; }
   #clientes-card .btn.chico, #btnContacto { min-height: 44px; }
   #tiemposTabla td { vertical-align: middle; }
@@ -1469,7 +1485,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-27-harina-3';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-28-ycloud-3';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1755,6 +1771,7 @@ function reglaRegistro_(d, L) {
   setInterval(function () { refrescarSiHaceFalta(55); }, 60000);
   $('btnActualizar').addEventListener('click', function (ev) { ev.preventDefault(); cargar(); enviarCola(); });
   function waUrl(t) {
+    if (/^\s*[A-Za-z]{2}\./.test(String(t || ''))) return '';   // 27 Sep (the yCloud build): yCloud's customer id is no phone
     var d = String(t || '').replace(/\D/g, '');
     if (!d) return '';
     if (d.charAt(0) === '0') d = '595' + d.slice(1); else if (d.length === 9 && d.charAt(0) === '9') d = '595' + d;
@@ -2558,11 +2575,20 @@ function reglaRegistro_(d, L) {
     var semanas = c.semanas || [], esta = semanas[0] || { lineas: [], tiempos: {} };
     LINEAS_CLIENTES = esta.lineas || [];
     var linea = function (l, i, conBoton) {
-      var que = l.sinLeer ? '<i>sin leer todavía</i>' : '<span translate="no">' + esc(l.queQuiere || '—') + '</span>' + (l.revisar ? ' <b class="revisar">revisar</b>' : '');
-      var estado = l.estado === 'esperando' ? '<b class="esperando">esperando</b>' : l.minutos ? '<span>contestado en ' + esc(l.minutosTexto || minutosTexto(l.minutos)) + '</span>' : '<span>contestado</span>';
+      /* 28 Sep (the yCloud build, stage 3): the line opens with the contact's order, the business's own offer, or who the contact
+         is when not a customer; the products and the day go under it */
+      var marca = l.sinLeer ? '' : l.pedido ? '<span class="marca">Pedido</span> ' : l.oferta ? '<span class="marca of">' + esc('Oferta de ' + (c.negocio || '')) + '</span> '
+        : (l.quien && l.quien !== 'cliente') ? '<span class="marca tipo">' + esc(l.quien.charAt(0).toUpperCase() + l.quien.slice(1)) + '</span> ' : '';
+      var detalle = !l.sinLeer && ((l.productos || []).length || l.paraCuando)
+        ? '<small class="detalle">' + esc((l.productos || []).map(function (x) { return x.producto + ' × ' + x.cantidad; }).join(' · ')) +
+          (l.paraCuando ? ((l.productos || []).length ? ' · ' : '') + '<span translate="no">' + esc(l.paraCuando) + '</span>' : '') + '</small>' : '';
+      var que = l.sinLeer ? '<i>sin leer todavía</i>' : marca + (l.queQuiere === 'Mandó solo fotos, audios o stickers' ? '<span>' + esc(l.queQuiere) + '</span>'
+        : '<span translate="no">' + esc(l.queQuiere || '—') + '</span>') + (l.revisar ? ' <b class="revisar">revisar</b>' : '') + detalle;
+      // 28 Sep (the yCloud build, stage 3): a chat read as not business-related shows no waiting or answered mark
+      var estado = l.quien === 'no es del negocio' ? '' : l.estado === 'esperando' ? '<b class="esperando">esperando</b>' : l.minutos ? '<span>contestado en ' + esc(l.minutosTexto || minutosTexto(l.minutos)) + '</span>' : '<span>contestado</span>';
       var venta = l.venta ? '<span>venta del ' + esc(l.venta.fecha) + '</span>' : l.yaCompro ? '<span>ya compró (a mano, ' + esc(l.yaCompro) + ')</span>' : '<span>sin venta</span>';
       return '<div class="cliente"><div class="quien"><b><span class="canal">' + esc(l.canal) + '</span>' + esc(l.nombre || '—') + '</b><small>' + esc(l.ultimo) + '</small></div>' +
-        '<div class="que">' + que + '</div><small class="estado">' + estado + ' · ' + venta + '</small>' +
+        '<div class="que">' + que + '</div><small class="estado">' + (estado ? estado + ' · ' : '') + venta + '</small>' +
         (conBoton && !l.venta ? '<div class="fila2 botones-cliente"><button type="button" class="btn chico" data-anotar="' + i + '">Anotar la venta</button>' +
           (!l.yaCompro ? '<button type="button" class="btn chico" data-yacompro="' + i + '">Ya compró</button>' : '') + '</div>' : '') + '</div>';
     };
