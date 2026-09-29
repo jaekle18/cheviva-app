@@ -134,6 +134,9 @@ var INGLES = {
   '¿Cuántos? Poné un número mayor que cero.': 'How many? Enter a number above zero.', '¿Se rompió o se perdió?': 'Did it break, or was it lost?',
   'La fecha no puede ser después de hoy.': 'The date cannot be after today.',
   'De qué insumo': 'Which supply', 'Ninguno, es un gasto': 'None, it is an expense', 'Elegí el insumo de la lista.': 'Pick the supply from the list.',
+  // 28 Sep (the acelga build, S1): the batch a purchase went into, its button and its refusals
+  'Sin lote': 'No batch', 'No encuentro esa compra en Compras.': 'I cannot find that purchase in Compras.',
+  'Esa compra ya tiene su lote.': 'That purchase already has its batch.', 'Elegí el lote de la lista.': 'Pick the batch from the list.',
   'No encuentro ese envío en Compras.': 'That shipping is not in "Compras".', 'Ese envío ya tiene su insumo.': 'That shipping already has its supply.',
   'Ese insumo no tiene una compra hasta ese día pagada por la misma persona: elegí "Ninguno, es un gasto".': 'That supply has no purchase by that day paid by the same person: choose "None, it is an expense".',
   // Venta
@@ -306,6 +309,14 @@ var INGLES_REGLAS = [
   [/^~(\d+) sem\.$/, function (x, n) { return '~' + n + ' wk'; }],
   [/^~(\d+) (día|días)$/, function (x, n) { return '~' + nPlural_(n, 'day', 'days'); }],
   [/^Envío de (Gs [\d.,]+) del (\d\d\/\d\d): ¿de qué insumo\?$/, function (x, g, d) { return 'Shipping of ' + g + ' on ' + d + ': which supply?'; }],
+  // 28 Sep (the acelga build, S1, S4): the question, its two toasts, the refusal about jars, the cells that cannot count (a batch's button: "Lote N" below)
+  [/^(.+), (Gs[\s\u00A0][\d.,]+) del (\d\d\/\d\d\/\d{4}): ¿de qué lote\?$/, function (x, i, g, d) { return inglesDe_(i) + ', ' + g + ' on ' + d + ': which batch?'; }],
+  [/^Listo: (.+) del (\d\d\/\d\d\/\d{4}) va al lote (.+)\.$/, function (x, i, d, n) { return 'Done: ' + inglesDe_(i) + ' of ' + d + ' goes into batch ' + n + '.'; }],
+  [/^Listo: (.+) del (\d\d\/\d\d\/\d{4}) queda sin lote\.$/, function (x, i, d) { return 'Done: ' + inglesDe_(i) + ' of ' + d + ' stays with no batch.'; }],
+  [/^El lote (.+) ya tiene frascos\.$/, function (x, n) { return 'Batch ' + n + ' already has jars.'; }],
+  [/^compra\(s\) con un lote que no cuenta: (.+)$/, function (x, l) {
+    return 'purchase(s) with a batch that does not count: ' + l.split(', ').map(function (p) {
+      var m = p.match(/^(.+) del (\d\d\/\d\d\/\d{4})$/); return m ? inglesDe_(m[1]) + ' on ' + m[2] : p; }).join(', '); }],
   [/^Listo: el envío de (Gs [\d.,]+)(?: del (\d\d\/\d\d))? se sumó a (.+) del (\d\d\/\d\d)\.$/, function (x, g, d, i, f) {
     return 'Done: the shipping of ' + g + (d ? ' on ' + d : '') + ' was added into the ' + inglesDe_(i) + ' bought on ' + f + '.'; }],
   [/^Listo: el envío de (Gs [\d.,]+)(?: del (\d\d\/\d\d))? queda como gasto: no hay una compra de (.+) hasta ese día\.$/, function (x, g, d, i) {
@@ -904,6 +915,7 @@ function reglaRegistro_(d, L) {
     subirRecibo: function (c) { return { accion: 'subir', carga: c }; },
     aceptarLectura: function (l, c, i) { return { accion: 'aceptar', lectura: l, cuenta: c, insumo: i || '' }; },
     guardarInsumoEnvio: function (d) { return { accion: 'insumoEnvio', datos: d }; },
+    guardarLoteDeCompra: function (d) { return { accion: 'loteDeCompra', datos: d }; },
     guardarYaCompro: function (d) { return { accion: 'yaCompro', datos: d }; },
     leerPendientes: function () { return { accion: 'leer' }; },
     empezarDeNuevo: function () { return { accion: 'empezarDeNuevo' }; }   // the demo's button (23 Sep); the live door refuses it
@@ -1510,7 +1522,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-demo-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-28-costo-lote-2';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-28-lote-compra-2';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1898,6 +1910,9 @@ function reglaRegistro_(d, L) {
     (av.consignas || []).forEach(function (x) { items.push([1, x.texto, { ir: 'registro', consigna: true }, x.ejemplo]); });   // the Venta screen
     (av.lotes || []).forEach(function (x) { items.push([1, x.texto, { ir: 'lote' }]); });   // 26 Sep (stage 3, S13): start a batch
     (av.envios || []).forEach(function (x) { items.push([1, x.texto, { envio: x }]); });   // 26 Sep (stage 3, S23): which supply
+    // 28 Sep (the acelga build, S1, S4): which batch a purchase went into; the "Lote" cells that cannot count
+    (av.lotesCompra || []).forEach(function (x) { items.push([1, x.texto, { loteCompra: x }]); });
+    if (av.lotesNoCuentan && av.lotesNoCuentan.n) items.push([av.lotesNoCuentan.n, av.lotesNoCuentan.texto, { url: d.urls.planilla }]);
     // 25 Sep (cheviva-demo stage 5, S13): the watchman's lines about the reader and the demo, in the live app only
     (av.vigilancia || []).forEach(function (x) { items.push([1, x.texto, x.ir ? { ir: x.ir } : (x.planilla ? { url: d.urls.planilla } : {})]); });
     ITEMS_HOJA = items;
@@ -2515,6 +2530,11 @@ function reglaRegistro_(d, L) {
         (envio.opciones || []).concat([ninguno]).map(function (n) {
           return '<button type="button" class="wa" data-envio="' + esc(envio.id) + '" data-insumo="' + esc(n) + '">' + esc(n === ninguno ? 'Ninguno, es un gasto' : n) + '</button>';
         }).join('') + '</span></span></div>';
+      // 28 Sep (the acelga build, S1): one button per batch of the first batch day on or after the purchase, and "Sin lote"
+      var lc = x[2] && x[2].loteCompra;
+      if (lc) return '<div class="pendiente envio"><span class="num">' + x[0] + '</span><span><span>' + esc(x[1]) + '</span><span class="botones-cola">' +
+        (lc.opciones || []).map(function (n) { return '<button type="button" class="wa" data-lote-compra="' + esc(lc.id) + '" data-lote="' + esc(n) + '">' + esc('Lote ' + n) + '</button>'; }).join('') +
+        '<button type="button" class="wa" data-lote-compra="' + esc(lc.id) + '" data-lote="' + esc(ninguno) + '">' + esc('Sin lote') + '</button></span></span></div>';
       return '<div class="pendiente" data-i="' + i + '"><span class="num">' + x[0] + '</span><span>' + (x[3] ? '<b class="ejemplo">EJEMPLO</b> ' : '') + esc(x[1]) + '</span></div>';
     }).join('');
     $('pendientes').innerHTML = html || '<p class="sub" style="margin:0">Nada pendiente.</p>';
@@ -2539,6 +2559,16 @@ function reglaRegistro_(d, L) {
           else { botones.forEach(function (x) { x.disabled = false; }); toast((r && (r.mensaje || r.error)) || 'No se pudo guardar.', true); }
         }).withFailureHandler(function (e) { botones.forEach(function (x) { x.disabled = false; }); toast(e && e.message ? e.message : String(e), true); })
           .guardarInsumoEnvio({ id: b.getAttribute('data-envio'), insumo: b.getAttribute('data-insumo') });
+      });
+    });
+    $('pendientes').querySelectorAll('button[data-lote-compra]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var botones = b.parentNode.querySelectorAll('button'); botones.forEach(function (x) { x.disabled = true; });
+        google.script.run.withSuccessHandler(function (r) {
+          if (r && r.ok) { toast(r.mensaje || 'Listo.'); cargar(); }
+          else { botones.forEach(function (x) { x.disabled = false; }); toast((r && (r.mensaje || r.error)) || 'No se pudo guardar.', true); }
+        }).withFailureHandler(function (e) { botones.forEach(function (x) { x.disabled = false; }); toast(e && e.message ? e.message : String(e), true); })
+          .guardarLoteDeCompra({ id: b.getAttribute('data-lote-compra'), lote: b.getAttribute('data-lote') });
       });
     });
     $('pendientes').querySelectorAll('button[data-corregir]').forEach(function (b) { b.addEventListener('click', function () { corregir(b.getAttribute('data-corregir')); }); });
