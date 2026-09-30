@@ -30,9 +30,8 @@ var INGLES = {
   // the frame
   'Leyendo la planilla…': 'Reading the sheet…', 'Actualizar': 'Refresh', 'Para revisar': 'To review',
   'Leer los recibos que quedaron en la carpeta': 'Read the receipts left in the folder',
-  'Este mes': 'This month', 'Esta semana': 'This week', 'Cuentas': 'Accounts', 'Mensajes': 'Messages', 'Números': 'Numbers',
+  'Este mes': 'This month', 'Esta semana': 'This week', 'Cuentas': 'Accounts', 'Números': 'Numbers',
   'Quién le debe a quién, anotar un pago, compras por cuenta': 'Who owes whom, record a payment, purchases by account',
-  'WhatsApp e Instagram': 'WhatsApp and Instagram',
   'Ventas por persona, lotes, en qué se convirtió la plata, costos por frasco, enlaces': 'Sales by person, batches, what the money turned into, costs per jar, links',
   '‹ Inicio': '‹ Home', 'Inicio': 'Home', 'Recibo': 'Receipt', 'Compra': 'Purchase', 'Lote': 'Batch', 'Venta': 'Sale',
   'Empezar de nuevo': 'Start over', 'Copiando…': 'Copying…', 'EJEMPLO': 'EXAMPLE',
@@ -42,7 +41,7 @@ var INGLES = {
   'Anotar el pago': 'Record the payment', 'Anotar un pago entre nosotros': 'Record a payment between us', 'Compras por cuenta': 'Purchases by account',
   'Sin cuenta todavía': 'No account yet', 'Todavía no hay compras.': 'No purchases yet.', 'Todavía no hay nadie en las cuentas.': 'Nobody in the accounts yet.',
   'Puso de su plata': 'Put in', 'Saldo': 'Balance', 'Puso': 'Put in', 'Tiene': 'Holds', 'Quién': 'Who',
-  // Mensajes
+  // Instagram
     'Abrir': 'Open', 'Publicación': 'Post', 'Alcance': 'Reach', 'Vistas': 'Views',
   'Me gusta': 'Likes', 'Todavía no hay publicaciones.': 'No posts yet.', 'Carrusel': 'Carousel', 'Reel': 'Reel', 'Imagen': 'Image', 'Video': 'Video',
   'todavía sumando': 'still adding up',
@@ -130,7 +129,6 @@ var INGLES = {
   'No encuentro ese envío en Compras.': 'That shipping is not in "Compras".', 'Ese envío ya tiene su insumo.': 'That shipping already has its supply.',
   'Ese insumo no tiene una compra hasta ese día pagada por la misma persona: elegí "Ninguno, es un gasto".': 'That supply has no purchase by that day paid by the same person: choose "None, it is an expense".',
   // Venta
-  'Qué vendiste o regalaste, cuándo, dónde y a quién. Nuestro WhatsApp:': 'What you sold or gave away, when, where and to whom. Our WhatsApp:',
   'Vendí': 'Sold', 'Regalé': 'Gave', 'Dejé': 'Left', 'Contacto': 'Contact',
   'Cuántos': 'How many', 'Total cobrado, Gs': 'Total charged, Gs', 'se completa con el precio de lista': 'filled in with the list price',
   '¿A qué bolsillo fue la plata?': 'Which pocket did the money go to?', 'Se queda por frasco, Gs (opcional)': 'They keep per jar, Gs (optional)',
@@ -1741,7 +1739,6 @@ function reglaRegistro_(d, L) {
   setInterval(function () { refrescarSiHaceFalta(55); }, 60000);
   $('btnActualizar').addEventListener('click', function (ev) { ev.preventDefault(); cargar(); enviarCola(); });
   function waUrl(t) {
-    if (/^\s*[A-Za-z]{2}\./.test(String(t || ''))) return '';   // 27 Sep (the yCloud build): yCloud's customer id is no phone
     var d = String(t || '').replace(/\D/g, '');
     if (!d) return '';
     if (d.charAt(0) === '0') d = '595' + d.slice(1); else if (d.length === 9 && d.charAt(0) === '9') d = '595' + d;
@@ -2613,7 +2610,7 @@ function reglaRegistro_(d, L) {
     guardar($('pe-guardar'), 'guardarPerdida', { que: $('pe-que').value, cantidad: $('pe-cantidad').value, motivo: MOTIVO, nota: $('pe-nota').value, fecha: diaDe(Date.now()) },
       function () { $('pe-cantidad').value = ''; $('pe-nota').value = ''; });
   });
-  /* Instagram next to WhatsApp (21 Sep, his point 9). The numbers come from the sheet, which reads Instagram at most once
+  /* Instagram (21 Sep, his point 9). The numbers come from the sheet, which reads Instagram at most once
      an hour; they always carry the time they were read, and a connection that was cut says so instead of showing old
      numbers as today's. A sheet with no Instagram key hands over nothing, and the card stays out of sight. */
   var VENTA_DADA = false;   // 26 Sep (stage 6): the sale form holds a corrected sale: the draw keeps its place and channel
