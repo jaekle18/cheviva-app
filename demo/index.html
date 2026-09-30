@@ -16,7 +16,7 @@
 
 var INGLES = {
   // 26 Sep (stage 4): Sale
-  'Agregar contacto': 'Add a contact', 'esperando': 'waiting', 'sin venta': 'no sale',
+  'Agregar contacto': 'Add a contact', 'esperando': 'waiting',
   'Pagó compras': 'Paid for purchases', 'Cobró ventas': 'Collected sales', 'Le pagó a otros': 'Paid to others', 'Recibió de otros': 'Received from others',
   // 27 Sep (stage 7, his yes to S10 as amended): the running statement and the official names of the balances
   'Movimiento': 'Entry', 'Pagó compra': 'Paid for a purchase', 'Cobró venta': 'Collected a sale', 'Le pagó a': 'Paid', 'Recibió de': 'Received from',
@@ -259,12 +259,7 @@ var INGLES_REGLAS = [
   [/^Las cuentas de cada uno no suman lo que se puso: difieren en (Gs [\d.,]+)$/, function (x, g) { return 'Each person\'s account does not add up to what was put in: off by ' + g; }],
   [/^(\d+) pago\(s\) entre ustedes no dicen a quién fueron$/, function (x, n) { return n + (n === '1' ? ' payment' : ' payments') + ' between you do not say whom it went to'.replace('it went', n === '1' ? 'it went' : 'they went'); }],
   // 26 Sep (stage 4): the customers' lines and answer times
-  [/^contestado en (\d+) h(?: (\d+) min)?$/, function (x, h, m) { return 'answered in ' + h + ' h' + (m ? ' ' + m + ' min' : ''); }],
-  [/^contestado en (\d+) min$/, function (x, m) { return 'answered in ' + m + ' min'; }],
   [/^el negocio le debe ([\d.]+)$/, function (x, n) { return 'the business owes ' + n.replace(/\./g, ','); }],
-  [/^ya compró \(a mano, (\d\d\/\d\d)\)$/, function (x, d) { return 'already bought (by hand, ' + d + ')'; }],
-  [/^venta del (\d\d\/\d\d)$/, function (x, d) { return 'sale of ' + d; }],
-  [/^Pasaron las (\d+) horas$/, function (x, h) { return 'Over ' + h + ' hours'; }],
   [/^hace (\d+) días$/, function (x, n) { return n + ' days ago'; }],
   // 26 Sep (cheviva-next-round stage 3): the stock tables' durations and parts, Broken or lost, the line to start a batch
   [/^~(\d+) sem\.$/, function (x, n) { return '~' + n + ' wk'; }],
@@ -373,7 +368,6 @@ var INGLES_REGLAS = [
   [/^(\d+) pago\(s\) sin "A quién" en la planilla: no cuentan hasta que lo pongas\.$/, function (x, n) { return n + ' payment(s) with no "A quién" in the sheet: not counted until it is filled in.'; }],
   [/^Anotar: (.+) le pagó a (.+)$/, function (x, a, b) { return 'Record: ' + a + ' paid ' + b; }],
   [/^WhatsApp de Cheviva (.+)$/, function (x, a) { return 'Cheviva\'s WhatsApp ' + a; }],
-  [/^(← nosotros|→ nos escribió) · (.+)$/, function (x, a, b) { return inglesDe_(a) + ' · ' + b; }],
   // 25 Sep (stage 2, the translation gap of the 19 labels): a receipt's "3 líneas · leído por …" after its date, the reader's name kept as written
   [/^(\d+) líneas? · leído por(?: (.+))?$/, function (x, c, l) { return nPlural_(c, 'line', 'lines') + ' · read by' + (l ? ' ' + l : ''); }],
   [/^(\d\d\/\d\d(?:\/\d{4})?) · (.+)$/, function (x, d, a) { return d + ' · ' + inglesDe_(a); }],
