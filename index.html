@@ -9,14 +9,14 @@
  * a call carries idioma 'en' (respuestaEnIngles_, 10_web.js), and the phone page carries this same file (tools/
  * construir-app-web.py puts it in the page) to show every screen, button, list and message in English.
  * American English (his standing rule); Alex, who is British, reads it after David.
- * What stays as written: customers' own words, place names, people's and shops' names, Instagram captions, and the names
+ * What stays as written: customers' own words, place names, people's and shops' names, and the names
  * of the sheet's own tabs, columns and menu items (the sheet stays in Spanish: his Q3), which are quoted where they appear.
  * The books never change language: what the page sends back is always the Spanish value; only what is shown is English.
  */
 
 var INGLES = {
   // 26 Sep (stage 4): Sale
-  'Agregar contacto': 'Add a contact', 'esperando': 'waiting', 'sin venta': 'no sale', 'Esta semana no hubo publicaciones.': 'No posts this week.',
+  'Agregar contacto': 'Add a contact', 'esperando': 'waiting', 'sin venta': 'no sale',
   'Pagó compras': 'Paid for purchases', 'Cobró ventas': 'Collected sales', 'Le pagó a otros': 'Paid to others', 'Recibió de otros': 'Received from others',
   // 27 Sep (stage 7, his yes to S10 as amended): the running statement and the official names of the balances
   'Movimiento': 'Entry', 'Pagó compra': 'Paid for a purchase', 'Cobró venta': 'Collected a sale', 'Le pagó a': 'Paid', 'Recibió de': 'Received from',
@@ -41,12 +41,7 @@ var INGLES = {
   'Anotar el pago': 'Record the payment', 'Anotar un pago entre nosotros': 'Record a payment between us', 'Compras por cuenta': 'Purchases by account',
   'Sin cuenta todavía': 'No account yet', 'Todavía no hay compras.': 'No purchases yet.', 'Todavía no hay nadie en las cuentas.': 'Nobody in the accounts yet.',
   'Puso de su plata': 'Put in', 'Saldo': 'Balance', 'Puso': 'Put in', 'Tiene': 'Holds', 'Quién': 'Who',
-  // Instagram
-    'Abrir': 'Open', 'Publicación': 'Post', 'Alcance': 'Reach', 'Vistas': 'Views',
-  'Me gusta': 'Likes', 'Todavía no hay publicaciones.': 'No posts yet.', 'Carrusel': 'Carousel', 'Reel': 'Reel', 'Imagen': 'Image', 'Video': 'Video',
-  'todavía sumando': 'still adding up',
-  'La conexión con Instagram se cortó: Instagram ya no acepta la llave.': 'The connection to Instagram was cut: Instagram no longer accepts the key.',
-  'Todavía no se leyó Instagram. La planilla lo lee sola, una vez por hora.': 'Instagram has not been read yet. The sheet reads it by itself, once an hour.',
+  'Abrir': 'Open',
   // Números
   'Ventas por persona': 'Sales by person', 'Lotes': 'Batches', 'En qué se convirtió la plata que salió': 'What the money that went out turned into',
   'Costos y margen por frasco': 'Costs and margin per jar', 'La planilla': 'The sheet', 'Formulario de compra': 'Purchase form',
@@ -253,9 +248,6 @@ var INGLES_REGLAS = [
   // 29 Sep (the no-messages build): a sheet clock that calls a function the program no longer has
   [/^Un reloj de la planilla llama a algo que ya no existe: (.+)$/, function (x, f) { return 'A sheet clock calls something that no longer exists: ' + f; }],
   [/^El resumen de los lunes no sale hace (\d+) días$/, function (x, n) { return 'The Monday summary has not gone out for ' + n + ' days'; }],
-  [/^La llave de Instagram no se pudo renovar: (.+)$/, function (x, m) { return 'The Instagram key could not be renewed: ' + m; }],
-  [/^La llave de Instagram no se renueva hace (\d+) días$/, function (x, n) { return 'The Instagram key has not been renewed for ' + n + ' days'; }],
-  [/^La llave de Instagram vence en (-?\d+) día\(s\) \((\d\d\/\d\d)\)$/, function (x, n, d) { return 'The Instagram key expires in ' + n + (n === '1' ? ' day' : ' days') + ' (' + d + ')'; }],
   [/^Hace (\d+) días que no se anota nada$/, function (x, n) { return 'Nothing has been recorded for ' + n + ' days'; }],
   [/^Hoy fue feria y no hay ninguna venta anotada$/, function () { return 'Today was a market day and no sale has been recorded'; }],
   [/^Quedan ([\d.,]+) frascos y en las últimas ferias se vendieron ([\d.,]+) por feria$/, function (x, n, m) { return n + (n === '1' ? ' jar' : ' jars') + ' left, and the last markets sold ' + m + ' per market'; }],
@@ -271,7 +263,6 @@ var INGLES_REGLAS = [
   [/^contestado en (\d+) min$/, function (x, m) { return 'answered in ' + m + ' min'; }],
   [/^el negocio le debe ([\d.]+)$/, function (x, n) { return 'the business owes ' + n.replace(/\./g, ','); }],
   [/^ya compró \(a mano, (\d\d\/\d\d)\)$/, function (x, d) { return 'already bought (by hand, ' + d + ')'; }],
-  [/^(\d+) (publicación anterior|publicaciones anteriores)$/, function (x, n) { return n + (n === '1' ? ' earlier post' : ' earlier posts'); }],
   [/^venta del (\d\d\/\d\d)$/, function (x, d) { return 'sale of ' + d; }],
   [/^Pasaron las (\d+) horas$/, function (x, h) { return 'Over ' + h + ' hours'; }],
   [/^hace (\d+) días$/, function (x, n) { return n + ' days ago'; }],
@@ -381,13 +372,6 @@ var INGLES_REGLAS = [
   [/^ya devuelto $/, 'already paid back '],
   [/^(\d+) pago\(s\) sin "A quién" en la planilla: no cuentan hasta que lo pongas\.$/, function (x, n) { return n + ' payment(s) with no "A quién" in the sheet: not counted until it is filled in.'; }],
   [/^Anotar: (.+) le pagó a (.+)$/, function (x, a, b) { return 'Record: ' + a + ' paid ' + b; }],
-  [/^(\d+) seguidor(es)?$/, function (x, n) { return nPlural_(n, 'follower', 'followers'); }],
-  [/^(\d+) publicaci(ón|ones)$/, function (x, n) { return nPlural_(n, 'post', 'posts'); }],
-  [/^(\d+) comentarios?$/, function (x, n) { return nPlural_(n, 'comment', 'comments'); }],
-  [/^Leído de Instagram el (.+?)\.( Instagram sigue sumando los números de una publicación durante 48 horas\.)?( La última lectura no se pudo: (.+))?$/, function (x, a, b, c, e) {
-    return 'Read from Instagram on ' + a + '.' + (b ? ' Instagram keeps adding to a post\'s numbers for 48 hours.' : '') + (c ? ' The last read failed: ' + e : ''); }],
-  [/^La última vez no se pudo: (.+)$/, function (x, a) { return 'Last time it failed: ' + a; }],
-  [/^Hay que volver a conectarla en la página de Meta de la app(\. Se vio el (.+))?\.$/, function (x, y, a) { return 'It has to be connected again on the app\'s Meta page' + (a ? '. Seen on ' + a : '') + '.'; }],
   [/^WhatsApp de Cheviva (.+)$/, function (x, a) { return 'Cheviva\'s WhatsApp ' + a; }],
   [/^(← nosotros|→ nos escribió) · (.+)$/, function (x, a, b) { return inglesDe_(a) + ' · ' + b; }],
   // 25 Sep (stage 2, the translation gap of the 19 labels): a receipt's "3 líneas · leído por …" after its date, the reader's name kept as written
@@ -558,33 +542,9 @@ function respuestaEnIngles_(salida) {
   (salida.semanas || []).forEach(function (w) { if (w && typeof w.texto === 'string') w.texto = fechaInglesa_(w.texto) || w.texto; });
   (salida.porFrasco || []).forEach(function (x) { if (x && typeof x.texto === 'string') x.texto = alIngles_(x.texto); });
   (salida.resultados || []).forEach(function (x) { if (x && typeof x === 'object') ['mensaje', 'aviso'].forEach(function (k) { if (typeof x[k] === 'string') x[k] = alIngles_(x[k]); }); });
-  if (salida.instagram && typeof salida.instagram.error === 'string') salida.instagram.error = alIngles_(salida.instagram.error);
-  leyendasEnIngles_(salida.instagram);
   return salida;
 }
 
-/**
- * Cheviva's own Instagram captions in English (the chat's word of 25 Sep: S7 lets only customers' words and place names stay
- * as written): Apps Script's built-in translation, which asks no permission and costs nothing, each caption kept 6 hours so it
- * is translated once. A caption the service cannot translate stays as written, and the answer says why; nothing else changes.
- */
-function leyendasEnIngles_(ig) {
-  if (!ig || !ig.posts || typeof LanguageApp === 'undefined') return;
-  var cache = null;
-  try { cache = CacheService.getScriptCache(); } catch (e) {}
-  ig.posts.forEach(function (p) {
-    var t = String((p && p.texto) || '').trim();
-    if (!t) return;
-    var k = 'ig-en-' + huellaTexto_(t), en = null;
-    try { en = cache ? cache.get(k) : null; } catch (e) {}
-    if (!en) {
-      try { en = LanguageApp.translate(t, 'es', 'en'); } catch (e) { ig.errorTraduccion = String(e && e.message ? e.message : e).slice(0, 160); return; }
-      try { if (cache && en) cache.put(k, en, 21600); } catch (e) {}
-    }
-    if (en && en !== t) { p.textoIngles = en; p.traducido = true; }
-  });
-}
-function huellaTexto_(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) + '-' + s.length; }
 
 </script>
 <script>
@@ -1400,13 +1360,6 @@ function reglaRegistro_(d, L) {
     </div>
     <!-- 26 Sep (stage 4): "Agregar contacto" replaces the Contact type; always here, with or without the customers' data -->
     <button class="btn chico" id="btnContacto" type="button">Agregar contacto</button>
-    <div class="tarjeta" id="ig-card">
-      <h3>Instagram</h3>
-      <p class="sub" id="igCuenta" style="margin:0 0 8px"></p>
-      <table id="igTabla" class="densa"></table>
-      <div id="igAnteriores"></div>
-      <small id="igEstado"></small>
-    </div>
     <div class="tarjeta" id="consigna-card" hidden>
       <h3>Frascos en manos de revendedores</h3>
       <div id="consigna"></div>
@@ -1451,7 +1404,7 @@ function reglaRegistro_(d, L) {
   var D = null;   // what the sheet says
   // 25 Sep (stage 1): the entries kept on this phone until the sheet confirms them (the demo page keeps its own list)
   var COLA = 'cheviva-cola', COLA_EN_MEMORIA = null, ENVIANDO = false, CONFIRMADAS = 0;
-  var VERSION_PAGINA = '2026-09-29-sin-mensajes-2';   // must match what the sheet hands over; see below
+  var VERSION_PAGINA = '2026-09-30-sin-mensajes-3';   // must match what the sheet hands over; see below
 
   /* ---------- ES | EN (24 Sep 2026, cheviva-demo stage 4, his C5; scene S7) ----------
      The phone's own choice wins; before it chooses, the demo's setting "Idioma al abrir" (kept from the last reading);
@@ -1805,7 +1758,6 @@ function reglaRegistro_(d, L) {
         pvs.map(function (v) { return '<tr><td>' + esc(v.quien) + '</td><td class="n">' + (v.frascos || 0) + '</td><td class="n">' + (v.vasitos || 0) + '</td><td class="n">' + (v.regalados || 0) + '</td><td class="n">' + gs(v.ventas) + '</td></tr>'; }).join('') +
         (pvs.length > 1 ? '<tr class="total"><td>Total</td><td class="n">' + sumar('frascos') + '</td><td class="n">' + sumar('vasitos') + '</td><td class="n">' + sumar('regalados') + '</td><td class="n">' + gs(sumar('ventas')) + '</td></tr>' : '')
       : '<tr><td class="placeholder">Todavía no hay ventas.</td></tr>';
-    pintarInstagram(d.instagram);
     var p = d.pendientes, items = [];
     /* 27 Sep (stage 7, his yes of 11:1x ET): every receipt is checked before it enters the books; each reason one waits for is its
        own line, figures only, until someone accepts it ("Fecha del recibo en el futuro: revisala", a date over 60 days old, lines
@@ -2610,59 +2562,7 @@ function reglaRegistro_(d, L) {
     guardar($('pe-guardar'), 'guardarPerdida', { que: $('pe-que').value, cantidad: $('pe-cantidad').value, motivo: MOTIVO, nota: $('pe-nota').value, fecha: diaDe(Date.now()) },
       function () { $('pe-cantidad').value = ''; $('pe-nota').value = ''; });
   });
-  /* Instagram (21 Sep, his point 9). The numbers come from the sheet, which reads Instagram at most once
-     an hour; they always carry the time they were read, and a connection that was cut says so instead of showing old
-     numbers as today's. A sheet with no Instagram key hands over nothing, and the card stays out of sight. */
   var VENTA_DADA = false;   // 26 Sep (stage 6): the sale form holds a corrected sale: the draw keeps its place and channel
-  function pintarInstagram(ig) {
-    $('ig-card').hidden = !ig;
-    if (!ig) return;
-    var c = ig.cuenta || {}, posts = ig.posts || [];
-    if (ig.cortada) {
-      $('igCuenta').innerHTML = '<span class="error">La conexión con Instagram se cortó: Instagram ya no acepta la llave.</span>';
-      $('igTabla').innerHTML = ''; $('igAnteriores').innerHTML = '';
-      $('igEstado').textContent = 'Hay que volver a conectarla en la página de Meta de la app' + (ig.fallo ? '. Se vio el ' + ig.fallo + '.' : '.');
-      return;
-    }
-    if (ig.pendiente) {
-      $('igCuenta').textContent = 'Todavía no se leyó Instagram. La planilla lo lee sola, una vez por hora.';
-      $('igTabla').innerHTML = ''; $('igAnteriores').innerHTML = ''; $('igEstado').textContent = ig.error ? 'La última vez no se pudo: ' + ig.error : '';
-      return;
-    }
-    $('igCuenta').innerHTML = (c.usuario ? '<b>@' + esc(c.usuario) + '</b> · ' : '') + '<span class="nb">' + cuantos(c.seguidores, 'seguidor', 'seguidores') + '</span> · <span class="nb">' + cuantos(c.publicaciones, 'publicación', 'publicaciones') + '</span>';
-    var algunaSumando = posts.some(function (p) { return p.sumando; });
-    /* 26 Sep (stage 4, his words of 25 Sep: "this week open and then expandable to see all of the rest"): this week's posts in the
-       table, every earlier one behind one tap; a door that hands no weeks shows them all, as before */
-    var porSemana = !!ig.semanaActual && posts.some(function (p) { return p.semana !== undefined; });
-    var anteriores = porSemana ? posts.filter(function (p) { return p.semana !== ig.semanaActual; }) : [];
-    if (porSemana) posts = posts.filter(function (p) { return p.semana === ig.semanaActual; });
-    var fila = function (p) {
-          var leyenda = IDIOMA === 'en' && p.textoIngles ? p.textoIngles : p.texto;
-          var nota = [p.tipo ? esc(p.tipo) : '', leyenda ? '<span translate="no">' + esc(leyenda) + '</span>' : ''].filter(Boolean).join(' · ') +
-            esc((p.comentarios ? ' · ' + cuantos(p.comentarios, 'comentario', 'comentarios') : '') + (p.sumando ? ' · todavía sumando' : ''));
-          var fecha = p.enlace ? '<a class="enlace" href="' + esc(p.enlace) + '" target="_blank" rel="noopener">' + esc(p.fecha) + '</a>' : esc(p.fecha);
-          var n = function (x) { return x === null || x === undefined ? '—' : num(x); };
-          return '<tr><td>' + fecha + '<small>' + nota + '</small>' + (IDIOMA === 'en' && p.textoIngles ? '<small class="auto">translated automatically</small>' : '') +
-                 '</td><td class="n">' + n(p.alcance) + '</td><td class="n">' + n(p.vistas) + '</td><td class="n">' + n(p.meGusta) + '</td></tr>';
-    };
-    var cabecera = '<tr><th>Publicación</th><th class="n">Alcance</th><th class="n">Vistas</th><th class="n envuelve">Me gusta</th></tr>';
-    $('igAnteriores').innerHTML = anteriores.length
-      ? '<details class="mas"><summary>' + esc(cuantos(anteriores.length, 'publicación anterior', 'publicaciones anteriores')) + '</summary><table class="densa">' + cabecera + anteriores.map(fila).join('') + '</table></details>' : '';
-    $('igTabla').innerHTML = posts.length
-      ? '<tr><th>Publicación</th><th class="n">Alcance</th><th class="n">Vistas</th><th class="n envuelve">Me gusta</th></tr>' +
-        posts.map(function (p) {
-          var leyenda = IDIOMA === 'en' && p.textoIngles ? p.textoIngles : p.texto;   // 25 Sep: Cheviva's own caption in English with EN on
-          var nota = [p.tipo ? esc(p.tipo) : '', leyenda ? '<span translate="no">' + esc(leyenda) + '</span>' : ''].filter(Boolean).join(' · ') +
-            esc((p.comentarios ? ' · ' + cuantos(p.comentarios, 'comentario', 'comentarios') : '') + (p.sumando ? ' · todavía sumando' : ''));
-          var fecha = p.enlace ? '<a class="enlace" href="' + esc(p.enlace) + '" target="_blank" rel="noopener">' + esc(p.fecha) + '</a>' : esc(p.fecha);
-          var n = function (x) { return x === null || x === undefined ? '—' : num(x); };
-          return '<tr><td>' + fecha + '<small>' + nota + '</small>' + (IDIOMA === 'en' && p.textoIngles ? '<small class="auto">translated automatically</small>' : '') +
-                 '</td><td class="n">' + n(p.alcance) + '</td><td class="n">' + n(p.vistas) + '</td><td class="n">' + n(p.meGusta) + '</td></tr>';
-        }).join('')
-      : '<tr><td class="placeholder">' + (porSemana && anteriores.length ? 'Esta semana no hubo publicaciones.' : 'Todavía no hay publicaciones.') + '</td></tr>';
-    $('igEstado').textContent = 'Leído de Instagram el ' + ig.leido + '.' +   // 26 Sep (stage 4's second check): no explanation after it
-      (ig.error ? ' La última lectura no se pudo: ' + ig.error : '');
-  }
   function kpi(e, n, neg) { return '<div class="kpi' + (neg ? ' neg' : '') + '"><div class="e">' + esc(e) + '</div><div class="n">' + n + '</div></div>'; }
   function ultimo(clave) { try { return localStorage.getItem(clave) || ''; } catch (e) { return ''; } }
   function recordar(clave, v) { try { if (v) localStorage.setItem(clave, v); } catch (e) {} }
