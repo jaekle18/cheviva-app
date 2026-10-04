@@ -892,6 +892,8 @@ function reglaRegistro_(d, L) {
   }
   window.google = { script: { get run() { return corredor(null, null); } } };
   if (!codigo()) { olvidarNumeros(); pedirCodigo(); }
+  // 3 Oct: the page opens with no signal (sw.js, written next to this page); a phone that cannot keep it works as before
+  if ('serviceWorker' in navigator) window.addEventListener('load', function () { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} });
 })();
 </script>
 <title>Cheviva Demo</title>
